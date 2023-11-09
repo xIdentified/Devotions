@@ -1,0 +1,29 @@
+# Devotions - Deities and Blessings
+# Made by xIdentified - https://discord.gg/yRrbBjfbXp
+
+initial-favor: 50 # favor players start out with
+max-favor: 250 # max amount of favor players can have
+decay-rate: 5 # rate at which favor decays over time
+decay-interval: 1200 # how often favor decays (in seconds) 1200 = 1 day
+
+# How many shrines can a player have at once?
+shrine-limit: 3
+
+# Amount of favor player should have for certain actions to occur
+blessingThreshold: 150
+curseThreshold: 35
+miracleThreshold: 210
+
+blessingChance: 0.4 #0.5 = 50%, 0.05 = 5%
+curseChance: 0.1
+miracleChance: 0.03
+daysUntilMiracleAllowed: 3
+
+# Cooldowns
+offering-cooldown: "5m"
+ritual-cooldown: "5m"
+blessing-cooldown: "5m"
+curse-cooldown: "5m"
+miracle-cooldown: "5m"
+
+debug_mode: false
