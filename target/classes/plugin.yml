@@ -1,0 +1,47 @@
+name: Devotions
+version: '1.0-beta'
+main: me.xidentified.devotions.Devotions
+api-version: '1.20'
+author: xIdentified
+description: Create and worship deities in Minecraft
+softdepend:
+  - MMOItems
+  - ProtocolLib
+commands:
+  devotions:
+    description: Manage the Devotions plugin
+    usage: /<command> reload
+    aliases: [dvo]
+  deity:
+    description: Manage and view information about deities.
+    usage: /<command> <select|info|list> [DeityName]
+    aliases: [god, gods]
+    tab-completions: true
+  shrine:
+    description: Manage and view information about deities.
+    usage: /<command> <set|delete> [DeityName]
+    aliases: [altar]
+    tab-completions: true
+  favor:
+    description: Manages and adjusts player's favor.
+    usage: /<command> <set|give|take> <playername> <amount>
+    tab-completions: true
+  ritual:
+    description: View ritual information
+    usage: /<command> <info> [RitualName]
+    aliases: [rituals]
+  testmiracle:
+    description: Execute miracles to ensure they work.
+    usage: /<command> <Miracle>
+    tab-completions: true
+
+permissions:
+  devotions.shrine.list:
+    description: Allows listing of all shrines on server.
+    default: op
+  devotions.shrine.set:
+    description: Allows dedication of shrines to your deity.
+    default: true
+  devotions.admin:
+    description: Allows use of all admin commands.
+    default: op
