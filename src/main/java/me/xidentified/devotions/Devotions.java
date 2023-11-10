@@ -238,12 +238,18 @@ public class Devotions extends JavaPlugin {
                         minAltitude, minExperience, minHealth, minHunger);
 
                 // Parse outcome
-                String outcomeCommand = ritualConfig.getString(path + "outcome-command");
-                if (outcomeCommand == null || outcomeCommand.isEmpty()) {
-                    getLogger().warning("No outcome specified for ritual: " + key);
-                    continue; // Skip if no command is provided
+                List<String> outcomeCommands;
+                if (ritualConfig.isList(path + "outcome-command")) {
+                    outcomeCommands = ritualConfig.getStringList(path + "outcome-command");
+                } else {
+                    String singleCommand = ritualConfig.getString(path + "outcome-command");
+                    if (singleCommand == null || singleCommand.isEmpty()) {
+                        getLogger().warning("No outcome specified for ritual: " + key);
+                        continue; // Skip if no command is provided
+                    }
+                    outcomeCommands = Collections.singletonList(singleCommand);
                 }
-                RitualOutcome ritualOutcome = new RitualOutcome("RUN_COMMAND", outcomeCommand);
+                RitualOutcome ritualOutcome = new RitualOutcome("RUN_COMMAND", outcomeCommands);
 
                 // Parse objectives
                 List<RitualObjective> objectives = new ArrayList<>();
@@ -266,7 +272,6 @@ public class Devotions extends JavaPlugin {
                 Ritual ritual = new Ritual(this, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
                 RitualManager.getInstance(this).addRitual(key, ritual);  // Store the ritual with its key
                 getLogger().info("Loaded ritual " + displayName + " with key: " + key + " and favor amount " + favorReward);
-                getLogger().info("Rituals Map Identity Hash Code: " + System.identityHashCode(RitualManager.getInstance(this).rituals));
             } catch (Exception e) {
                 getLogger().severe("Failed to load ritual with key: " + key);
                 e.printStackTrace();
@@ -437,16 +442,6 @@ public class Devotions extends JavaPlugin {
 
         // Cancel tasks
         getServer().getScheduler().cancelTasks(this);
-
-        /** Save player devotion data when server shuts down
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            UUID playerUniqueId = player.getUniqueId();
-            FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
-            if (favorManager != null) {
-                devotionStorage.savePlayerDevotion(playerUniqueId, favorManager);
-            }
-        }
-         **/
 
         // TODO: other cleanup
 

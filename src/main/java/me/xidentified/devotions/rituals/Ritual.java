@@ -37,7 +37,7 @@ public class Ritual {
 
     // Validate ritual conditions against a player and environment.
     public boolean validateConditions(Player player) {
-        System.out.println("Validating Conditions for: " + this.getDisplayName());
+        plugin.debugLog("Validating Conditions for ritual " + this.getDisplayName());
 
         // Time condition
         if (conditions.time() != null) {
@@ -133,7 +133,22 @@ public class Ritual {
 
     public String getDescription() { return description; }
 
-    public RitualItem getItem() { return item; }
+    public String getParsedItemName() {
+        String id = item.id();
+        if (id == null || id.isEmpty()) {
+            return "";
+        }
+        StringBuilder readableName = new StringBuilder();
+        String[] words = id.split("_");
+        for (String word : words) {
+            if (word.length() > 0) {
+                readableName.append(word.substring(0, 1).toUpperCase())
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+        return readableName.toString().trim();
+    }
 
     public int getFavorAmount() { return favorAmount; }
 
@@ -143,6 +158,10 @@ public class Ritual {
             objective.reset();
         }
         this.isCompleted = false;
+    }
+
+    public RitualItem getItem() {
+        return item;
     }
 }
 

@@ -5,9 +5,9 @@ rituals:
   harvest_festival:
     display_name: "Ritual of the Harvest Festival"
     description: "Celebrate the bounties of the earth and create prime farming conditions"
-    favor: 30 # Amount of favor rewarded for completing the ritual
+    favor: 30
     item:
-      type: "VANILLA"
+      type: "VANILLA" # Can be VANILLA or MMOITEM
       id: "GOLDEN_HOE"
     conditions:
       weather: "STORM"
@@ -17,39 +17,42 @@ rituals:
         target: "WHEAT"
         count: 20
     outcome-command:
-      - "weather set clear" # You can add multiple commands if you wish
+      - "weather set clear"
 
-  cleanse_darkness:
-    display_name: "Cleansing of Darkness"
-    description: "Vanquish fallen souls from this realm"
-    favor: 50
+  purification_ritual:
+    display_name: "Ritual of Purification"
+    description: "Purify the land by vanquishing dark entities"
+    favor: 40
     item:
       type: "VANILLA"
-      id: "TOTEM_OF_UNDYING"
+      id: "IRON_SWORD"
     conditions:
-      biome: "PLAINS"
+      time: "NIGHT"
     objectives:
       - type: "PURIFICATION"
-        description: "Cleanse the shrine area of the tainted beings."
+        description: "Defeat 6 zombies around the shrine"
         target: "ZOMBIE"
-        count: 5
-    outcome-command: "time set day"
+        count: 6
+    outcome-command:
+      - "effect give @p minecraft:regeneration 30 1"
+      - "effect give @p minecraft:strength 60 1"
+
 
   meditation_ritual:
     display_name: "Ritual of Deep Meditation"
-    description: "Find inner peace through deep meditation."
+    description: "Attain inner peace and spiritual enlightenment"
     favor: 25
     item:
       type: "VANILLA"
-      id: "LAPIS_LAZULI"
+      id: "BOOK"
     conditions:
-      time: "NIGHT"
-      weather: "CLEAR"
+      time: "DAY"
     objectives:
       - type: "MEDITATION"
-        description: "Meditate at a sacred shrine"
-        target: "SACRED_SHRINE"
-        count: 60
-    outcome-command: "time set day"
+        description: "Meditate at the shrine for 10 seconds"
+        count: 10
+    outcome-command:
+      - "give {player} minecraft:totem_of_undying"
+      - "minecraft:say @p has achieved enlightenment!"
 
   # You can make more rituals in the same format, or update the existing ones.
