@@ -64,7 +64,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     private void displayRitualInfo(Player player, Ritual ritual) {
         sendMessage(player, "<gold>Details of " + ritual.getDisplayName());
         sendMessage(player, "<yellow>Description: <gray>" + ritual.getDescription());
-        sendMessage(player, "<yellow>Key Item: <gray>" + ritual.getItem());
+        sendMessage(player, "<yellow>Key Item: <gray>" + ritual.getParsedItemName());
         sendMessage(player, "<yellow>Favor Rewarded: <gray>" + ritual.getFavorAmount());
     }
 

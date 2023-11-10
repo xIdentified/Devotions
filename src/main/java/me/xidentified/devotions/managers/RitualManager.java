@@ -3,6 +3,7 @@ package me.xidentified.devotions.managers;
 import io.lumine.mythic.lib.api.item.NBTItem;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
+import me.xidentified.devotions.rituals.RitualItem;
 import me.xidentified.devotions.rituals.RitualObjective;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,6 +30,7 @@ public class RitualManager {
         rituals = new ConcurrentHashMap<>();
     }
 
+    // Use one instance of RitualManager throughout the plugin!
     public static RitualManager getInstance(Devotions plugin) {
         if (instance == null) {
             synchronized (RitualManager.class) {
@@ -118,10 +120,20 @@ public class RitualManager {
     }
 
     public Ritual getRitualByItem(ItemStack item) {
+        if (item == null) return null;
+
         String itemId = getItemId(item);
-        plugin.debugLog("Rituals Map Content: " + rituals.keySet());
-        return rituals.get(itemId);
+        plugin.debugLog("Looking for ritual with item ID: " + itemId);
+
+        for (Ritual ritual : rituals.values()) {
+            RitualItem keyRitualItem = ritual.getItem();
+            if (keyRitualItem != null && keyRitualItem.getUniqueId().equals(itemId)) {
+                return ritual;
+            }
+        }
+        return null;
     }
+
 
     // Translates item ID from config to match ritual ID in rituals table
     private String getItemId(ItemStack item) {

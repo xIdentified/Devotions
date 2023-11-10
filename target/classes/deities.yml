@@ -8,7 +8,7 @@ deities:
       - "GOLD_INGOT:5" # ITEM:FAVOR
       - "NETHER_STAR:50"
     rituals:
-      - "forest_awakening"
+      - "purification_ritual"
     blessings:
       - "SPEED,2,300"  # Speed II for 300 seconds
       - "NIGHT_VISION,1,600"  # Night Vision I for 600 seconds
@@ -39,26 +39,6 @@ deities:
       - "grow_crops"
       - "tame_animals"
       - "run_command:give {player} EMERALD 5"
-  thor:
-    name: "Thor"
-    lore: "A fierce deity known for his might and mastery over storms and thunder."
-    domain: "Thunder"
-    alignment: "Neutral"
-    offerings:
-      - "IRON_BLOCK:2"
-      - "GOLDEN_APPLE:3"
-    rituals:
-      - "storm_ritual"
-    blessings:
-      - "STRENGTH,3,200"  # Strength III for 200 seconds
-      - "RESISTANCE,2,400"  # Resistance II for 400 seconds
-    curses:
-      - "SLOWNESS,2,100"  # Slowness II for 100 seconds
-      - "WEAKNESS,2,200"  # Weakness II for 200 seconds
-    miracles:
-      - "strike_lightning"
-      - "clear_weather"
-      - "run_command:summon HORSE {player} 1"
   anubis:
     name: "Anubis"
     lore: "Guardian of the underworld, associated with mummification and the afterlife in ancient Egyptian religion."
@@ -68,7 +48,7 @@ deities:
       - "BONE:20"
       - "GOLDEN_SWORD:1"
     rituals:
-      - "cleanse_darkness"
+      - "meditation_ritual"
     blessings:
       - "INVISIBILITY,1,300"  # Invisibility I for 300 seconds
       - "LUCK,2,300"  # Luck II for 300 seconds

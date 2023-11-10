@@ -47,16 +47,16 @@ public class RitualObjective {
     public void incrementCount() {
         if (this.currentCount < this.count) {
             this.currentCount++;
-            plugin.debugLog("[DEBUG] Incremented objective count to: " + this.currentCount + "/" + this.count);
+            plugin.debugLog("Incremented objective count to: " + this.currentCount + "/" + this.count);
         }
     }
 
     public boolean isComplete() {
         boolean complete = this.currentCount >= this.count;
         if (complete) {
-            plugin.debugLog("[DEBUG] Objective is marked as complete.");
+            plugin.debugLog("Objective is marked as complete.");
         } else {
-            plugin.debugLog("[DEBUG] Objective is not yet complete. Current/Required: " + this.currentCount + "/" + this.count);
+            plugin.debugLog("Objective is not yet complete. Current/Required: " + this.currentCount + "/" + this.count);
         }
         return complete;
     }

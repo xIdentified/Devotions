@@ -1,11 +1,17 @@
 package me.xidentified.devotions.rituals;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public record RitualOutcome(String type, String command) {
-    public RitualOutcome(String type, String command) {
+import java.util.List;
+
+public class RitualOutcome {
+    private final String type;
+    private final List<String> commands;
+
+    public RitualOutcome(String type, List<String> commands) {
         this.type = type;
-        this.command = command;
+        this.commands = commands;
         validateOutcome(); // Validate outcome data upon object creation
     }
 
@@ -16,15 +22,18 @@ public record RitualOutcome(String type, String command) {
         if (!"RUN_COMMAND".equals(type)) {
             throw new IllegalArgumentException("Currently, only 'RUN_COMMAND' type is supported");
         }
-        if (command == null || command.isEmpty()) {
-            throw new IllegalArgumentException("Command cannot be null or empty for 'RUN_COMMAND' type");
+        if (commands == null || commands.isEmpty()) {
+            throw new IllegalArgumentException("Commands list cannot be null or empty for 'RUN_COMMAND' type");
         }
     }
 
     public void executeOutcome(Player player) {
-        if ("RUN_COMMAND".equals(type())) {
-            String processedCommand = command.replace("{player}", player.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), processedCommand);
+        if ("RUN_COMMAND".equals(type)) {
+            for (String command : commands) {
+                String processedCommand = command.replace("{player}", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), processedCommand);
+            }
         }
     }
 }
+

@@ -20,20 +20,4 @@ public record RitualItem(String type, String id) {
         return type.equals(that.type) && id.equals(that.id);
     }
 
-    public static String getReadableName(String id) {
-        if (id == null || id.isEmpty()) {
-            return "";
-        }
-        StringBuilder readableName = new StringBuilder();
-        String[] words = id.split("_");
-        for (String word : words) {
-            if (word.length() > 0) {
-                readableName.append(word.substring(0, 1).toUpperCase())
-                        .append(word.substring(1).toLowerCase())
-                        .append(" ");
-            }
-        }
-        return readableName.toString().trim();
-    }
-
 }

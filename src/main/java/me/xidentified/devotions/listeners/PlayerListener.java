@@ -39,7 +39,7 @@ public class PlayerListener implements Listener {
                     favorManager.setFavor(devotionData.getFavor());
                     devotionManager.setPlayerDevotion(playerUniqueId, favorManager);
                 } else {
-                    plugin.getLogger().warning("Deity named '" + devotionData.getDeityName() + "' not found for player " + event.getPlayer().getName());
+                    plugin.debugLog("Player '" + event.getPlayer().getName() + " does not have devotion set: " + devotionData.getDeityName());
                 }
             }
         }

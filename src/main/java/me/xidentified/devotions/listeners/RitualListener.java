@@ -126,6 +126,7 @@ public class RitualListener implements Listener {
         }
     }
 
+    // Check if player has returned to shrine to complete the ritual
     private boolean isPlayerNearShrine(Player player) {
         // Check if the player is within the shrine's radius
         Location shrineLocation = shrineManager.getShrineLocationForPlayer(player);
