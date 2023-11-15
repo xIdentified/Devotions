@@ -1,6 +1,7 @@
 package me.xidentified.devotions.storage;
 
 import me.xidentified.devotions.Deity;
+import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.DevotionManager;
 import org.bukkit.Bukkit;
@@ -14,13 +15,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class ShrineStorage {
+    private final Devotions plugin;
     private final File shrineFile;
     private final YamlConfiguration yaml;
 
-    public ShrineStorage(StorageManager storageManager) {
+    public ShrineStorage(Devotions plugin, StorageManager storageManager) {
+        this.plugin = plugin;
         shrineFile = new File(storageManager.getStorageFolder(), "shrines.yml");
         if (!shrineFile.exists()) {
             try {
@@ -84,12 +86,10 @@ public class ShrineStorage {
 
 
     public List<Shrine> loadAllShrines(DevotionManager devotionManager) {
-        Bukkit.getLogger().log(Level.WARNING, "Inside loadAllShrines");
-
         List<Shrine> loadedShrines = new ArrayList<>();
         ConfigurationSection shrineSection = yaml.getConfigurationSection("shrines");
         if (shrineSection == null) {
-            System.out.println("Shrine section is null."); // Debug log
+            plugin.debugLog("Shrine section is null.");
             return loadedShrines;
         }
 
@@ -97,7 +97,7 @@ public class ShrineStorage {
             String[] parts = shrineKey.split(",");
             World world = Bukkit.getWorld(parts[0]);
             if (world == null) {
-                System.out.println("World not found: " + parts[0]); // Debug log
+                plugin.debugLog("World not found: " + parts[0]);
                 continue;
             }
             int x = Integer.parseInt(parts[1]);
@@ -108,19 +108,16 @@ public class ShrineStorage {
             String deityName = shrineSection.getString(shrineKey);
             Deity deity = devotionManager.getDeityByName(deityName);
             if (deity == null) {
-                System.out.println("Deity not found: " + deityName); // Debug log
+                plugin.debugLog("Deity not found: " + deityName);
                 continue;
             }
 
             Location location = new Location(world, x, y, z);
             Shrine shrine = new Shrine(location, deity, ownerUUID);
-
-            Bukkit.getLogger().log(Level.WARNING, "Owner UUID for shrine: " + ownerUUID);
-
             loadedShrines.add(shrine);
         }
 
-        System.out.println("Loaded Shrines: " + loadedShrines.size()); // Debug log
+        plugin.getLogger().info("Loaded " + loadedShrines.size() + " shrines.");
         return loadedShrines;
     }
 
