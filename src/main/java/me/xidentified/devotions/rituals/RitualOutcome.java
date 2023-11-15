@@ -9,6 +9,9 @@ public class RitualOutcome {
     private final String type;
     private final List<String> commands;
 
+    // I was going to have built in outcomes at first, but I realized almost all of them can be done with commands.
+    // I might add more dynamic outcome types again later so let's keep things open-ended
+
     public RitualOutcome(String type, List<String> commands) {
         this.type = type;
         this.commands = commands;

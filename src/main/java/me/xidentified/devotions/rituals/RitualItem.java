@@ -1,5 +1,6 @@
 package me.xidentified.devotions.rituals;
 
+// Item types for other plugins can be added here later
 /**
  * @param type VANILLA or MMOITEM
  * @param id   Minecraft ID or MMOItem ID

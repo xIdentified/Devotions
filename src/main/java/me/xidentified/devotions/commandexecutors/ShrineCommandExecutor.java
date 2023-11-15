@@ -9,6 +9,7 @@ import me.xidentified.devotions.util.MessageUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -74,7 +75,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             // If the player doesn't follow a deity, don't let them make a shrine
             FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
             if (favorManager == null || favorManager.getDeity() == null) {
-                sendMessage(player, "<red>You need to follow a deity to designate an altar!");
+                sendMessage(player, "<red>You need to follow a deity to designate a shrine!");
                 return true;
             }
 
@@ -84,7 +85,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 pendingShrineDesignations.put(player, deity);
                 sendMessage(player, "<yellow>Right-click on a block to designate it as a shrine for " + deity.getName());
             } else {
-                sendMessage(player, "<red>Error: Could not determine your deity.");
+                sendMessage(player, "<red>Could not determine your deity, please inform an admin.");
             }
             return true;
         } else {
@@ -161,6 +162,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             TextComponent message = Component.text()
                     .content(shrine.getDeity().getName() + " at " + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ())
                     .clickEvent(ClickEvent.runCommand("/tp " + player.getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ()))
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to tp")))
                     .build();
             player.sendMessage(message);
         }

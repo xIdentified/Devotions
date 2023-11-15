@@ -4,7 +4,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Offering {
     private Deity deity;
-    private int value;  // The amount of favor given for an offering
+    private final int value;  // The amount of favor given for an offering
 
     public Offering(ItemStack item, Deity deity, int value) {
         this.deity = deity;
@@ -23,7 +23,4 @@ public class Offering {
         return value;
     }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
 }

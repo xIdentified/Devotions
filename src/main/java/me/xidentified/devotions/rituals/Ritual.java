@@ -104,23 +104,20 @@ public class Ritual {
             case "SUCCESS" -> {
                 plugin.playConfiguredSound(player, "ritualComplete");
                 plugin.spawnParticles(location, Particle.VILLAGER_HAPPY, 50, 2.0, 0.5);
-                player.sendMessage(MessageUtils.parse("<green>The ritual was a success! Blessings upon ye!"));
+                player.sendMessage(MessageUtils.parse("<green>" + displayName + " was a success! Blessings upon ye!"));
                 favorManager.increaseFavor(25);
             }
             case "FAILURE" -> {
                 plugin.playConfiguredSound(player, "ritualFailed");
                 plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
                 player.damage(5);
-                player.sendMessage(MessageUtils.parse("<red>The " + displayName + " ritual has failed - the conditions were not met!"));
+                player.sendMessage(MessageUtils.parse("<red>" + displayName + " has failed - the conditions were not met!"));
                 favorManager.decreaseFavor(15);
             }
         }
     }
 
-    public List<RitualObjective> getObjectives() {
-        plugin.debugLog("Objectives returned in getObjectives: " + objectives);
-        return objectives;
-    }
+    public List<RitualObjective> getObjectives() { return objectives; }
 
     public RitualOutcome getOutcome() { return outcome; }
 
