@@ -36,7 +36,7 @@ public class RitualManager {
             synchronized (RitualManager.class) {
                 if (instance == null) {
                     instance = new RitualManager(plugin);
-                    plugin.getLogger().info("New RitualManager instance initialized.");
+                    plugin.debugLog("New RitualManager instance initialized.");
                 }
             }
         }

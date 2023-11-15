@@ -105,7 +105,7 @@ public class Devotions extends JavaPlugin {
 
             Deity deity = new Deity(this, name, lore, domain, alignment, favoredOfferings, favoredRituals, deityBlessings, deityCurses, deityMiracles);
             deityMap.put(deityKey.toLowerCase(), deity);
-            getLogger().info("Loaded deity " + deity.getName() + " with offerings: " + favoredOfferings.size());
+            getLogger().info("Loaded deity " + deity.getName() + " with " + favoredOfferings.size() + " offerings.");
         }
 
         return deityMap;
@@ -211,9 +211,6 @@ public class Devotions extends JavaPlugin {
             return;
         }
 
-        // Test to print out the structure of the rituals section
-        debugLog("Rituals Section Keys: " + ritualsSection.getKeys(true));
-
         for (String key : ritualsSection.getKeys(false)) {
             try {
                 String path = "rituals." + key + ".";
@@ -277,8 +274,7 @@ public class Devotions extends JavaPlugin {
 
                 // Create and store the ritual
                 Ritual ritual = new Ritual(this, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
-                RitualManager.getInstance(this).addRitual(key, ritual);  // Store the ritual with its key
-                getLogger().info("Loaded ritual " + displayName + " with key: " + key + ", favor amount " + favorReward + ", and objectives " + objectives);
+                RitualManager.getInstance(this).addRitual(key, ritual);  // Store the ritual and key
             } catch (Exception e) {
                 getLogger().severe("Failed to load ritual with key: " + key);
                 e.printStackTrace();
@@ -403,7 +399,7 @@ public class Devotions extends JavaPlugin {
         this.devotionManager = new DevotionManager(this, loadedDeities);
         ShrineManager shrineManager = new ShrineManager(this);
         loadRituals();
-        ShrineStorage shrineStorage = new ShrineStorage(storageManager);
+        ShrineStorage shrineStorage = new ShrineStorage(this, storageManager);
         shrineManager.setShrineStorage(shrineStorage);
         ritualManager = RitualManager.getInstance(this);
         this.cooldownManager = new CooldownManager(this);
@@ -452,7 +448,6 @@ public class Devotions extends JavaPlugin {
 
         ritualManager.ritualDroppedItems.clear();
 
-        debugLog("Devotions has been disabled and all data saved!");
     }
 
 

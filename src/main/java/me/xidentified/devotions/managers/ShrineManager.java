@@ -21,7 +21,7 @@ public class ShrineManager {
     public ShrineManager(Devotions plugin) {
         this.plugin = plugin;
         this.allShrinesList = new ArrayList<>();
-        this.shrineStorage = new ShrineStorage(plugin.getStorageManager());  // Initialize the ShrineStorage
+        this.shrineStorage = new ShrineStorage(plugin, plugin.getStorageManager());  // Initialize the ShrineStorage
     }
 
 
@@ -41,9 +41,6 @@ public class ShrineManager {
 
     public boolean removeShrine(UUID playerId, Location location) {
         Shrine shrine = shrines.get(location);
-        plugin.debugLog("Shrine location from getShrineAtLocation: " + location);
-        plugin.debugLog("Shrines map from removeShrine: " + shrines);
-        plugin.debugLog("Player ID: " + playerId + " | Shrine Owner: " + (shrine != null ? shrine.getOwner() : "null"));
 
         if (shrine == null) {
             plugin.debugLog("No shrine found at: " + location);
