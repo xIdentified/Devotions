@@ -7,15 +7,16 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ShrineManager {
     private final Devotions plugin;
     private ShrineStorage shrineStorage;
     private final List<Shrine> allShrinesList;
-    private final Map<Location, Shrine> shrines = new HashMap<>();
+    private final Map<Location, Shrine> shrines = new ConcurrentHashMap<>();
 
     public ShrineManager(Devotions plugin) {
         this.plugin = plugin;
@@ -38,16 +39,28 @@ public class ShrineManager {
         }
     }
 
-    public boolean removeShrine(Player player, Location location) {
+    public boolean removeShrine(UUID playerId, Location location) {
         Shrine shrine = shrines.get(location);
-        if (shrine != null && shrine.getOwner().equals(player)) {
-            shrines.remove(location);
-            allShrinesList.remove(shrine);
-            shrineStorage.removeShrine(location);
-            plugin.debugLog("Shrine removed for deity " + shrine.getDeity().getName() + " at " + shrine.getLocation());
-            return true;  // Successfully removed
+        plugin.debugLog("Shrine location from getShrineAtLocation: " + location);
+        plugin.debugLog("Shrines map from removeShrine: " + shrines);
+        plugin.debugLog("Player ID: " + playerId + " | Shrine Owner: " + (shrine != null ? shrine.getOwner() : "null"));
+
+        if (shrine == null) {
+            plugin.debugLog("No shrine found at: " + location);
+            return false;
         }
-        return false;  // Shrine not found or not owned by the player
+
+        plugin.debugLog("Attempting to remove shrine at: " + location + " owned by " + shrine.getOwner());
+        if (!shrine.getOwner().equals(playerId)) {
+            plugin.debugLog("Shrine ownership mismatch: " + playerId + " vs " + shrine.getOwner());
+            return false;
+        }
+
+        shrines.remove(location);
+        allShrinesList.remove(shrine);
+        shrineStorage.removeShrine(location, playerId);
+        plugin.debugLog("Shrine removed for deity " + shrine.getDeity().getName() + " at " + shrine.getLocation());
+        return true;
     }
 
     public List<Shrine> getAllShrines() {
@@ -57,12 +70,20 @@ public class ShrineManager {
     public Shrine getShrineAtLocation(Location location) {
         for (Shrine shrine : allShrinesList) {
             Location shrineLocation = shrine.getLocation();
-            if (shrineLocation.equals(location)) {
+            plugin.debugLog("Shrine location from getShrineAtLocation: " + shrineLocation);
+            if (isSameBlockLocation(shrineLocation, location)) {
                 plugin.debugLog("Shrine found at location: " + shrineLocation);
                 return shrine;
             }
         }
         return null;
+    }
+
+    private boolean isSameBlockLocation(Location loc1, Location loc2) {
+        return loc1.getWorld().equals(loc2.getWorld()) &&
+                loc1.getBlockX() == loc2.getBlockX() &&
+                loc1.getBlockY() == loc2.getBlockY() &&
+                loc1.getBlockZ() == loc2.getBlockZ();
     }
 
     public Location getShrineLocationForPlayer(Player player) {
@@ -77,8 +98,8 @@ public class ShrineManager {
     public int getShrineCount(Player player) {
         int count = 0;
         for (Shrine shrine : allShrinesList) {
-            Player owner = shrine.getOwner();
-            if (owner != null && owner.equals(player)) {
+            UUID owner = shrine.getOwner();
+            if (owner != null && owner.equals(player.getUniqueId())) {
                 count++;
             }
         }
@@ -92,10 +113,16 @@ public class ShrineManager {
 
     public void setShrineStorage(ShrineStorage newStorage) {
         this.shrineStorage = newStorage;
-        // Clear the existing list to avoid duplicates
+        // Clear the existing lists and maps to avoid duplicates
         this.allShrinesList.clear();
+        this.shrines.clear();
         // Load all shrines using the newly set ShrineStorage
-        this.allShrinesList.addAll(shrineStorage.loadAllShrines(this, plugin.getDevotionManager()));
+        List<Shrine> loadedShrines = shrineStorage.loadAllShrines(plugin.getDevotionManager());
+        this.allShrinesList.addAll(loadedShrines);
+        // Also update the shrines map
+        for (Shrine shrine : loadedShrines) {
+            this.shrines.put(shrine.getLocation(), shrine);
+        }
     }
 
 }

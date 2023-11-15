@@ -23,7 +23,6 @@ me\xidentified\devotions\Condition.class
 me\xidentified\devotions\storage\DevotionData.class
 me\xidentified\devotions\managers\DevotionManager.class
 me\xidentified\devotions\commandexecutors\ShrineCommandExecutor.class
-me\xidentified\devotions\listeners\RitualListener$1.class
 me\xidentified\devotions\managers\MeditationData.class
 me\xidentified\devotions\Effect.class
 me\xidentified\devotions\commandexecutors\RitualCommand.class

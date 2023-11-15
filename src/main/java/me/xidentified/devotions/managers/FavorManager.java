@@ -41,13 +41,14 @@ public class FavorManager {
         this.maxFavor = plugin.getConfig().getInt("max-favor", 250);
 
         // Blessing, curse, miracle thresholds and chances etc
-        this.BLESSING_THRESHOLD = plugin.getConfig().getInt("blessingThreshold");
-        this.CURSE_THRESHOLD = plugin.getConfig().getInt("curseThreshold");
-        this.BLESSING_CHANCE = plugin.getConfig().getDouble("blessingChance");
-        this.CURSE_CHANCE = plugin.getConfig().getDouble("curseChance");
-        this.MIRACLE_THRESHOLD = plugin.getConfig().getInt("miracleThreshold", 90);
-        this.MIRACLE_CHANCE = plugin.getConfig().getDouble("miracleChance");
+        this.BLESSING_THRESHOLD = plugin.getConfig().getInt("blessing-threshold");
+        this.CURSE_THRESHOLD = plugin.getConfig().getInt("curse-threshold");
+        this.BLESSING_CHANCE = plugin.getConfig().getDouble("blessing-chance");
+        this.CURSE_CHANCE = plugin.getConfig().getDouble("curse-chance");
+        this.MIRACLE_THRESHOLD = plugin.getConfig().getInt("miracle-threshold", 90);
+        this.MIRACLE_CHANCE = plugin.getConfig().getDouble("miracle-chance");
         this.MIRACLE_DURATION = plugin.getConfig().getInt("miracleDuration", 3) * 24000L; // 3 in-game days, 24000 ticks per day
+        long effectCheckInterval = plugin.getConfig().getLong("effect-interval", 1800) * 20L; // Convert seconds to ticks
 
         // Decay system variables
         this.decayRate = plugin.getConfig().getInt("decay-rate", 5);
@@ -55,16 +56,16 @@ public class FavorManager {
         this.lastDecayTime = System.currentTimeMillis();
 
         // Check for effects (Blessings, Curses, Miracles)
-        Bukkit.getScheduler().runTaskTimer(plugin, this::checkForEffects, 0L, 20L * 5);  // Check every 10 minutes
+        Bukkit.getScheduler().runTaskTimer(plugin, this::checkForEffects, 0L, effectCheckInterval);
 
         // Check for favor decay (if player hasn't worshipped deity in too long)
         Bukkit.getScheduler().runTaskTimer(plugin, this::decayFavor, 0L, 20L); // Check every second
     }
 
     private void checkForEffects() {
-        Player player = Bukkit.getPlayer(uuid); // Get the player from the UUID
+        Player player = Bukkit.getPlayer(uuid);
 
-        if (player != null && player.isOnline()) { // Check if the player is online
+        if (player != null && player.isOnline()) { // Check if the player is online first
             long currentTime = System.currentTimeMillis();
 
             // Check for blessings
@@ -128,6 +129,13 @@ public class FavorManager {
     }
 
     public void decreaseFavor(int amount) {
+        // Ensure favor is 0 at the lowest
+        if (this.favor <= 0 ) {
+            this.favor = 0;
+            // Skip processing if player's favor is already 0
+            return;
+        }
+
         this.favor -= amount;
         if (this.favor < 0) {
             this.favor = 0;

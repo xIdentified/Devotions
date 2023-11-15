@@ -21,7 +21,7 @@ rituals:
 
   purification_ritual:
     display_name: "Ritual of Purification"
-    description: "Purify the land by vanquishing dark entities"
+    description: "Purify the lands by vanquishing dark entities"
     favor: 40
     item:
       type: "VANILLA"
@@ -37,7 +37,6 @@ rituals:
       - "effect give @p minecraft:regeneration 30 1"
       - "effect give @p minecraft:strength 60 1"
 
-
   meditation_ritual:
     display_name: "Ritual of Deep Meditation"
     description: "Attain inner peace and spiritual enlightenment"
@@ -50,9 +49,10 @@ rituals:
     objectives:
       - type: "MEDITATION"
         description: "Meditate at the shrine for 10 seconds"
+        target: PLAYER
         count: 10
     outcome-command:
-      - "give {player} minecraft:totem_of_undying"
+      - "give {player} minecraft:totem_of_undying 1"
       - "minecraft:say @p has achieved enlightenment!"
 
   # You can make more rituals in the same format, or update the existing ones.
