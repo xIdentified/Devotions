@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public class Shrine {
     private final Location location;
-    private Deity deity;
     private final UUID owner;
+    private Deity deity;
 
     public Shrine(Location location, Deity deity, UUID owner) {
         this.location = location;

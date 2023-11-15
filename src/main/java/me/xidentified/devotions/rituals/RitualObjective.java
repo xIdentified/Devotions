@@ -4,6 +4,7 @@ import me.xidentified.devotions.Devotions;
 
 public class RitualObjective {
 
+    // Other ritual objectives should be added later, but I'm going to keep it simple for right now
     public enum Type {
         GATHERING, PURIFICATION, MEDITATION
     }

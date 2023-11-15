@@ -51,7 +51,7 @@ public class MeditationManager {
         };
 
         meditationTimers.put(player, newTimer);
-        newTimer.runTaskLater(plugin, 20L * 60);  // 20 ticks/second * 60 seconds
+        newTimer.runTaskLater(plugin, 20L * objective.getCount());  // 20 ticks/second * config value
     }
 
     public boolean hasPlayerMovedSince(Player player) {

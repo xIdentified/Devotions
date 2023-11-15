@@ -44,7 +44,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
             sendMessage(player, "<yellow>Please specify the ritual you'd like to lookup information for.");
-            return true;
+            return false;
         }
 
         String ritualName = args[1];
@@ -77,7 +77,6 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         } else if (args.length == 2 && "info".equalsIgnoreCase(args[0])) {
             // Suggestions for the second argument (e.g., ritual names)
             List<String> ritualNames = plugin.getRitualManager().getAllRitualNames();
-            plugin.debugLog("All ritual names pulled from getAllRitualNames: " + ritualNames);
             suggestions.addAll(ritualNames);
         }
 

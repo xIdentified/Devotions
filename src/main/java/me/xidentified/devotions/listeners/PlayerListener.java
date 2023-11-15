@@ -45,6 +45,7 @@ public class PlayerListener implements Listener {
         }
     }
 
+    // Save player devotion when they leave the game
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         UUID playerUniqueId = event.getPlayer().getUniqueId();

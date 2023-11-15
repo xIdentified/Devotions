@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeityCommand implements CommandExecutor, TabCompleter {
-
     private final Devotions plugin;
 
     public DeityCommand(Devotions plugin) {
@@ -64,7 +63,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         if (selectedDeity == null) {
             sendMessage(player, "<red>Unknown deity. Please choose a valid deity name.");
-            return true;
+            return false;
         }
 
         // Fetch or create the player's FavorManager
@@ -96,7 +95,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         if (selectedDeity == null) {
             sendMessage(player,"<red>Unknown deity. Please choose a valid deity name.");
-            return true;
+            return false;
         }
 
         // Display deity information
@@ -114,7 +113,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         List<Deity> deities = plugin.getDevotionManager().getAllDeities();
         if (deities.isEmpty()) {
             sendMessage(player,"<red>No deities found.");
-            return true;
+            return false;
         }
 
         sendMessage(player, "<gold>Available Deities:");

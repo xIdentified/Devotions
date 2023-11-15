@@ -6,6 +6,9 @@ import me.xidentified.devotions.util.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 // Point system for tracking favor with each deity
@@ -59,7 +62,7 @@ public class FavorManager {
         Bukkit.getScheduler().runTaskTimer(plugin, this::checkForEffects, 0L, effectCheckInterval);
 
         // Check for favor decay (if player hasn't worshipped deity in too long)
-        Bukkit.getScheduler().runTaskTimer(plugin, this::decayFavor, 0L, 20L); // Check every second
+        Bukkit.getScheduler().runTaskTimer(plugin, this::decayFavor, 0L, 300L * 20L); // Check every 5 minutes
     }
 
     private void checkForEffects() {
@@ -67,31 +70,47 @@ public class FavorManager {
 
         if (player != null && player.isOnline()) { // Check if the player is online first
             long currentTime = System.currentTimeMillis();
+            List<String> possibleEffects = new ArrayList<>();
 
             // Check for blessings
             if (favor >= BLESSING_THRESHOLD && Math.random() < BLESSING_CHANCE) {
-                deity.applyBlessing(player, deity);
+                possibleEffects.add("blessing");
             }
 
             // Check for curses
             if (favor <= CURSE_THRESHOLD && Math.random() < CURSE_CHANCE) {
-                deity.applyCurse(player, deity);
+                possibleEffects.add("curse");
             }
 
             // Check for miracles
-            if (favor >= MIRACLE_THRESHOLD) {
-                if (lastTimeBelowMiracleThreshold == 0 || (currentTime - lastTimeBelowMiracleThreshold) >= MIRACLE_DURATION) {
-                    if (Math.random() < MIRACLE_CHANCE) {
+            if (favor >= MIRACLE_THRESHOLD && (lastTimeBelowMiracleThreshold == 0 ||
+                    (currentTime - lastTimeBelowMiracleThreshold) >= MIRACLE_DURATION) &&
+                    Math.random() < MIRACLE_CHANCE) {
+                possibleEffects.add("miracle");
+            }
+
+            // Apply only one effect
+            if (!possibleEffects.isEmpty()) {
+                Collections.shuffle(possibleEffects); // Randomize the list
+                String selectedEffect = possibleEffects.get(0); // Get the first (random) effect
+
+                switch (selectedEffect) {
+                    case "blessing" -> deity.applyBlessing(player, deity);
+                    case "curse" -> deity.applyCurse(player, deity);
+                    case "miracle" -> {
                         deity.applyMiracle(player);
-                        lastTimeBelowMiracleThreshold = 0; // Reset timer
+                        lastTimeBelowMiracleThreshold = 0; // Reset timer for miracles
                     }
                 }
-            } else {
-                lastTimeBelowMiracleThreshold = currentTime; // Update timer if favor drops below the threshold
+            }
+
+            // Update timer for miracles if not selected
+            if (!possibleEffects.contains("miracle")) {
+                lastTimeBelowMiracleThreshold = currentTime;
             }
         }
-        // If player is offline, don't apply effects
     }
+
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);

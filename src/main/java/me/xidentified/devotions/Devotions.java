@@ -217,7 +217,6 @@ public class Devotions extends JavaPlugin {
         for (String key : ritualsSection.getKeys(false)) {
             try {
                 String path = "rituals." + key + ".";
-                ConfigurationSection objectivesSection = ritualConfig.getConfigurationSection(path + "objectives");
 
                 // Parse general info
                 String displayName = ritualConfig.getString(path + "display_name");
@@ -451,7 +450,6 @@ public class Devotions extends JavaPlugin {
         // Cancel tasks
         getServer().getScheduler().cancelTasks(this);
 
-        // TODO: other cleanup
         ritualManager.ritualDroppedItems.clear();
 
         debugLog("Devotions has been disabled and all data saved!");

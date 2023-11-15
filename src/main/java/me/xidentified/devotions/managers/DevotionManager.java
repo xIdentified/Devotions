@@ -44,12 +44,13 @@ public class DevotionManager {
             return;
         }
 
+        removeDevotion(playerUUID); // Remove current devotion before setting new one
         playerDevotions.put(playerUUID, devotion);
         Player player = Bukkit.getPlayer(playerUUID);
 
         if (player != null) {
             Deity deity = devotion.getDeity();
-            devotionStorage.savePlayerDevotion(playerUUID, devotion);
+            devotionStorage.savePlayerDevotion(playerUUID, devotion); // Set new devotion
             plugin.playConfiguredSound(player, "deitySelected");
             player.sendMessage(MessageUtils.parse("<green>You are now devoted to " + deity.getName() + ". Your favor is " + devotion.getFavor() + "."));
         } else {
@@ -102,13 +103,6 @@ public class DevotionManager {
                 devotionStorage.savePlayerDevotion(playerUUID, favorManager);
             }
         }
-        // If you keep a cache of offline player devotions, make sure to save those as well
-        saveOfflinePlayerDevotions();
-    }
-
-
-    public void saveOfflinePlayerDevotions() {
-        // TODO: Iterate through any cached offline player devotions and save them
     }
 
 }

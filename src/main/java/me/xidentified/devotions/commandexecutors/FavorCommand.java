@@ -32,7 +32,6 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             if (favorManager == null) {
                 sendMessage(player,"<red>You don't have any devotion set.");
             } else {
-                // TODO: Green text for high devotion score, yellow for medium, red for low
                 sendMessage(player,"<green>Your current favor is " + favorManager.getFavor());
             }
             return true;
