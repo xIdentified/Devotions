@@ -211,9 +211,13 @@ public class Devotions extends JavaPlugin {
             return;
         }
 
+        // Test to print out the structure of the rituals section
+        debugLog("Rituals Section Keys: " + ritualsSection.getKeys(true));
+
         for (String key : ritualsSection.getKeys(false)) {
             try {
                 String path = "rituals." + key + ".";
+                ConfigurationSection objectivesSection = ritualConfig.getConfigurationSection(path + "objectives");
 
                 // Parse general info
                 String displayName = ritualConfig.getString(path + "display_name");
@@ -253,25 +257,29 @@ public class Devotions extends JavaPlugin {
 
                 // Parse objectives
                 List<RitualObjective> objectives = new ArrayList<>();
-                ConfigurationSection objectivesSection = ritualConfig.getConfigurationSection(path + "objectives");
-                if (objectivesSection != null) {
-                    for (String objKey : objectivesSection.getKeys(false)) {
-                        String objPath = path + "objectives." + objKey + ".";
-                        RitualObjective.Type type = RitualObjective.Type.valueOf(ritualConfig.getString(objPath + "type"));
-                        String objDescription = ritualConfig.getString(objPath + "description");
-                        String target = ritualConfig.getString(objPath + "target");
-                        int count = ritualConfig.getInt(objPath + "count");
+                try {
+                    List<Map<?, ?>> objectivesList = ritualConfig.getMapList(path + "objectives");
+                    for (Map<?, ?> objectiveMap : objectivesList) {
+                        String typeStr = (String) objectiveMap.get("type");
+                        RitualObjective.Type type = RitualObjective.Type.valueOf(typeStr);
+                        String objDescription = (String) objectiveMap.get("description");
+                        String target = (String) objectiveMap.get("target");
+                        int count = (Integer) objectiveMap.get("count");
 
                         RitualObjective objective = new RitualObjective(this, type, objDescription, target, count);
                         objectives.add(objective);
                         debugLog("Loaded objective " + objDescription + " for ritual " + key);
                     }
+                } catch (Exception e) {
+                    getLogger().warning("Failed to load objectives for ritual: " + key);
+                    e.printStackTrace();
                 }
+
 
                 // Create and store the ritual
                 Ritual ritual = new Ritual(this, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
                 RitualManager.getInstance(this).addRitual(key, ritual);  // Store the ritual with its key
-                getLogger().info("Loaded ritual " + displayName + " with key: " + key + " and favor amount " + favorReward);
+                getLogger().info("Loaded ritual " + displayName + " with key: " + key + ", favor amount " + favorReward + ", and objectives " + objectives);
             } catch (Exception e) {
                 getLogger().severe("Failed to load ritual with key: " + key);
                 e.printStackTrace();
@@ -444,6 +452,7 @@ public class Devotions extends JavaPlugin {
         getServer().getScheduler().cancelTasks(this);
 
         // TODO: other cleanup
+        ritualManager.ritualDroppedItems.clear();
 
         debugLog("Devotions has been disabled and all data saved!");
     }

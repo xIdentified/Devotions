@@ -9,6 +9,7 @@ import me.xidentified.devotions.util.MessageUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -17,18 +18,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
 
 public class ShrineCommandExecutor implements CommandExecutor, Listener, TabCompleter {
     private final Map<Player, Deity> pendingShrineDesignations = new HashMap<>();
-    private final Map<Player, Boolean> pendingShrineRemovals = new HashMap<>();
+    private final Map<UUID, Boolean> pendingShrineRemovals = new HashMap<>();
     private final DevotionManager devotionManager;
     private final ShrineManager shrineManager;
 
@@ -54,8 +54,9 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 return true;
             } else if (args[0].equalsIgnoreCase("remove")) {
                 if (player.hasPermission("devotions.shrine.remove")) {
-                    pendingShrineRemovals.put(player, true);
+                    pendingShrineRemovals.put(player.getUniqueId(), true);
                     player.sendMessage(MessageUtils.parse("<yellow>Right-click on a shrine to remove it."));
+                    Bukkit.getLogger().log(Level.WARNING, "Current pendingShrineRemovals map: " + pendingShrineRemovals);
                 } else {
                     player.sendMessage(MessageUtils.parse("<red>You don't have permission to remove shrines."));
                 }
@@ -101,28 +102,33 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             if (clickedBlock != null && shrineManager.getShrineAtLocation(clickedBlock.getLocation()) == null) {
                 Deity deity = pendingShrineDesignations.remove(player);
                 // Store the clickedBlock location, deity, and player as a designated shrine
-                Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player);
+                Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player.getUniqueId());
                 shrineManager.addShrine(newShrine);
                 sendMessage(player,"<green>Successfully designated a shrine for " + deity.getName() + "!");
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onShrineRemoval(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (pendingShrineRemovals.containsKey(player)) {
+        UUID playerId = player.getUniqueId();
+        if (pendingShrineRemovals.containsKey(playerId)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
                 Location location = clickedBlock.getLocation();
-                if (shrineManager.removeShrine(player, location)) {
-                    player.sendMessage(MessageUtils.parse("<green>Shrine removed successfully!"));
+                if (shrineManager.getShrineAtLocation(location) != null) {
+                    boolean removed = shrineManager.removeShrine(playerId, location);
+                    if (removed) {
+                        player.sendMessage(MessageUtils.parse("<green>Shrine removed successfully!"));
+                    } else {
+                        player.sendMessage(MessageUtils.parse("<red>Failed to remove shrine. You might not own it."));
+                    }
                 } else {
-                    player.sendMessage(MessageUtils.parse("<red>No shrine found or you don't own this shrine."));
+                    player.sendMessage(MessageUtils.parse("<red>No shrine found at this location."));
                 }
-                // Remove the player from "shrine removal mode"
-                pendingShrineRemovals.remove(player);
-                event.setCancelled(true);  // Cancel the event to prevent any default behavior
+                pendingShrineRemovals.remove(playerId);
+                event.setCancelled(true);
             }
         }
     }

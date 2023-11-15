@@ -15,7 +15,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -42,21 +41,30 @@ public class ShrineListener implements Listener {
         this.cooldownManager = cooldownManager;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler
     public void onShrineInteract(PlayerInteractEvent event) {
+        // Return if player isn't right-clicking the shrine or interacting with their hand.
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
 
+        // Ensure player is clicking on a solid block
         Player player = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
 
+        // Make sure valid shrine is at location
         Shrine shrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
         if (shrine == null) return;
 
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        // If the shrine doesn't belong to player's deity, inform them
+        Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
+        if (!shrine.getDeity().equals(playerDeity)) {
+            player.sendMessage(MessageUtils.parse("<red>Only followers of " + shrine.getDeity().getName() + " may use this shrine."));
+            return;
+        }
 
         // Check for ritual initiation
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
         if (ritual != null) {
             long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");

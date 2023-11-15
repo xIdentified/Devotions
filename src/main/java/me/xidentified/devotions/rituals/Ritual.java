@@ -118,6 +118,7 @@ public class Ritual {
     }
 
     public List<RitualObjective> getObjectives() {
+        plugin.debugLog("Objectives returned in getObjectives: " + objectives);
         return objectives;
     }
 

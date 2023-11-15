@@ -23,7 +23,7 @@ public class RitualManager {
     private static volatile RitualManager instance; // Use this instance throughout plugin
     public final ConcurrentHashMap<String, Ritual> rituals; // Defined rituals
     private final Map<Player, Ritual> playerRituals = new HashMap<>(); // Track what ritual each player is doing
-    private final Map<Player, Item> ritualDroppedItems = new HashMap<>(); // Track dropped item so we can remove later
+    public final Map<Player, Item> ritualDroppedItems = new HashMap<>(); // Track dropped item so we can remove later
 
     public RitualManager(Devotions plugin) {
         this.plugin = plugin;
@@ -59,9 +59,17 @@ public class RitualManager {
     }
 
     public boolean startRitual(Player player, ItemStack item, Item droppedItem) {
+        plugin.debugLog("Inside startRitual method");
+
+        // Make sure player isn't already in a ritual before starting another one
+        if (RitualManager.getInstance(plugin).getCurrentRitualForPlayer(player) != null) return false;
+
         // Retrieve the ritual associated with the item
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(item);
+        plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
+
         ritual.reset();
+        plugin.debugLog("After reset: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
         associateDroppedItem(player, droppedItem);
 
         // Validate the ritual and its conditions
@@ -70,6 +78,7 @@ public class RitualManager {
             ritual.provideFeedback(player, "START");
 
             List<RitualObjective> objectives = ritual.getObjectives(); // Directly fetch from the ritual object
+
             if (objectives != null) {
                 for (RitualObjective objective : objectives) {
                     // If it's a purification ritual, we'll spawn the desired mobs around the player
@@ -123,7 +132,7 @@ public class RitualManager {
         if (item == null) return null;
 
         String itemId = getItemId(item);
-        plugin.debugLog("Looking for ritual with item ID: " + itemId);
+        plugin.debugLog("Looking for ritual associated with item ID " + itemId);
 
         for (Ritual ritual : rituals.values()) {
             RitualItem keyRitualItem = ritual.getItem();

@@ -14,10 +14,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RitualListener implements Listener {
     private final Devotions plugin;
@@ -49,50 +49,45 @@ public class RitualListener implements Listener {
         Player player = event.getPlayer();
         Ritual ritual = ritualManager.getCurrentRitualForPlayer(player);
 
+        // Return if player is not in a ritual
         if (ritual == null || ritual.isCompleted()) {
             return;
         }
 
-        // Check if player moved, if in meditation
+        // Check if player moved, if in meditation. Reset timer if they moved.
         if (meditationManager().hasPlayerMovedSince(player) && meditationManager().isPlayerInMeditation(player)) {
             plugin.debugLog("Player " + player.getName() + " moved during meditation.");
             player.sendMessage(MessageUtils.parse("<red>You moved during meditation! Restarting timer..."));
             meditationManager().startMeditation(player, ritual, getMeditationObjective(ritual));
         }
 
-        AtomicBoolean allObjectivesMet = new AtomicBoolean(true);
-
-        List<RitualObjective> objectives = ritual.getObjectives();
-        for (RitualObjective objective : objectives) {
-            if (objective == null) {
-                continue;
-            }
-
-            if (!objective.isComplete()) {
-                allObjectivesMet.set(false);
-
-                switch (objective.getType()) {
-                    case GATHERING -> {
-                        ItemStack requiredItem = new ItemStack(Material.valueOf(objective.getTarget()), objective.getCount());
-                        if (player.getInventory().containsAtLeast(requiredItem, objective.getCount())) {
-                            if (isPlayerNearShrine(player)) {
-                                objective.incrementCount();
-                            }
-                        }
-                    }
-                    case PURIFICATION -> {
-                        // Handled in the EntityDeathEvent listener
-                    }
-                    case MEDITATION -> {
-                        // Meditation check done above
-                    }
+        // Check and update gathering objectives
+        for (RitualObjective objective : ritual.getObjectives()) {
+            if (objective.getType() == RitualObjective.Type.GATHERING && !objective.isComplete()) {
+                int itemCount = countItemsInInventory(player.getInventory(), Material.valueOf(objective.getTarget()));
+                if (itemCount >= objective.getCount()) {
+                    objective.setCurrentCount(itemCount);
                 }
             }
         }
 
-        if (allObjectivesMet.get()) {
+        // Check if player has returned to shrine with all objectives completed regardless of the objective type
+        if (isPlayerNearShrine(player) && allObjectivesCompleted(ritual)) {
+            plugin.debugLog("Player " + player.getName() + " returned to the shrine with all objectives completed.");
             plugin.getRitualManager().completeRitual(player, ritual, meditationManager());
         }
+
+    }
+
+    // Count items in inventory for 'gathering' objective
+    private int countItemsInInventory(Inventory inventory, Material material) {
+        int count = 0;
+        for (ItemStack item : inventory.getContents()) {
+            if (item != null && item.getType() == material) {
+                count += item.getAmount();
+            }
+        }
+        return count;
     }
 
     private RitualObjective getMeditationObjective(Ritual ritual) {
@@ -118,8 +113,9 @@ public class RitualListener implements Listener {
             for (RitualObjective objective : objectives) {
                 if (objective.getType() == RitualObjective.Type.PURIFICATION && objective.getTarget().equals(event.getEntityType().name())) {
                     objective.incrementCount();
-                    if (objective.isComplete() && isPlayerNearShrine(player)) {
-                        plugin.getRitualManager().completeRitual(player, ritual, meditationManager());
+                    if (objective.isComplete()) {
+                        plugin.debugLog("Objective complete for ritual " + ritual.getDisplayName());
+                        player.sendMessage(MessageUtils.parse("<light_purple>Return to the shrine to complete the ritual."));
                     }
                 }
             }
@@ -132,9 +128,13 @@ public class RitualListener implements Listener {
         Location shrineLocation = shrineManager.getShrineLocationForPlayer(player);
         if (shrineLocation != null && player.getWorld().equals(shrineLocation.getWorld())) {
             double distance = player.getLocation().distance(shrineLocation);
-            return distance <= 3;
+            return distance <= 5;
         }
         return false;
+    }
+
+    private boolean allObjectivesCompleted(Ritual ritual) {
+        return ritual.getObjectives().stream().allMatch(RitualObjective::isComplete);
     }
 
     private MeditationManager meditationManager(){

@@ -1,14 +1,15 @@
 package me.xidentified.devotions;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class Shrine {
     private final Location location;
     private Deity deity;
-    private final Player owner;
+    private final UUID owner;
 
-    public Shrine(Location location, Deity deity, Player owner) {
+    public Shrine(Location location, Deity deity, UUID owner) {
         this.location = location;
         this.deity = deity;
         this.owner = owner;
@@ -26,7 +27,7 @@ public class Shrine {
         this.deity = deity;
     }
 
-    public Player getOwner() {
+    public UUID getOwner() {
         return owner;
     }
 
