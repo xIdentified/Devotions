@@ -9,6 +9,7 @@ import me.xidentified.devotions.rituals.*;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.storage.ShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
+import me.xidentified.devotions.util.Placeholders;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -45,6 +46,12 @@ public class Devotions extends JavaPlugin {
         saveDefaultConfig();
         initializePlugin();
         loadSoundsConfig();
+
+        // If PAPI is installed we'll register our placeholders
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new Placeholders(this).register();
+            debugLog("PlaceholderAPI expansion enabled!");
+        }
     }
 
     private Map<String, Deity> loadDeities(YamlConfiguration deitiesConfig) {

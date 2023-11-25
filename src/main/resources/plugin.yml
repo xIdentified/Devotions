@@ -6,7 +6,7 @@ author: xIdentified
 description: Create and worship deities in Minecraft
 softdepend:
   - MMOItems
-  - ProtocolLib
+  - PlaceholderAPI
 commands:
   devotions:
     description: Manage the Devotions plugin
