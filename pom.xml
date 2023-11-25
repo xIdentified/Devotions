@@ -6,7 +6,7 @@
 
     <groupId>me.xIdentified</groupId>
     <artifactId>Devotions</artifactId>
-    <version>1.0-beta</version>
+    <version>1.1-beta</version>
     <packaging>jar</packaging>
 
     <name>Devotions</name>
@@ -65,6 +65,10 @@
             <id>phoenix</id>
             <url>https://nexus.phoenixdevt.fr/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -80,6 +84,12 @@
             <version>1.5.2-SNAPSHOT</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.5</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

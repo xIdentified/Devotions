@@ -3,6 +3,7 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.util.MessageUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -116,6 +117,8 @@ public class FavorManager {
         return Bukkit.getPlayer(uuid);
     }
 
+    public UUID getPlayerUUID() { return uuid; }
+
     public Deity getDeity() {
         return deity;
     }
@@ -138,7 +141,8 @@ public class FavorManager {
             this.favor = maxFavor;
         }
         if (player != null && deity != null) {
-            player.sendMessage(MessageUtils.parse("<green>Your favor with " + deity.getName() + " has increased to " + this.favor + "."));
+            Component favorMessage = MessageUtils.getFavorText(this.favor);
+            player.sendMessage(Component.text("§aYour favor with " + deity.getName() + " has increased to ").append(favorMessage));
 
             DevotionStorage devotionStorage = plugin.getDevotionStorage();
             devotionStorage.savePlayerDevotion(player.getUniqueId(), this);
@@ -162,7 +166,8 @@ public class FavorManager {
 
         Player player = getPlayer();
         if (player != null && player.isOnline() && deity != null) {
-            player.sendMessage(MessageUtils.parse("<red>Your favor with " + deity.getName() + " has decreased to " + this.favor + "."));
+            Component favorMessage = MessageUtils.getFavorText(this.favor);
+            player.sendMessage(Component.text("§cYour favor with " + deity.getName() + " has decreased to ").append(favorMessage));
         }
 
         DevotionStorage devotionStorage = plugin.getDevotionStorage();

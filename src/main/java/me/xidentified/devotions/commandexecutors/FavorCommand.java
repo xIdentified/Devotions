@@ -3,6 +3,7 @@ package me.xidentified.devotions.commandexecutors;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.MessageUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,9 +31,10 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             if (favorManager == null) {
-                sendMessage(player,"<red>You don't have any devotion set.");
+                sendMessage(player, "<red>You don't have any devotion set.");
             } else {
-                sendMessage(player,"<green>Your current favor is " + favorManager.getFavor());
+                Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
+                player.sendMessage(Component.text("§aYour current favor is: ").append(favorText));
             }
             return true;
         }
@@ -79,7 +81,8 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        sendMessage(player,"<green>" + targetPlayer.getName() + "'s favor has been updated to " + favorManager.getFavor() + ".");
+        Component updatedFavorText = MessageUtils.getFavorText(favorManager.getFavor());
+        player.sendMessage(Component.text("§a" + targetPlayer.getName() + "'s favor has been set to ").append(updatedFavorText));
         return true;
     }
 

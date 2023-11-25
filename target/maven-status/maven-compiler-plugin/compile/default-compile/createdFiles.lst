@@ -2,6 +2,7 @@ me\xidentified\devotions\NearCropsCondition.class
 me\xidentified\devotions\LowHealthCondition.class
 me\xidentified\devotions\IsDeadCondition.class
 me\xidentified\devotions\util\MessageUtils.class
+me\xidentified\devotions\util\Placeholders.class
 me\xidentified\devotions\HasRepairableItemsCondition.class
 me\xidentified\devotions\Miracle.class
 me\xidentified\devotions\RepairAllItems.class

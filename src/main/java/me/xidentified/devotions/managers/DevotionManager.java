@@ -105,5 +105,12 @@ public class DevotionManager {
         }
     }
 
+    public List<FavorManager> getSortedFavorData() {
+        List<FavorManager> sortedFavorData = new ArrayList<>(playerDevotions.values());
+        // Sort the list by favor in descending order so top players show first
+        sortedFavorData.sort((o1, o2) -> Integer.compare(o2.getFavor(), o1.getFavor()));
+        return sortedFavorData;
+    }
+
 }
 
