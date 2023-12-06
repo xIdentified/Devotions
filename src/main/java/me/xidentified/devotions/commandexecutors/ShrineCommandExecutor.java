@@ -57,7 +57,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 if (player.hasPermission("devotions.shrine.remove")) {
                     pendingShrineRemovals.put(player.getUniqueId(), true);
                     player.sendMessage(MessageUtils.parse("<yellow>Right-click on a shrine to remove it."));
-                    Bukkit.getLogger().log(Level.WARNING, "Current pendingShrineRemovals map: " + pendingShrineRemovals);
+                    //Bukkit.getLogger().log(Level.WARNING, "Current pendingShrineRemovals map: " + pendingShrineRemovals);
                 } else {
                     player.sendMessage(MessageUtils.parse("<red>You don't have permission to remove shrines."));
                 }

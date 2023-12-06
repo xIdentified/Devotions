@@ -44,7 +44,7 @@ public class Placeholders extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("deity")) {
             Deity deity = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()).getDeity();
-            return deity != null ? "§e" + deity.getName() : "§eNone";
+            return deity != null ? "§e" + deity.getName() : "\u00A0"; // Non-breaking space
         }
 
         if (params.equalsIgnoreCase("favor")) {

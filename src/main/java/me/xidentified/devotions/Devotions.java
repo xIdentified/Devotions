@@ -18,6 +18,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
@@ -47,7 +48,7 @@ public class Devotions extends JavaPlugin {
         initializePlugin();
         loadSoundsConfig();
 
-        // If PAPI is installed we'll register our placeholders
+        // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new Placeholders(this).register();
             debugLog("PlaceholderAPI expansion enabled!");
@@ -57,9 +58,11 @@ public class Devotions extends JavaPlugin {
     private Map<String, Deity> loadDeities(YamlConfiguration deitiesConfig) {
         Map<String, Deity> deityMap = new HashMap<>();
         ConfigurationSection deitiesSection = deitiesConfig.getConfigurationSection("deities");
+        assert deitiesSection != null;
         for (String deityKey : deitiesSection.getKeys(false)) {
             ConfigurationSection deityConfig = deitiesSection.getConfigurationSection(deityKey);
 
+            assert deityConfig != null;
             String name = deityConfig.getString("name");
             String lore = deityConfig.getString("lore");
             String domain = deityConfig.getString("domain");
@@ -340,8 +343,13 @@ public class Devotions extends JavaPlugin {
     public void reloadConfigurations() {
         reloadConfig();
         reloadRitualConfig();
-        reloadDeitiesConfig();
         reloadSoundsConfig();
+
+        // Reset the DevotionManager
+        if (devotionManager != null) {
+            devotionManager.reset();
+        }
+
         initializePlugin();
     }
 
@@ -364,7 +372,6 @@ public class Devotions extends JavaPlugin {
     private Map<String, Deity> reloadDeitiesConfig() {
         File deitiesFile = new File(getDataFolder(), "deities.yml");
         if (!deitiesFile.exists()) {
-            // The file does not exist, let's extract it from the JAR
             saveResource("deities.yml", false);
         }
 
@@ -395,12 +402,18 @@ public class Devotions extends JavaPlugin {
     }
 
     private void initializePlugin() {
-        // Load configurations
+        HandlerList.unregisterAll(this);
         instance = this;
         loadRitualConfig();
 
         // Initiate manager classes
         this.storageManager = new StorageManager(this);
+
+        // Clear existing data before re-initializing
+        if (devotionManager != null) {
+            devotionManager.clearData();
+        }
+
         Map<String, Deity> loadedDeities = reloadDeitiesConfig();
         this.devotionStorage = new DevotionStorage(storageManager);
         this.devotionManager = new DevotionManager(this, loadedDeities);
@@ -447,11 +460,15 @@ public class Devotions extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Unregister all listeners
+        HandlerList.unregisterAll(this);
+
         // Save all player devotions to ensure data is not lost on shutdown
         devotionManager.saveAllPlayerDevotions();
 
         // Cancel tasks
         getServer().getScheduler().cancelTasks(this);
+        getServer().getAsyncScheduler().cancelTasks(this);
 
         ritualManager.ritualDroppedItems.clear();
 

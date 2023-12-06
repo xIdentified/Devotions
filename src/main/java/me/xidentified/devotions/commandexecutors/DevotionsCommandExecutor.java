@@ -1,14 +1,19 @@
 package me.xidentified.devotions.commandexecutors;
 
+import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.MessageUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class DevotionsCommandExecutor implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final Devotions plugin;
 
@@ -34,6 +39,17 @@ public class DevotionsCommandExecutor implements CommandExecutor {
         }
 
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        List<String> completions = new ArrayList<>();
+
+        if (args.length == 1) {
+            completions.add("reload");
+        }
+
+        return completions;
     }
 
     private void sendMessage(Player player, String message) {

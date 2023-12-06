@@ -30,7 +30,7 @@ public class DevotionManager {
 
     public Deity getDeityByName(String name) {
         if (name == null || deities == null) return null;
-        return deities.get(name.toLowerCase()); // Ensure that the deity names in the 'deities' map are all lowercase
+        return deities.get(name.toLowerCase());
     }
 
     public FavorManager getPlayerDevotion(UUID playerUUID) {
@@ -110,6 +110,19 @@ public class DevotionManager {
         // Sort the list by favor in descending order so top players show first
         sortedFavorData.sort((o1, o2) -> Integer.compare(o2.getFavor(), o1.getFavor()));
         return sortedFavorData;
+    }
+
+    public void clearData() {
+        playerDevotions.clear();
+        deities.clear();
+    }
+
+    public void reset() {
+        // Clear current player devotions
+        playerDevotions.clear();
+
+        // Reload devotions from storage
+        loadPlayerDevotions();
     }
 
 }

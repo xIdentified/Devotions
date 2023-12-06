@@ -172,7 +172,7 @@ class HeroEffectInVillage implements MiracleEffect {
 class SaveFromBurning implements MiracleEffect {
     @Override
     public void execute(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 900, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 300, 1));
         player.sendMessage(MessageUtils.parse("<green>A miracle has granted you Fire Resistance!"));
     }
 }
