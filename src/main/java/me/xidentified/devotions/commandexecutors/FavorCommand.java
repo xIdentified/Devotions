@@ -36,7 +36,9 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
                 plugin.sendMessage(player, "<red>You don't have any devotion set.");
             } else {
                 Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
-                player.sendMessage(Component.text("§aYour current favor is: ").append(favorText));
+                plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
+                    Placeholder.component("favor", favorText)
+                ));
             }
             return true;
         }

@@ -1,6 +1,8 @@
 package me.xidentified.devotions;
 
+import de.cubbossa.translations.Message;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -156,7 +158,7 @@ class ReviveOnDeath implements MiracleEffect {
         @Nullable AttributeInstance maxHealth = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH));
         if (maxHealth != null) {
             player.setHealth(maxHealth.getValue());
-            player.sendMessage(MessageUtils.parse("<green>A miracle has revived you upon death!"));
+            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
         }
     }
 }
@@ -165,7 +167,7 @@ class HeroEffectInVillage implements MiracleEffect {
     @Override
     public void execute(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 6000, 1)); // 5 minutes of Hero of the Village effect
-        player.sendMessage(MessageUtils.parse("<green>A miracle has granted you the Hero of the Village effect!"));
+        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HERO_OF_VILLAGE);
     }
 }
 
@@ -173,7 +175,7 @@ class SaveFromBurning implements MiracleEffect {
     @Override
     public void execute(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 300, 1));
-        player.sendMessage(MessageUtils.parse("<green>A miracle has granted you Fire Resistance!"));
+        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_FIRE_RESISTANCE);
     }
 }
 
@@ -192,7 +194,7 @@ class RepairAllItems implements MiracleEffect {
                 }
             }
         }
-        player.sendMessage(MessageUtils.parse("<green>A miracle has repaired all your items!"));
+        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_REPAIR);
     }
 }
 
@@ -207,15 +209,15 @@ class SummonAidEffect implements MiracleEffect {
     public void execute(Player player) {
         Random random = new Random();
         EntityType entityType;
-        String message;
+        Message message;
 
         // 50% chance to decide between Iron Golems or Wolves
         if (random.nextBoolean()) {
             entityType = EntityType.IRON_GOLEM;
-            message = "<green>A miracle has summoned Iron Golems to aid you!";
+            message = Messages.MIRACLE_GOLEM;
         } else {
             entityType = EntityType.WOLF;
-            message = "<green>A miracle has summoned friendly Wolves to protect you!";
+            message = Messages.MIRACLE_WOLVES;
         }
 
         for (int i = 0; i < entityCount; i++) {
@@ -226,7 +228,7 @@ class SummonAidEffect implements MiracleEffect {
                 wolf.setTamed(true);
             }
         }
-        player.sendMessage(MessageUtils.parse(message));
+        Devotions.getInstance().sendMessage(player, message);
     }
 }
 
@@ -240,7 +242,7 @@ class ExecuteCommandEffect implements MiracleEffect {
     @Override
     public void execute(Player player) {
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
-        player.sendMessage(MessageUtils.parse("<green>A miracle has been bestowed upon ye!"));
+        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_BESTOWED);
     }
 }
 
@@ -259,7 +261,7 @@ class DoubleCropDropsEffect implements MiracleEffect, Listener {
     public void execute(Player player) {
         playersWithEffect.add(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(plugin, () -> playersWithEffect.remove(player.getUniqueId()), duration);
-        player.sendMessage(MessageUtils.parse("<green>A miracle has blessed you with a bountiful harvest!"));
+        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HARVEST);
     }
 
     @EventHandler

@@ -55,7 +55,7 @@ public class Devotions extends JavaPlugin {
     @Getter private StorageManager storageManager;
     @Getter private DevotionStorage devotionStorage;
     private BukkitAudiences audiences;
-    private Translations translations;
+    @Getter private Translations translations;
 
     @Override
     public void onEnable() {

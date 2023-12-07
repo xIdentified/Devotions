@@ -111,6 +111,10 @@ public class Messages {
   public static final Message FAVOR_CMD_USAGE = new MessageBuilder("favor.cmd.usage")
       .withDefault("<warning>Usage: /favor <set|give|take> <playername> <amount>")
       .build();
+  public static final Message FAVOR_CURRENT = new MessageBuilder("favor.current_favor")
+      .withDefault("Your current favor is: <favor>")
+      .withPlaceholder("favor")
+      .build();
 
   public static final Message RITUAL_CMD_USAGE = new MessageBuilder("ritual.cmd.usage")
       .withDefault("<warning>Usage: /ritual <info> [RitualName]")
@@ -125,5 +129,30 @@ public class Messages {
       .build();
   public static final Message RITUAL_NOT_FOUND = new MessageBuilder("ritual.not_found")
       .withDefault("<negative>Unknown ritual. Please choose a valid ritual name.")
+      .build();
+
+  public static final Message MIRACLE_BESTOWED = new MessageBuilder("miracle.bestowed")
+      .withDefault("<positive>A miracle has been bestowed upon ye!")
+      .build();
+  public static final Message MIRACLE_SAVED_FROM_DEATH = new MessageBuilder("miracle.saved_from_death")
+      .withDefault("<positive>A miracle has revived you upon death!")
+      .build();
+  public static final Message MIRACLE_HERO_OF_VILLAGE = new MessageBuilder("miracle.hero_of_the_village")
+      .withDefault("<positive>A miracle has granted you the Hero of the Village effect!")
+      .build();
+  public static final Message MIRACLE_FIRE_RESISTANCE = new MessageBuilder("miracle.fire_resistance")
+      .withDefault("<positive>A miracle has granted you Fire Resistance!")
+      .build();
+  public static final Message MIRACLE_REPAIR = new MessageBuilder("miracle.repair")
+      .withDefault("<positive>A miracle has repaired all your items!")
+      .build();
+  public static final Message MIRACLE_HARVEST = new MessageBuilder("miracle.harvest")
+      .withDefault("<positive>A miracle has blessed you with a bountiful harvest!")
+      .build();
+  public static final Message MIRACLE_GOLEM = new MessageBuilder("miracle.iron_golem")
+      .withDefault("<positive>A miracle has summoned Iron Golems to aid you!")
+      .build();
+  public static final Message MIRACLE_WOLVES = new MessageBuilder("miracle.wolves")
+      .withDefault("<positive>A miracle has summoned friendly Wolves to protect you!")
       .build();
 }
