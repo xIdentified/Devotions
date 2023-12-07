@@ -3,7 +3,9 @@ package me.xidentified.devotions.commandexecutors;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,7 +33,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             if (favorManager == null) {
-                sendMessage(player, "<red>You don't have any devotion set.");
+                plugin.sendMessage(player, "<red>You don't have any devotion set.");
             } else {
                 Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
                 player.sendMessage(Component.text("§aYour current favor is: ").append(favorText));
@@ -40,20 +42,22 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length != 3) {
-            sendMessage(player,"<yellow>Usage: /favor <set|give|take> <playername> <amount>");
+            plugin.sendMessage(player,"<yellow>Usage: /favor <set|give|take> <playername> <amount>");
             return true;
         }
 
         // Check for permission
         if (!player.hasPermission("devotions.admin")) {
-            sendMessage(player, "<red>You don't have permission to use this command.");
+            plugin.sendMessage(player, Messages.GENERAL_CMD_NO_PERM);
             return true;
         }
 
         String action = args[0].toLowerCase();
         Player targetPlayer = Bukkit.getPlayer(args[1]);
         if (targetPlayer == null) {
-            sendMessage(player,"<red>Player not found!");
+            plugin.sendMessage(player, Messages.GENERAL_PLAYER_NOT_FOUND.formatted(
+                Placeholder.unparsed("player", args[1])
+            ));
             return true;
         }
 
@@ -61,13 +65,13 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         try {
             amount = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            sendMessage(player,"<red>Invalid amount. Please enter a number.");
+            plugin.sendMessage(player,"<red>Invalid amount. Please enter a number.");
             return true;
         }
 
         FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(targetPlayer.getUniqueId());
         if (favorManager == null) {
-            sendMessage(player,"<red>" + targetPlayer.getName() + " doesn't worship any deity.");
+            plugin.sendMessage(player,"<red>" + targetPlayer.getName() + " doesn't worship any deity.");
             return true;
         }
 
@@ -76,7 +80,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             case "give" -> favorManager.increaseFavor(amount);
             case "take" -> favorManager.decreaseFavor(amount);
             default -> {
-                sendMessage(player,"<red>Invalid action. Use set, give, or take.");
+                plugin.sendMessage(player,"<red>Invalid action. Use set, give, or take.");
                 return true;
             }
         }
@@ -102,9 +106,4 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
         return completions;
     }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

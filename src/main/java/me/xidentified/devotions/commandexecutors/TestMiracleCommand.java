@@ -1,5 +1,6 @@
 package me.xidentified.devotions.commandexecutors;
 
+import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Miracle;
 import me.xidentified.devotions.util.MessageUtils;
 import org.bukkit.command.Command;
@@ -23,14 +24,14 @@ public class TestMiracleCommand implements CommandExecutor {
 
         if (player.hasPermission("devotions.admin")) {
             if (miracles.isEmpty()) {
-                sendMessage((Player) sender, "<red>No miracles are loaded.");
+                Devotions.getInstance().sendMessage((Player) sender, "<red>No miracles are loaded.");
                 return true;
             }
 
-            sendMessage((Player) sender, "<green>Available miracles: <yellow>" + miracles.keySet());
+            Devotions.getInstance().sendMessage((Player) sender, "<green>Available miracles: <yellow>" + miracles.keySet());
 
             if (args.length != 1) {
-                sendMessage(player, "<yellow>Usage: /testmiracle <miracleName>");
+                Devotions.getInstance().sendMessage(player, "<yellow>Usage: /testmiracle <miracleName>");
                 return true;
             }
 
@@ -38,20 +39,15 @@ public class TestMiracleCommand implements CommandExecutor {
             Miracle miracle = miracles.get(miracleName);
 
             if (miracle == null) {
-                sendMessage(player, "<red>Unknown miracle: " + miracleName);
+                Devotions.getInstance().sendMessage(player, "<red>Unknown miracle: " + miracleName);
                 return true;
             }
 
             miracle.apply(player);
-            sendMessage(player, "<green>Applied miracle: <yellow>" + miracleName);
+            Devotions.getInstance().sendMessage(player, "<green>Applied miracle: <yellow>" + miracleName);
 
             return true;
         }
         return false;
     }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

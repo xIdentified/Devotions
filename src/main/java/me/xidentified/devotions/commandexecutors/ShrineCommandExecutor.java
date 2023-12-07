@@ -1,15 +1,21 @@
 package me.xidentified.devotions.commandexecutors;
 
 import me.xidentified.devotions.Deity;
+import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -41,7 +47,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(MessageUtils.parse("<red>Only players can use this command."));
+            Devotions.getInstance().sendMessage(sender, Messages.GENERAL_CMD_PLAYER_ONLY);
             return true;
         }
 
@@ -50,16 +56,16 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 if (player.hasPermission("devotions.shrine.list")) {
                     displayShrineList(player);
                 } else {
-                    player.sendMessage(MessageUtils.parse("<red>You don't have permission to list shrines."));
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_LIST);
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("remove")) {
                 if (player.hasPermission("devotions.shrine.remove")) {
                     pendingShrineRemovals.put(player.getUniqueId(), true);
-                    player.sendMessage(MessageUtils.parse("<yellow>Right-click on a shrine to remove it."));
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_RC_TO_REMOVE);
                     //Bukkit.getLogger().log(Level.WARNING, "Current pendingShrineRemovals map: " + pendingShrineRemovals);
                 } else {
-                    player.sendMessage(MessageUtils.parse("<red>You don't have permission to remove shrines."));
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_REMOVE);
                 }
                 return true;
             }
@@ -68,14 +74,16 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             int shrineLimit = shrineManager.getPlugin().getShrineLimit();
 
             if (currentShrineCount >= shrineLimit) {
-                sendMessage(player, "<red>You have reached the maximum number of shrines (" + shrineLimit + ").");
+                Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIMIT_REACHED.formatted(
+                    Formatter.number("limit", shrineLimit)
+                ));
                 return true;
             }
 
             // If the player doesn't follow a deity, don't let them make a shrine
             FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
             if (favorManager == null || favorManager.getDeity() == null) {
-                sendMessage(player, "<red>You need to follow a deity to designate a shrine!");
+                Devotions.getInstance().sendMessage(player, Messages.SHRINE_FOLLOW_DEITY_TO_DESIGNATE);
                 return true;
             }
 
@@ -83,13 +91,15 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             Deity deity = favorManager.getDeity();
             if (deity != null) {
                 pendingShrineDesignations.put(player, deity);
-                sendMessage(player, "<yellow>Right-click on a block to designate it as a shrine for " + deity.getName());
+                Devotions.getInstance().sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.formatted(
+                    Placeholder.unparsed("deity", deity.getName())
+                ));
             } else {
-                sendMessage(player, "<red>Could not determine your deity, please inform an admin.");
+                Devotions.getInstance().sendMessage(player, Messages.SHRINE_DEITY_NOT_FOUND);
             }
             return true;
         } else {
-            player.sendMessage(MessageUtils.parse("<red>You don't have permission to set a shrine."));
+            Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_SET);
             return false;
         }
         return false;
@@ -105,7 +115,9 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 // Store the clickedBlock location, deity, and player as a designated shrine
                 Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player.getUniqueId());
                 shrineManager.addShrine(newShrine);
-                sendMessage(player,"<green>Successfully designated a shrine for " + deity.getName() + "!");
+                Devotions.getInstance().sendMessage(player,Messages.SHRINE_SUCCESS.formatted(
+                    Placeholder.unparsed("deity", deity.getName())
+                ));
             }
         }
     }
@@ -121,12 +133,12 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 if (shrineManager.getShrineAtLocation(location) != null) {
                     boolean removed = shrineManager.removeShrine(playerId, location);
                     if (removed) {
-                        player.sendMessage(MessageUtils.parse("<green>Shrine removed successfully!"));
+                        Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVED);
                     } else {
-                        player.sendMessage(MessageUtils.parse("<red>Failed to remove shrine. You might not own it."));
+                        Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
                     }
                 } else {
-                    player.sendMessage(MessageUtils.parse("<red>No shrine found at this location."));
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_NOT_FOUND);
                 }
                 pendingShrineRemovals.remove(playerId);
                 event.setCancelled(true);
@@ -152,24 +164,19 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     private void displayShrineList(Player player) {
         List<Shrine> shrines = shrineManager.getAllShrines();
         if (shrines.isEmpty()) {
-            player.sendMessage(MessageUtils.parse("<red>There are no designated shrines."));
+            Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_DESIGNATED_SHRINE);
             return;
         }
 
         player.sendMessage(MessageUtils.parse("<yellow>Shrines:"));
         for (Shrine shrine : shrines) {
             Location loc = shrine.getLocation();
-            TextComponent message = Component.text()
-                    .content(shrine.getDeity().getName() + " at " + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ())
-                    .clickEvent(ClickEvent.runCommand("/tp " + player.getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ()))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to tp")))
-                    .build();
-            player.sendMessage(message);
+            Devotions.getInstance().sendMessage(player, Messages.SHRINE_SHRINE.formatted(
+                Placeholder.unparsed("deity", shrine.getDeity().getName()),
+                Formatter.number("x", loc.getBlockX()),
+                Formatter.number("y", loc.getBlockZ()),
+                Formatter.number("z", loc.getBlockY())
+            ));
         }
     }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

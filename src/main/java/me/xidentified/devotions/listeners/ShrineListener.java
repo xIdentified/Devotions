@@ -219,8 +219,4 @@ public class ShrineListener implements Listener {
         }
     }
 
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

@@ -3,6 +3,7 @@ package me.xidentified.devotions.commandexecutors;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,12 +25,12 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(MessageUtils.parse("<red>This command can only be used by players!"));
+            Devotions.getInstance().sendMessage(sender, Messages.GENERAL_CMD_PLAYER_ONLY);
             return true;
         }
 
         if (args.length < 1) {
-            sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
+            plugin.sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
             return true;
         }
 
@@ -37,13 +38,13 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         if (subCommand.equals("info")) {
             return handleInfo(player, args);
         }
-        sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
+        plugin.sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
         return true;
     }
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            sendMessage(player, "<yellow>Please specify the ritual you'd like to lookup information for.");
+            plugin.sendMessage(player, "<yellow>Please specify the ritual you'd like to lookup information for.");
             return false;
         }
 
@@ -51,7 +52,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         Ritual selectedRitual = plugin.getRitualManager().getRitualByKey(ritualName);
 
         if (selectedRitual == null) {
-            sendMessage(player, "<red>Unknown ritual. Please choose a valid ritual name.");
+            plugin.sendMessage(player, "<red>Unknown ritual. Please choose a valid ritual name.");
             return true;
         }
 
@@ -62,10 +63,11 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     }
 
     private void displayRitualInfo(Player player, Ritual ritual) {
-        sendMessage(player, "<gold>Details of " + ritual.getDisplayName());
-        sendMessage(player, "<yellow>Description: <gray>" + ritual.getDescription());
-        sendMessage(player, "<yellow>Key Item: <gray>" + ritual.getParsedItemName());
-        sendMessage(player, "<yellow>Favor Rewarded: <gray>" + ritual.getFavorAmount());
+        // TODO one message
+        plugin.sendMessage(player, "<gold>Details of " + ritual.getDisplayName());
+        plugin.sendMessage(player, "<yellow>Description: <gray>" + ritual.getDescription());
+        plugin.sendMessage(player, "<yellow>Key Item: <gray>" + ritual.getParsedItemName());
+        plugin.sendMessage(player, "<yellow>Favor Rewarded: <gray>" + ritual.getFavorAmount());
     }
 
     @Override
@@ -84,9 +86,5 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         return suggestions.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
-    }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
     }
 }

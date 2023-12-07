@@ -3,6 +3,7 @@ package me.xidentified.devotions.commandexecutors;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,12 +30,12 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
         if ("reload".equalsIgnoreCase(args[0])) {
             if (!sender.hasPermission("devotions.reload")) {
-                sendMessage((Player) sender, "You do not have permission to use this command.");
+                plugin.sendMessage(sender, Messages.GENERAL_CMD_NO_PERM);
                 return true;
             }
 
             plugin.reloadConfigurations();
-            sendMessage((Player) sender,"<green>Devotions successfully reloaded!");
+            plugin.sendMessage(sender,"<green>Devotions successfully reloaded!");
             return true;
         }
 
@@ -51,9 +52,4 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
         return completions;
     }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

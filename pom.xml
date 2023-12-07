@@ -74,9 +74,18 @@
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>Translations</id>
+            <url>https://nexus.leonardbausenwein.de/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>de.cubbossa</groupId>
+            <artifactId>Translations</artifactId>
+            <version>3.2.1</version>
+        </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>

@@ -1,5 +1,7 @@
 package me.xidentified.devotions;
 
+import de.cubbossa.translations.Translations;
+import de.cubbossa.translations.TranslationsFramework;
 import lombok.Getter;
 import me.xidentified.devotions.commandexecutors.*;
 import me.xidentified.devotions.effects.Blessing;
@@ -13,9 +15,11 @@ import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.storage.ShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Placeholders;
+import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,12 +48,16 @@ public class Devotions extends JavaPlugin {
     private FileConfiguration soundsConfig;
     @Getter private StorageManager storageManager;
     @Getter private DevotionStorage devotionStorage;
+    private Translations translations;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         initializePlugin();
         loadSoundsConfig();
+
+        TranslationsFramework.enable(new File(getDataFolder(), "/../"));
+        translations = TranslationsFramework.application("Devotions");
 
         // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -474,7 +482,6 @@ public class Devotions extends JavaPlugin {
         getServer().getAsyncScheduler().cancelTasks(this);
 
         ritualManager.ritualDroppedItems.clear();
-
     }
 
     public int getShrineLimit() {
@@ -506,4 +513,7 @@ public class Devotions extends JavaPlugin {
         }
     }
 
+    public void sendMessage(CommandSender sender, ComponentLike componentLike) {
+
+    }
 }
