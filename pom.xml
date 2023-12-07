@@ -38,10 +38,16 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>io.lumine:MythicLib-dist</include>
+                                    <include>de.cubbossa:Translations</include>
+                                </includes>
+                            </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.kyori.adventure</pattern>
-                                    <shadedPattern>me.xidentified.devotions.adventure</shadedPattern>
+                                    <pattern>de.cubbossa.translations</pattern>
+                                    <shadedPattern>me.xidentified.devotions.libs.translations</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
