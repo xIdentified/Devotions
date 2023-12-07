@@ -7,6 +7,9 @@ import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.*;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +27,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 // Begins rituals or player's offerings
@@ -59,7 +64,9 @@ public class ShrineListener implements Listener {
         // If the shrine doesn't belong to player's deity, inform them
         Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
         if (!shrine.getDeity().equals(playerDeity)) {
-            player.sendMessage(MessageUtils.parse("<red>Only followers of " + shrine.getDeity().getName() + " may use this shrine."));
+            plugin.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.formatted(
+                Placeholder.unparsed("deity", shrine.getDeity().getName())
+            ));
             return;
         }
 
@@ -145,7 +152,7 @@ public class ShrineListener implements Listener {
 
             if (favorManager != null) {
                 takeItemInHand(player, itemInHand);
-                sendMessage(player, "<green>Your offering has been accepted!");
+                plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
 
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     favorManager.increaseFavor(offering.getValue());
@@ -204,7 +211,7 @@ public class ShrineListener implements Listener {
         Shrine shrine = shrineManager.getShrineAtLocation(block.getLocation().subtract(0, 1, 0)); // Check the block below
         if (shrine != null) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(MessageUtils.parse("<red>You cannot place blocks on top of a shrine!"));
+            plugin.sendMessage(event.getPlayer(), Messages.SHRINE_PLACE_ON_TOP);
         }
     }
 
@@ -215,7 +222,7 @@ public class ShrineListener implements Listener {
         Shrine shrine = shrineManager.getShrineAtLocation(block.getLocation());
         if (shrine != null) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(MessageUtils.parse("<red>You cannot destroy shrines! Remove with <yellow>/shrine remove<red>."));
+            plugin.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
         }
     }
 

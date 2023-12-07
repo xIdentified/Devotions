@@ -4,6 +4,8 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +32,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 1) {
-            plugin.sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
+            plugin.sendMessage(player, Messages.RITUAL_CMD_USAGE);
             return true;
         }
 
@@ -38,7 +40,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         if (subCommand.equals("info")) {
             return handleInfo(player, args);
         }
-        plugin.sendMessage(player, "<yellow>Usage: /ritual <info> [RitualName]");
+        plugin.sendMessage(player, Messages.RITUAL_CMD_USAGE);
         return true;
     }
 
@@ -52,7 +54,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         Ritual selectedRitual = plugin.getRitualManager().getRitualByKey(ritualName);
 
         if (selectedRitual == null) {
-            plugin.sendMessage(player, "<red>Unknown ritual. Please choose a valid ritual name.");
+            plugin.sendMessage(player, Messages.RITUAL_NOT_FOUND);
             return true;
         }
 
@@ -63,11 +65,12 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     }
 
     private void displayRitualInfo(Player player, Ritual ritual) {
-        // TODO one message
-        plugin.sendMessage(player, "<gold>Details of " + ritual.getDisplayName());
-        plugin.sendMessage(player, "<yellow>Description: <gray>" + ritual.getDescription());
-        plugin.sendMessage(player, "<yellow>Key Item: <gray>" + ritual.getParsedItemName());
-        plugin.sendMessage(player, "<yellow>Favor Rewarded: <gray>" + ritual.getFavorAmount());
+        plugin.sendMessage(player, Messages.RITUAL_INFO.formatted(
+            Placeholder.unparsed("display-name", ritual.getDisplayName()),
+            Placeholder.unparsed("description", ritual.getDescription()),
+            Placeholder.unparsed("item-name", ritual.getParsedItemName()),
+            Formatter.number("favour-amount", ritual.getFavorAmount())
+        ));
     }
 
     @Override

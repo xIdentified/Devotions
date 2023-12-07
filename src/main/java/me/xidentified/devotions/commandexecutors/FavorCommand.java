@@ -42,7 +42,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length != 3) {
-            plugin.sendMessage(player,"<yellow>Usage: /favor <set|give|take> <playername> <amount>");
+            plugin.sendMessage(player,Messages.FAVOR_CMD_USAGE);
             return true;
         }
 
