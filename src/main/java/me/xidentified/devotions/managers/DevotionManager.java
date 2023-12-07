@@ -118,10 +118,7 @@ public class DevotionManager {
     }
 
     public void reset() {
-        // Clear current player devotions
         playerDevotions.clear();
-
-        // Reload devotions from storage
         loadPlayerDevotions();
     }
 

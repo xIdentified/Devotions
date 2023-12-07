@@ -1,4 +1,7 @@
 package me.xidentified.devotions.managers;
+
+import lombok.Getter;
+import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
@@ -15,11 +18,11 @@ import java.util.UUID;
 // Point system for tracking favor with each deity
 public class FavorManager {
     // Basic details
-    private final Devotions plugin;
-    private final UUID uuid;
-    private Deity deity;
-    private int favor;
-    private final int maxFavor;
+    @Getter private final Devotions plugin;
+    @Getter private final UUID uuid;
+    @Getter @Setter private Deity deity;
+    @Getter @Setter private int favor;
+    @Getter private final int maxFavor;
 
     // Blessing, curse, miracle thresholds and chances etc
     private final int BLESSING_THRESHOLD;
@@ -113,7 +116,7 @@ public class FavorManager {
     }
 
 
-    public Player getPlayer() {
+   /** public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
 
@@ -124,18 +127,18 @@ public class FavorManager {
     }
 
     public int getFavor() {
-        return favor;
-    }
+        return favor;}
 
     public void setFavor(int favor) {
         this.favor = favor;
     }
 
     public void setDeity(Deity newDeity) { this.deity = newDeity; }
+**/
 
     public void increaseFavor(int amount) {
         this.favor += amount;
-        Player player = getPlayer();
+        Player player = Bukkit.getPlayer(uuid);
 
         if (this.favor > maxFavor) {
             this.favor = maxFavor;
@@ -164,7 +167,7 @@ public class FavorManager {
             this.favor = 0;
         }
 
-        Player player = getPlayer();
+        Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
             Component favorMessage = MessageUtils.getFavorText(this.favor);
             player.sendMessage(Component.text("§cYour favor with " + deity.getName() + " has decreased to ").append(favorMessage));

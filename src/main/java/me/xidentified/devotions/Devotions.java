@@ -1,6 +1,9 @@
 package me.xidentified.devotions;
 
+import lombok.Getter;
 import me.xidentified.devotions.commandexecutors.*;
+import me.xidentified.devotions.effects.Blessing;
+import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.listeners.PlayerListener;
 import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
@@ -29,18 +32,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Devotions extends JavaPlugin {
-    private static Devotions instance;
-    private DevotionManager devotionManager;
-    private RitualManager ritualManager;
+    @Getter private static Devotions instance;
+    @Getter private DevotionManager devotionManager;
+    @Getter private RitualManager ritualManager;
     private final Map<String, Miracle> miraclesMap = new HashMap<>();
-    private CooldownManager cooldownManager;
-    private MeditationManager meditationManager;
-    private ShrineListener shrineListener;
+    @Getter private CooldownManager cooldownManager;
+    @Getter private MeditationManager meditationManager;
+    @Getter private ShrineListener shrineListener;
     private YamlConfiguration deitiesConfig;
     private FileConfiguration ritualConfig;
     private FileConfiguration soundsConfig;
-    private StorageManager storageManager;
-    private DevotionStorage devotionStorage;
+    @Getter private StorageManager storageManager;
+    @Getter private DevotionStorage devotionStorage;
 
     @Override
     public void onEnable() {
@@ -473,27 +476,6 @@ public class Devotions extends JavaPlugin {
         ritualManager.ritualDroppedItems.clear();
 
     }
-
-
-
-
-    public static Devotions getInstance() {
-        return instance;
-    }
-
-    public DevotionManager getDevotionManager() {return this.devotionManager;}
-
-    public RitualManager getRitualManager() {return ritualManager;}
-
-    public CooldownManager getCooldownManager() {return cooldownManager;}
-
-    public MeditationManager getMeditationManager() {return meditationManager;}
-
-    public ShrineListener getShrineListener() {return shrineListener;}
-
-    public DevotionStorage getDevotionStorage() {return devotionStorage;}
-
-    public StorageManager getStorageManager() {return storageManager;}
 
     public int getShrineLimit() {
         return getConfig().getInt("shrine-limit", 3); // 3 is a default value if not set in config

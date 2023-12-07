@@ -1,11 +1,8 @@
 package me.xidentified.devotions.storage;
 
-public record DevotionData(String deityName, int favor) {
-    public int getFavor() {
-        return favor;
-    }
+import lombok.Getter;
 
-    public String getDeityName() {
-        return deityName;
-    }
+@Getter
+public record DevotionData(String deityName, int favor) {
+
 }
