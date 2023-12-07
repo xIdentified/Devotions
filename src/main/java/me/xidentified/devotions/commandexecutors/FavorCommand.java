@@ -33,7 +33,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             if (favorManager == null) {
-                plugin.sendMessage(player, "<red>You don't have any devotion set.");
+                plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
             } else {
                 Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
                 plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
@@ -67,13 +67,15 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         try {
             amount = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            plugin.sendMessage(player,"<red>Invalid amount. Please enter a number.");
+            plugin.sendMessage(player,Messages.FAVOR_CMD_NUMBER_FORMAT);
             return true;
         }
 
         FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(targetPlayer.getUniqueId());
         if (favorManager == null) {
-            plugin.sendMessage(player,"<red>" + targetPlayer.getName() + " doesn't worship any deity.");
+            plugin.sendMessage(player,Messages.FAVOR_CMD_PLAYER_DOESNT_WORSHIP.formatted(
+                Placeholder.unparsed("player", targetPlayer.getName())
+            ));
             return true;
         }
 
@@ -82,7 +84,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             case "give" -> favorManager.increaseFavor(amount);
             case "take" -> favorManager.decreaseFavor(amount);
             default -> {
-                plugin.sendMessage(player,"<red>Invalid action. Use set, give, or take.");
+                plugin.sendMessage(player,Messages.FAVOR_CMD_INVALID_ACTION);
                 return true;
             }
         }

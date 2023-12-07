@@ -168,10 +168,10 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             return;
         }
 
-        player.sendMessage(MessageUtils.parse("<yellow>Shrines:"));
+        Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIST);
         for (Shrine shrine : shrines) {
             Location loc = shrine.getLocation();
-            Devotions.getInstance().sendMessage(player, Messages.SHRINE_SHRINE.formatted(
+            Devotions.getInstance().sendMessage(player, Messages.SHRINE_INFO.formatted(
                 Placeholder.unparsed("deity", shrine.getDeity().getName()),
                 Formatter.number("x", loc.getBlockX()),
                 Formatter.number("y", loc.getBlockZ()),

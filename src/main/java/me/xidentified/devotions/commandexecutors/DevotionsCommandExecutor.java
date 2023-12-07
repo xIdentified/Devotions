@@ -35,7 +35,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
             }
 
             plugin.reloadConfigurations();
-            plugin.sendMessage(sender,"<green>Devotions successfully reloaded!");
+            plugin.sendMessage(sender,Messages.DEVOTION_RELOAD_SUCCESS);
             return true;
         }
 

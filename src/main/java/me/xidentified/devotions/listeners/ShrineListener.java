@@ -27,8 +27,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 // Begins rituals or player's offerings
@@ -76,7 +78,9 @@ public class ShrineListener implements Listener {
         if (ritual != null) {
             long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
             if (remainingCooldown > 0) {
-                player.sendMessage(MessageUtils.parse("<red>You must wait " + cooldownManager.formatCooldownTime(remainingCooldown) + " before performing another ritual."));
+                plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
+                    Formatter.date("cooldown", Instant.ofEpochMilli(remainingCooldown))
+                ));
                 return;
             }
             try {
@@ -92,7 +96,9 @@ public class ShrineListener implements Listener {
         else if (!itemInHand.getType().equals(Material.AIR)) {
             long remainingCooldown = cooldownManager.isActionAllowed(player, "offering");
             if (remainingCooldown > 0) {
-                player.sendMessage(MessageUtils.parse("<red>You must wait " + cooldownManager.formatCooldownTime(remainingCooldown) + " before making another offering!"));
+                plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
+                    Formatter.date("cooldown", Instant.ofEpochMilli(remainingCooldown))
+                ));
                 return;
             }
             try {
@@ -162,7 +168,9 @@ public class ShrineListener implements Listener {
                 }, 100L);
             }
         } else {
-            sendMessage(player, "<red>Your offering was not accepted by " + favorManager.getDeity().getName() + ".");
+            plugin.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED.formatted(
+                Placeholder.unparsed("subject", favorManager.getDeity().getName())
+            ));
             if (droppedItem != null) droppedItem.remove();
         }
     }

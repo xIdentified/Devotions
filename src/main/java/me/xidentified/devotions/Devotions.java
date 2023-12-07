@@ -69,6 +69,8 @@ public class Devotions extends JavaPlugin {
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
         translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
 
+        translations.addMessages(TranslationsFramework.messageFieldsFromClass(Messages.class));
+
         translations.getStyleSet().put("negative", "<red>");
         translations.getStyleSet().put("positive", "<green>");
         translations.getStyleSet().put("warning", "<yellow>");

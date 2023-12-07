@@ -56,7 +56,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleSelect(Player player, String[] args) {
         if (args.length < 2) {
-            plugin.sendMessage(player, "<yellow>Please specify the deity you wish to worship.");
+            plugin.sendMessage(player, Messages.DEITY_CMD_SPECIFY_DEITY);
             return true;
         }
 
@@ -64,7 +64,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
         if (selectedDeity == null) {
-            plugin.sendMessage(player, "<red>Unknown deity. Please choose a valid deity name.");
+            plugin.sendMessage(player, Messages.DEITY_NOT_FOUND);
             return false;
         }
 
@@ -88,7 +88,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            plugin.sendMessage(player,"<yellow>Please specify the deity whose information you wish to view.");
+            plugin.sendMessage(player,Messages.DEITY_SPECIFY_PLAYER);
             return true;
         }
 
@@ -96,7 +96,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
         if (selectedDeity == null) {
-            plugin.sendMessage(player,"<red>Unknown deity. Please choose a valid deity name.");
+            plugin.sendMessage(player,Messages.DEITY_NOT_FOUND);
             return false;
         }
 
@@ -115,13 +115,15 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     private boolean handleList(Player player) {
         List<Deity> deities = plugin.getDevotionManager().getAllDeities();
         if (deities.isEmpty()) {
-            plugin.sendMessage(player,"<red>No deities found.");
+            plugin.sendMessage(player,Messages.DEITY_NO_DEITY_FOUND);
             return false;
         }
 
-        plugin.sendMessage(player, "<gold>Available Deities:");
+        plugin.sendMessage(player, Messages.DEITY_LIST_HEADER);
         for (Deity deity : deities) {
-            player.sendMessage(MessageUtils.parse("<gray>- " + deity.getName()));
+            plugin.sendMessage(player, Messages.DEITY_LIST_HEADER.formatted(
+                Placeholder.unparsed("name", deity.name)
+            ));
         }
 
         return true;

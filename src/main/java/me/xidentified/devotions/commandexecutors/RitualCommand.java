@@ -46,7 +46,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            plugin.sendMessage(player, "<yellow>Please specify the ritual you'd like to lookup information for.");
+            plugin.sendMessage(player, Messages.RITUAL_CMD_SPECIFY);
             return false;
         }
 
