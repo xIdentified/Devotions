@@ -1,5 +1,8 @@
 package me.xidentified.devotions;
 
+import lombok.Getter;
+import me.xidentified.devotions.effects.Blessing;
+import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
@@ -14,10 +17,11 @@ import java.util.stream.Collectors;
 
 public class Deity {
     private final Devotions plugin;
-    public final String name;
-    private final String lore;
+    // Getter methods below
+    @Getter public final String name;
+    @Getter private final String lore;
+    @Getter private final String alignment;
     private final String domain;
-    private final String alignment;
     private final List<ItemStack> offerings;
     private final List<String> rituals;
     private final List<Blessing> blessings;
@@ -125,22 +129,8 @@ public class Deity {
         return applicableMiracles.get(randomIndex);
     }
 
-
-    // Getter methods below
-    public String getName(){
-        return name;
-    }
-
-    public String getLore() {
-        return this.lore;
-    }
-
     public CharSequence getDomain() {
         return this.domain;
-    }
-
-    public String getAlignment() {
-        return this.alignment;
     }
 
     // Return offerings as a well formatted list

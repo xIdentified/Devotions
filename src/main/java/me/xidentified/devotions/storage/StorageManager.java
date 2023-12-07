@@ -1,10 +1,12 @@
 package me.xidentified.devotions.storage;
 
+import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 
 import java.io.File;
 
 public class StorageManager {
+    @Getter
     private File storageFolder;
     private final Devotions plugin;
 
@@ -20,7 +22,4 @@ public class StorageManager {
         }
     }
 
-    public File getStorageFolder() {
-        return storageFolder;
-    }
 }

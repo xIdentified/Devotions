@@ -1,5 +1,6 @@
 package me.xidentified.devotions.rituals;
 
+import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
@@ -14,12 +15,18 @@ public class Ritual {
     public boolean isCompleted = false;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
+    @Getter
     private final String displayName;
+    @Getter
     private final String description;
+    @Getter
     private final RitualItem item;
+    @Getter
     private final int favorAmount;
     private final RitualConditions conditions;
+    @Getter
     private final RitualOutcome outcome;
+    @Getter
     private final List<RitualObjective> objectives;
 
     public Ritual(Devotions plugin, String displayName, String description, RitualItem item, int favorAmount,
@@ -117,19 +124,9 @@ public class Ritual {
         }
     }
 
-    public List<RitualObjective> getObjectives() { return objectives; }
-
-    public RitualOutcome getOutcome() { return outcome; }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public boolean isCompleted() {
         return this.isCompleted;
     }
-
-    public String getDescription() { return description; }
 
     public String getParsedItemName() {
         String id = item.id();
@@ -148,9 +145,6 @@ public class Ritual {
         return readableName.toString().trim();
     }
 
-    public int getFavorAmount() { return favorAmount; }
-
-
     public void reset() {
         for (RitualObjective objective : this.getObjectives()) {
             objective.reset();
@@ -158,8 +152,5 @@ public class Ritual {
         this.isCompleted = false;
     }
 
-    public RitualItem getItem() {
-        return item;
-    }
 }
 

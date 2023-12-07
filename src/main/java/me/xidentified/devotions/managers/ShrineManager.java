@@ -1,5 +1,6 @@
 package me.xidentified.devotions.managers;
 
+import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.storage.ShrineStorage;
@@ -13,7 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ShrineManager {
-    private final Devotions plugin;
+    @Getter private final Devotions plugin;
     private ShrineStorage shrineStorage;
     private final List<Shrine> allShrinesList;
     private final Map<Location, Shrine> shrines = new ConcurrentHashMap<>();
@@ -103,10 +104,6 @@ public class ShrineManager {
         return count;
     }
 
-
-    public Devotions getPlugin() {
-        return plugin;
-    }
 
     public void setShrineStorage(ShrineStorage newStorage) {
         this.shrineStorage = newStorage;

@@ -58,7 +58,7 @@ public class Placeholders extends PlaceholderExpansion {
             StringBuilder topPlayers = new StringBuilder();
             for (int i = 0; i < Math.min(3, sortedFavorData.size()); i++) {
                 FavorManager data = sortedFavorData.get(i);
-                String playerName = Bukkit.getOfflinePlayer(data.getPlayerUUID()).getName();
+                String playerName = Bukkit.getOfflinePlayer(data.getUuid()).getName();
                 Component favorText = MessageUtils.getFavorText(data.getFavor());
                 String favorTextString = LegacyComponentSerializer.legacySection().serialize(favorText);
                 topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ").append(favorTextString).append("\n");

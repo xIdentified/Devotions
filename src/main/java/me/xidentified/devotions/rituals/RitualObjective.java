@@ -1,5 +1,6 @@
 package me.xidentified.devotions.rituals;
 
+import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 
 public class RitualObjective {
@@ -10,10 +11,10 @@ public class RitualObjective {
     }
 
     private final Devotions plugin;
-    private final Type type;
-    private final String description;
-    private final String target;  // Can be an item or a mob type
-    private final int count;
+    @Getter private final Type type;
+    @Getter private final String description;
+    @Getter private final String target;  // Can be an item or a mob type
+    @Getter private final int count;
     private int currentCount;  // To track objective progress
 
     public RitualObjective(Devotions plugin, Type type, String description, String target, int count) {
@@ -23,22 +24,6 @@ public class RitualObjective {
         this.target = target;
         this.count = count;
         this.currentCount = 0;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public int getCount() {
-        return count;
     }
 
     public void setCurrentCount(int count) {
