@@ -1,6 +1,7 @@
 package me.xidentified.devotions;
 
 import de.cubbossa.translations.Message;
+import de.cubbossa.translations.StyleSet;
 import de.cubbossa.translations.Translations;
 import de.cubbossa.translations.TranslationsFramework;
 import de.cubbossa.translations.persistent.YamlMessageStorage;
@@ -71,15 +72,7 @@ public class Devotions extends JavaPlugin {
 
         translations.addMessages(TranslationsFramework.messageFieldsFromClass(Messages.class));
 
-        translations.getStyleSet().put("negative", "<red>");
-        translations.getStyleSet().put("positive", "<green>");
-        translations.getStyleSet().put("warning", "<yellow>");
-
-        // save default translations
-        translations.saveLocale(Locale.ENGLISH);
-        saveResource("lang/de.yml", false);
-        translations.loadLocales();
-        translations.loadStyles();
+        loadLanguages();
 
         // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -377,6 +370,7 @@ public class Devotions extends JavaPlugin {
         reloadConfig();
         reloadRitualConfig();
         reloadSoundsConfig();
+        loadLanguages();
 
         // Reset the DevotionManager
         if (devotionManager != null) {
@@ -423,6 +417,41 @@ public class Devotions extends JavaPlugin {
             soundsConfig = YamlConfiguration.loadConfiguration(soundFile);
         }
         loadRituals();
+    }
+
+    /**
+     * Run to reload changes to message files
+     */
+    public void loadLanguages() {
+        // load so that we can check if certain styles are present and potentially modified already
+        translations.loadStyles();
+
+        boolean saveStyles = false;
+        // if any of "negative", "positive" or "warning" is missing, it will be added. If present, it won't be overridden.
+        StyleSet set = translations.getStyleSet();
+        if (!set.containsKey("negative")) {
+            translations.getStyleSet().put("negative", "<red>");
+            saveStyles = true;
+        }
+        if (!set.containsKey("positive")) {
+            translations.getStyleSet().put("positive", "<green>");
+            saveStyles = true;
+        }
+        if (!set.containsKey("warning")) {
+            translations.getStyleSet().put("warning", "<yellow>");
+            saveStyles = true;
+        }
+        if (saveStyles) {
+            // we only do it conditionally to save performance
+            translations.saveStyles();
+        }
+
+        // save default translations
+        translations.saveLocale(Locale.ENGLISH);
+        saveResource("lang/de.yml", false);
+
+        // load
+        translations.loadLocales();
     }
 
     public void loadSoundsConfig() {

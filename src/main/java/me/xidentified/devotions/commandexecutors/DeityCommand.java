@@ -121,7 +121,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         plugin.sendMessage(player, Messages.DEITY_LIST_HEADER);
         for (Deity deity : deities) {
-            plugin.sendMessage(player, Messages.DEITY_LIST_HEADER.formatted(
+            plugin.sendMessage(player, Messages.DEITY_LIST_ENTRY.formatted(
                 Placeholder.unparsed("name", deity.name)
             ));
         }
