@@ -370,6 +370,7 @@ public class Devotions extends JavaPlugin {
         reloadConfig();
         reloadRitualConfig();
         reloadSoundsConfig();
+        loadLanguages();
 
         // Reset the DevotionManager
         if (devotionManager != null) {

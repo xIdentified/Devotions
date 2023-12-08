@@ -21,17 +21,17 @@ ritual:
 favor:
   cmd:
     usage: '<warning>Usage: /favor <set|give|take> <playername> <amount>'
-    player_does_not_worship: <red><player> verehrt keine Gottheit.
-    invalid_number_format: <red>Ungültige Anzahl. Bitte gib eine Ganzzahl an.
-    invalid_action: <red>Ungültige Aktion. Verwende set, give, oder take.
+    player_does_not_worship: <negative><player> verehrt keine Gottheit.
+    invalid_number_format: <negative>Ungültige Anzahl. Bitte gib eine Ganzzahl an.
+    invalid_action: <negative>Ungültige Aktion. Verwende set, give, oder take.
   current_favor: 'Deine aktuelle Gunst beträgt: <favor>'
-  no_devotion_set: <red>Du hast keine Ergebenheit gesetzt.
+  no_devotion_set: <negative>Du hast keine Ergebenheit gesetzt.
 meditation:
   cancelled: <negative>Du hast dich beim Meditieren bewegt! Starte Timer neu...
   complete: <positive>Meditation abgeschlossen! Du kannst dich nun bewegen.
 devotion:
-  set: <green>Du bist nun <deity> ergeben. Deine Gunst beträgt <favor>.
-  reload_success: <green>Devotions erfolgreich neu geladen!
+  set: <positive>Du bist nun <deity> ergeben. Deine Gunst beträgt <favor>.
+  reload_success: <positive>Devotions erfolgreich neu geladen!
 miracle:
   repair: <positive>Ein Wunder hat all deine Items repariert!
   iron_golem: <positive>Ein Wunder hat Eisengolems beschworen, um dich zu beschützen!
@@ -56,8 +56,8 @@ shrines:
     no_shrines: <negative>Es gibt keine Schreine.
     no_perm: <negative>Du hast keine Berechtigung, um Schreine aufzulisten.
     header: '<yellow>Schreine:'
-    shrine: <hover:show_text:Click to teleport><click:run_cmd:/teleport @p <x> <y>
-      <z>><deity> bei <x>, <y>, <z>
+    shrine: <hover:show_text:Click to teleport><click:run_cmd:/teleport <x> <y>
+      <z>><deity> bei <x:#.#>, <y:#.#>, <z:#.#>
   offering_accepted: <positive>Dein Opfer wurde akzeptiert!
   remove:
     success: <positive>Schrein erfolgreich entfernt!
@@ -68,23 +68,22 @@ shrines:
   limit_reached: <negative>Du hast dein Limit für Schreine erreicht (<limit>).
   cannot_break_shrines: <negative>Du kannst Schreine nicht abbauen. Entferne sie mit <warning>/shrine
     remove</warning>.
-  cooldown: <red>Du musst weitere <cooldown:'mm Minuten und ss Sekunden'> warten, um ein weiteres Ritual auszuführen.
-  offering_declined: <red>Dein Opfer wurde von <subject> nicht akzeptiert.
+  cooldown: <negative>Du musst weitere <cooldown:'m'> Minuten und <cooldown:'s'> warten, um ein weiteres Ritual auszuführen.
+  offering_declined: <negative>Dein Opfer wurde von <subject> nicht akzeptiert.
   not_following_deity: <negative>Nur Anhänger von <deity> können diesen Schrein anbeten.
   shrine_created: <positive>Erfolgreich einen Schrein für <deity> bestimmt!
 deity:
-  no_deity_found: <red>Keine Gottheiten gefunden.
+  no_deity_found: <negative>Keine Gottheiten gefunden.
   cursed: <positive><deity> verflucht dich mit <curse>!
   blessed: <positive><deity> segnet dich mit <blessing>!
   cmd:
     specify_deity: <yellow>Bitte gebe eine Gottheit an, der du folgen möchtest.
     specify_player: <warning>Bitte gebe eine Gottheit an, um Informationen zu ihr zu erhalten.
-    usage: '<warning>Usage: /Verwendung <select|info> [Gottheit]'
+    usage: '<warning>Verwendung: /Verwendung <select|info> [Gottheit]'
   list:
-    entry: |
-      <gray>- <name></gray>
+    entry: <gray>- <name></gray>
     header: '<gold>Mögliche Gottheiten:'
-  not_found: <red>Unbekannte Gottheit, bitte gebe einen gültigen Namen an.
+  not_found: <negative>Unbekannte Gottheit, bitte gebe einen gültigen Namen an.
   info: |-
     <gold>Details zu <name>
     <yellow>Beschreibung: <gray><lore>
@@ -94,4 +93,4 @@ deity:
     <yellow>Favored Offerings: <gray><offerings>
 miracles:
   cmd:
-    list_available: '<green>Verfügbare Wunder: <yellow><miracles>'
+    list_available: '<positive>Verfügbare Wunder: <yellow><miracles>'

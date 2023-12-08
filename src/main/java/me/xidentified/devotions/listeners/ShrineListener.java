@@ -6,7 +6,6 @@ import me.xidentified.devotions.Offering;
 import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.*;
 import me.xidentified.devotions.rituals.Ritual;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -27,10 +26,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
 import java.util.List;
 
 // Begins rituals or player's offerings
@@ -79,7 +77,7 @@ public class ShrineListener implements Listener {
             long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
             if (remainingCooldown > 0) {
                 plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", Instant.ofEpochMilli(remainingCooldown))
+                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
                 ));
                 return;
             }
@@ -97,7 +95,7 @@ public class ShrineListener implements Listener {
             long remainingCooldown = cooldownManager.isActionAllowed(player, "offering");
             if (remainingCooldown > 0) {
                 plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", Instant.ofEpochMilli(remainingCooldown))
+                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
                 ));
                 return;
             }

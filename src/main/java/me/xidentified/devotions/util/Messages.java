@@ -19,18 +19,18 @@ public class Messages {
 			.build();
 
 	public static final Message DEVOTION_RELOAD_SUCCESS = new MessageBuilder("devotion.reload_success")
-			.withDefault("<green>Devotions successfully reloaded!")
+			.withDefault("<positive>Devotions successfully reloaded!")
 			.build();
 	public static final Message DEVOTION_SET = new MessageBuilder("devotion.set")
-			.withDefault("<green>You are now devoted to <deity>. Your favor is <favor>.")
+			.withDefault("<positive>You are now devoted to <name>. Your favor is <favor>.")
 			.withPlaceholder("name", "favor")
 			.build();
 
 	public static final Message DEITY_NOT_FOUND = new MessageBuilder("deity.not_found")
-			.withDefault("<red>Unknown deity. Please choose a valid deity name.")
+			.withDefault("<negative>Unknown deity. Please choose a valid deity name.")
 			.build();
 	public static final Message DEITY_NO_DEITY_FOUND = new MessageBuilder("deity.no_deity_found")
-			.withDefault("<red>No deities found.")
+			.withDefault("<negative>No deities found.")
 			.build();
 	public static final Message DEITY_BLESSED = new MessageBuilder("deity.blessed")
 			.withDefault("<positive><deity> has blessed you with <blessing>!")
@@ -53,7 +53,7 @@ public class Messages {
 			.withDefault("<gold>Available Deities:")
 			.build();
 	public static final Message DEITY_LIST_ENTRY = new MessageBuilder("deity.list.entry")
-			.withDefault("<gray>- <name></gray>\n")
+			.withDefault("<gray>- <name></gray>")
 			.withPlaceholder("name")
 			.build();
 	public static final Message DEITY_INFO = new MessageBuilder("deity.info")
@@ -84,7 +84,7 @@ public class Messages {
 			.withDefault("<yellow>Shrines:")
 			.build();
 	public static final Message SHRINE_INFO = new MessageBuilder("shrines.list.shrine")
-			.withDefault("<hover:show_text:Click to teleport><click:run_cmd:/teleport @p <x> <y> <z>><deity> at <x>, <y>, <z>")
+			.withDefault("<hover:show_text:Click to teleport><click:run_command:'/teleport @p <x> <y> <z>'><deity> at <x:#.#>, <y:#.#>, <z:#.#>")
 			.withPlaceholders("deity", "x", "y", "z")
 			.build();
 	public static final Message SHRINE_NO_PERM_REMOVE = new MessageBuilder("shrines.remove.no_perm")
@@ -108,7 +108,7 @@ public class Messages {
 			.withPlaceholder("deity")
 			.build();
 	public static final Message SHRINE_COOLDOWN = new MessageBuilder("shrines.cooldown")
-			.withDefault("<red>You must wait <cooldown:mm minutes and ss seconds> before performing another ritual.")
+			.withDefault("<negative>You must wait <cooldown:'m'> minutes and <cooldown:'s'> before performing another ritual.")
 			.build();
 	public static final Message SHRINE_CLICK_BLOCK_TO_DESIGNATE = new MessageBuilder("shrines.click_block_to_create")
 			.withDefault("<warning>Right-click on a block to designate it as a shrine for <deity>")
@@ -140,7 +140,7 @@ public class Messages {
 			.withDefault("<negative>You cannot destroy shrines! Remove with <warning>/shrine remove</warning>.")
 			.build();
 	public static final Message SHRINE_OFFERING_DECLINED = new MessageBuilder("shrines.offering_declined")
-			.withDefault("<red>Your offering was not accepted by <subject>.")
+			.withDefault("<negative>Your offering was not accepted by <subject>.")
 			.withPlaceholder("subject")
 			.build();
 
@@ -148,21 +148,21 @@ public class Messages {
 			.withDefault("<warning>Usage: /favor <set|give|take> <playername> <amount>")
 			.build();
 	public static final Message FAVOR_CMD_PLAYER_DOESNT_WORSHIP = new MessageBuilder("favor.cmd.player_does_not_worship")
-			.withDefault("<red><player> doesn't worship any deity.")
+			.withDefault("<negative><player> doesn't worship any deity.")
 			.withPlaceholder("player")
 			.build();
 	public static final Message FAVOR_CMD_INVALID_ACTION = new MessageBuilder("favor.cmd.invalid_action")
-			.withDefault("<red>Invalid action. Use set, give, or take.")
+			.withDefault("<negative>Invalid action. Use set, give, or take.")
 			.build();
 	public static final Message FAVOR_CMD_NUMBER_FORMAT = new MessageBuilder("favor.cmd.invalid_number_format")
-			.withDefault("<red>Invalid amount. Please enter a number.")
+			.withDefault("<negative>Invalid amount. Please enter a number.")
 			.build();
 	public static final Message FAVOR_CURRENT = new MessageBuilder("favor.current_favor")
 			.withDefault("Your current favor is: <favor>")
 			.withPlaceholder("favor")
 			.build();
 	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.no_devotion_set")
-			.withDefault("<red>You don't have any devotion set.")
+			.withDefault("<negative>You don't have any devotion set.")
 			.build();
 
 	public static final Message RITUAL_CMD_USAGE = new MessageBuilder("ritual.cmd.usage")
@@ -205,7 +205,7 @@ public class Messages {
 			.withDefault("<negative>No miracles are loaded.")
 			.build();
 	public static final Message MIRACLE_CMD_AVAILABLE = new MessageBuilder("miracles.cmd.list_available")
-			.withDefault("<green>Available miracles: <yellow><miracles>")
+			.withDefault("<positive>Available miracles: <yellow><miracles>")
 			.withPlaceholder("miracles")
 			.build();
 	public static final Message MIRACLE_CMD_UNKNOWN_MIRACLE = new MessageBuilder("miracle.cmd.unknown_miracle")
