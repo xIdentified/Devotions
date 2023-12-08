@@ -31,10 +31,16 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <artifactSet>
+                <includes>
+                  <include>io.lumine:MythicLib-dist</include>
+                  <include>de.cubbossa:Translations</include>
+                </includes>
+              </artifactSet>
               <relocations>
                 <relocation>
-                  <pattern>net.kyori.adventure</pattern>
-                  <shadedPattern>me.xidentified.devotions.adventure</shadedPattern>
+                  <pattern>de.cubbossa.translations</pattern>
+                  <shadedPattern>me.xidentified.devotions.libs.translations</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -59,6 +65,10 @@
     <repository>
       <id>placeholderapi</id>
       <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+    </repository>
+    <repository>
+      <id>Translations</id>
+      <url>https://nexus.leonardbausenwein.de/repository/maven-public/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -86,6 +96,12 @@
       <artifactId>placeholderapi</artifactId>
       <version>2.11.5</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-text-minimessage</artifactId>
+      <version>4.14.0</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <properties>
