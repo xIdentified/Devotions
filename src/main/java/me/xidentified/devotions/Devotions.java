@@ -1,5 +1,10 @@
 package me.xidentified.devotions;
 
+import de.cubbossa.translations.Message;
+import de.cubbossa.translations.Translations;
+import de.cubbossa.translations.TranslationsFramework;
+import de.cubbossa.translations.persistent.YamlMessageStorage;
+import de.cubbossa.translations.persistent.YamlStyleStorage;
 import lombok.Getter;
 import me.xidentified.devotions.commandexecutors.*;
 import me.xidentified.devotions.effects.Blessing;
@@ -12,10 +17,15 @@ import me.xidentified.devotions.rituals.*;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.storage.ShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
+import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Placeholders;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,12 +54,32 @@ public class Devotions extends JavaPlugin {
     private FileConfiguration soundsConfig;
     @Getter private StorageManager storageManager;
     @Getter private DevotionStorage devotionStorage;
+    private BukkitAudiences audiences;
+    @Getter private Translations translations;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         initializePlugin();
         loadSoundsConfig();
+
+        audiences = BukkitAudiences.create(this);
+        TranslationsFramework.enable(new File(getDataFolder(), "/../"));
+        translations = TranslationsFramework.application("Devotions");
+        translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
+        translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
+
+        translations.addMessages(TranslationsFramework.messageFieldsFromClass(Messages.class));
+
+        translations.getStyleSet().put("negative", "<red>");
+        translations.getStyleSet().put("positive", "<green>");
+        translations.getStyleSet().put("warning", "<yellow>");
+
+        // save default translations
+        translations.saveLocale(Locale.ENGLISH);
+        saveResource("lang/de.yml", false);
+        translations.loadLocales();
+        translations.loadStyles();
 
         // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -475,6 +505,8 @@ public class Devotions extends JavaPlugin {
 
         ritualManager.ritualDroppedItems.clear();
 
+        translations.close();
+        audiences.close();
     }
 
     public int getShrineLimit() {
@@ -506,4 +538,12 @@ public class Devotions extends JavaPlugin {
         }
     }
 
+    public void sendMessage(CommandSender sender, ComponentLike componentLike) {
+        Audience audience = audiences.sender(sender);
+        if (componentLike instanceof Message msg) {
+            // Translate the message into the locale of the command sender
+            componentLike = msg.formatted(audience);
+        }
+        audience.sendMessage(componentLike);
+    }
 }

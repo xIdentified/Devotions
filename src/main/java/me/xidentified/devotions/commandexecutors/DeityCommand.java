@@ -4,6 +4,8 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,12 +27,12 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(MessageUtils.parse("<red>This command can only be used by players!"));
+            Devotions.getInstance().sendMessage(sender, Messages.GENERAL_CMD_PLAYER_ONLY);
             return true;
         }
 
         if (args.length < 1) {
-            sendMessage(player,"<yellow>Usage: /deity <select|info> [DeityName]");
+            plugin.sendMessage(player, Messages.DEITY_CMD_USAGE);
             return true;
         }
 
@@ -46,7 +48,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
                 return handleInfo(player, args);
             }
             default -> {
-                sendMessage(player,"<yellow>Usage: /deity <select|info> [DeityName]");
+                plugin.sendMessage(player,Messages.DEITY_CMD_USAGE);
                 return true;
             }
         }
@@ -54,7 +56,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleSelect(Player player, String[] args) {
         if (args.length < 2) {
-            sendMessage(player, "<yellow>Please specify the deity you wish to worship.");
+            plugin.sendMessage(player, Messages.DEITY_CMD_SPECIFY_DEITY);
             return true;
         }
 
@@ -62,7 +64,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
         if (selectedDeity == null) {
-            sendMessage(player, "<red>Unknown deity. Please choose a valid deity name.");
+            plugin.sendMessage(player, Messages.DEITY_NOT_FOUND);
             return false;
         }
 
@@ -86,7 +88,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            sendMessage(player,"<yellow>Please specify the deity whose information you wish to view.");
+            plugin.sendMessage(player,Messages.DEITY_SPECIFY_PLAYER);
             return true;
         }
 
@@ -94,31 +96,34 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
         if (selectedDeity == null) {
-            sendMessage(player,"<red>Unknown deity. Please choose a valid deity name.");
+            plugin.sendMessage(player,Messages.DEITY_NOT_FOUND);
             return false;
         }
 
         // Display deity information
-        sendMessage(player,"<gold>Details of " + selectedDeity.getName());
-        sendMessage(player,"<yellow>Lore: <gray>" + selectedDeity.getLore());
-        sendMessage(player,"<yellow>Domain: <gray>" + String.join(", ", selectedDeity.getDomain()));
-        sendMessage(player,"<yellow>Alignment: <gray>" + selectedDeity.getAlignment());
-        sendMessage(player,"<yellow>Favored Rituals: <gray>" + selectedDeity.getRituals());
-        sendMessage(player,"<yellow>Favored Offerings: <gray>" + selectedDeity.getOfferings());
-
+        plugin.sendMessage(player, Messages.DEITY_INFO.formatted(
+            Placeholder.unparsed("name", selectedDeity.getName()),
+            Placeholder.unparsed("lore", selectedDeity.getLore()),
+            Placeholder.unparsed("domain", String.join(", ", selectedDeity.getDomain())),
+            Placeholder.unparsed("alignment", selectedDeity.getAlignment()),
+            Placeholder.unparsed("rituals", selectedDeity.getRituals()),
+            Placeholder.unparsed("offerings", selectedDeity.getOfferings())
+        ));
         return true;
     }
 
     private boolean handleList(Player player) {
         List<Deity> deities = plugin.getDevotionManager().getAllDeities();
         if (deities.isEmpty()) {
-            sendMessage(player,"<red>No deities found.");
+            plugin.sendMessage(player,Messages.DEITY_NO_DEITY_FOUND);
             return false;
         }
 
-        sendMessage(player, "<gold>Available Deities:");
+        plugin.sendMessage(player, Messages.DEITY_LIST_HEADER);
         for (Deity deity : deities) {
-            player.sendMessage(MessageUtils.parse("<gray>- " + deity.getName()));
+            plugin.sendMessage(player, Messages.DEITY_LIST_HEADER.formatted(
+                Placeholder.unparsed("name", deity.name)
+            ));
         }
 
         return true;
@@ -141,10 +146,6 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         }
 
         return completions;
-    }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
     }
 
 }

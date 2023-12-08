@@ -4,6 +4,7 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,12 +39,12 @@ public class MeditationManager {
 
                     if (objective.isComplete()) {
                         plugin.debugLog("[DEBUG] Meditation objective complete for player: " + player.getName());
-                        player.sendMessage(MessageUtils.parse("<green>Meditation complete! You can now move."));
+                        plugin.sendMessage(player, Messages.MEDITATION_COMPLETE);
                         plugin.getRitualManager().completeRitual(player, ritual, plugin.getMeditationManager());
                     }
                 } else {
                     plugin.debugLog("[DEBUG] Player moved. Restarting meditation for player: " + player.getName());
-                    player.sendMessage(MessageUtils.parse("<red>You moved during meditation! Restarting timer..."));
+                    plugin.sendMessage(player, Messages.MEDIDATION_CANCELLED);
                     startMeditation(player, ritual, objective); // Restart meditation timer
                     meditationTimers.remove(player);
                 }

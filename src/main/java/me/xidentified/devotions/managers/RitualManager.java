@@ -90,7 +90,7 @@ public class RitualManager {
                     if (objective.getType() == RitualObjective.Type.MEDITATION) {
                         plugin.getMeditationManager().startMeditation(player, ritual, objective);
                     }
-                    player.sendMessage(objective.getDescription());
+                    plugin.sendMessage(player, plugin.getTranslations().process(objective.getDescription()));
                 }
             }
 

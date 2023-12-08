@@ -7,6 +7,8 @@ import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -63,7 +65,10 @@ public class Deity {
 
             // Provide feedback
             plugin.debugLog("Blessing applied to player " + player.getName());
-            player.sendMessage(MessageUtils.parse("<green>" + deity.getName() + " has blessed you with " + blessing.getName() + "!"));
+            plugin.sendMessage(player, Messages.DEITY_BLESSED.formatted(
+                Placeholder.unparsed("deity", deity.getName()),
+                Placeholder.unparsed("blessing", blessing.getName())
+            ));
         }
     }
 
@@ -86,7 +91,10 @@ public class Deity {
 
             // Provide feedback
             plugin.debugLog("Curse applied to player " + player.getName());
-            player.sendMessage(MessageUtils.parse("<red>" + deity.getName() + " has cursed you with " + curse.getName() + "!"));
+            plugin.sendMessage(player, Messages.DEITY_CURSED.formatted(
+                Placeholder.unparsed("deity", deity.getName()),
+                Placeholder.unparsed("curse", curse.getName())
+            ));
         }
     }
 

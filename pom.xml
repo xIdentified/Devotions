@@ -38,10 +38,16 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>io.lumine:MythicLib-dist</include>
+                                    <include>de.cubbossa:Translations</include>
+                                </includes>
+                            </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.kyori.adventure</pattern>
-                                    <shadedPattern>me.xidentified.devotions.adventure</shadedPattern>
+                                    <pattern>de.cubbossa.translations</pattern>
+                                    <shadedPattern>me.xidentified.devotions.libs.translations</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -74,9 +80,18 @@
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>Translations</id>
+            <url>https://nexus.leonardbausenwein.de/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>de.cubbossa</groupId>
+            <artifactId>Translations</artifactId>
+            <version>3.2.1</version>
+        </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>

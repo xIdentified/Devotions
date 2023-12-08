@@ -5,6 +5,9 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionData;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -52,7 +55,10 @@ public class DevotionManager {
             Deity deity = devotion.getDeity();
             devotionStorage.savePlayerDevotion(playerUUID, devotion); // Set new devotion
             plugin.playConfiguredSound(player, "deitySelected");
-            player.sendMessage(MessageUtils.parse("<green>You are now devoted to " + deity.getName() + ". Your favor is " + devotion.getFavor() + "."));
+            plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
+                Placeholder.unparsed("name", deity.getName()),
+                Formatter.number("favor", devotion.getFavor())
+            ));
         } else {
             plugin.getLogger().warning("Tried to set devotion for a player that is not online: " + playerUUID);
         }

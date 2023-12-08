@@ -5,6 +5,8 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -106,19 +108,19 @@ public class Ritual {
             case "START" -> {
                 plugin.playConfiguredSound(player, "ritualStarted");
                 plugin.spawnParticles(location, Particle.ENCHANTMENT_TABLE, 50, 2.0, 0.5);
-                player.sendMessage(MessageUtils.parse("<light_purple>The " + displayName + " has begun..."));
+                plugin.sendMessage(player, Messages.RITUAL_START.formatted(Placeholder.unparsed("ritual", displayName)));
             }
             case "SUCCESS" -> {
                 plugin.playConfiguredSound(player, "ritualComplete");
                 plugin.spawnParticles(location, Particle.VILLAGER_HAPPY, 50, 2.0, 0.5);
-                player.sendMessage(MessageUtils.parse("<green>" + displayName + " was a success! Blessings upon ye!"));
+                plugin.sendMessage(player, Messages.RITUAL_SUCCESS.formatted(Placeholder.unparsed("ritual", displayName)));
                 favorManager.increaseFavor(25);
             }
             case "FAILURE" -> {
                 plugin.playConfiguredSound(player, "ritualFailed");
                 plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
                 player.damage(5);
-                player.sendMessage(MessageUtils.parse("<red>" + displayName + " has failed - the conditions were not met!"));
+                plugin.sendMessage(player, Messages.RITUAL_FAILURE.formatted(Placeholder.unparsed("ritual", displayName)));
                 favorManager.decreaseFavor(15);
             }
         }

@@ -1,7 +1,10 @@
 package me.xidentified.devotions.commandexecutors;
 
+import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Miracle;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,14 +26,16 @@ public class TestMiracleCommand implements CommandExecutor {
 
         if (player.hasPermission("devotions.admin")) {
             if (miracles.isEmpty()) {
-                sendMessage((Player) sender, "<red>No miracles are loaded.");
+                Devotions.getInstance().sendMessage(sender, Messages.MIRACLE_CMD_NO_MIRACLES);
                 return true;
             }
 
-            sendMessage((Player) sender, "<green>Available miracles: <yellow>" + miracles.keySet());
+            Devotions.getInstance().sendMessage(sender, Messages.MIRACLE_CMD_AVAILABLE.formatted(
+                Placeholder.unparsed("miracles", String.join(", ", miracles.keySet()))
+            ));
 
             if (args.length != 1) {
-                sendMessage(player, "<yellow>Usage: /testmiracle <miracleName>");
+                Devotions.getInstance().sendMessage(player, Messages.MIRACLE_CMD_USAGE);
                 return true;
             }
 
@@ -38,20 +43,17 @@ public class TestMiracleCommand implements CommandExecutor {
             Miracle miracle = miracles.get(miracleName);
 
             if (miracle == null) {
-                sendMessage(player, "<red>Unknown miracle: " + miracleName);
+                Devotions.getInstance().sendMessage(player, Messages.MIRACLE_CMD_UNKNOWN_MIRACLE.formatted(
+                    Placeholder.unparsed("miracle", miracleName)
+                ));
                 return true;
             }
 
             miracle.apply(player);
-            sendMessage(player, "<green>Applied miracle: <yellow>" + miracleName);
+            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_CMD_APPLIED);
 
             return true;
         }
         return false;
     }
-
-    private void sendMessage(Player player, String message) {
-        player.sendMessage(MessageUtils.parse(message));
-    }
-
 }

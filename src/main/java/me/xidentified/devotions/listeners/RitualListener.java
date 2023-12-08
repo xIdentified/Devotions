@@ -7,6 +7,7 @@ import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -57,7 +58,7 @@ public class RitualListener implements Listener {
         // Check if player moved, if in meditation. Reset timer if they moved.
         if (meditationManager().hasPlayerMovedSince(player) && meditationManager().isPlayerInMeditation(player)) {
             plugin.debugLog("Player " + player.getName() + " moved during meditation.");
-            player.sendMessage(MessageUtils.parse("<red>You moved during meditation! Restarting timer..."));
+            plugin.sendMessage(player, Messages.MEDIDATION_CANCELLED);
             meditationManager().startMeditation(player, ritual, getMeditationObjective(ritual));
         }
 
@@ -115,7 +116,7 @@ public class RitualListener implements Listener {
                     objective.incrementCount();
                     if (objective.isComplete()) {
                         plugin.debugLog("Objective complete for ritual " + ritual.getDisplayName());
-                        player.sendMessage(MessageUtils.parse("<light_purple>Return to the shrine to complete the ritual."));
+                        plugin.sendMessage(player, Messages.RITUAL_RETURN_TO_RESUME);
                     }
                 }
             }

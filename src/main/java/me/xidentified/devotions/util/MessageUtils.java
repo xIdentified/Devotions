@@ -10,11 +10,6 @@ public class MessageUtils {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().build();
     private static final Devotions plugin = Devotions.getInstance();
 
-    // Parse mini-messages
-    public static Component parse(String message) {
-        return MINI_MESSAGE.deserialize(message);
-    }
-
     // Method to get color-coded favor text
     public static Component getFavorText(int favor) {
         int curseThreshold = plugin.getConfig().getInt("curse-threshold", 35);
