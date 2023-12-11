@@ -4,7 +4,6 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -33,15 +32,14 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             if (favorManager == null) {
-                plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
+                MessageUtils.sendMessage(player, "<red>You don't have any devotion set.");
             } else {
-                Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
-                plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
-                    Placeholder.component("favor", favorText)
-                ));
+                String favorText = MessageUtils.getFavorText(favorManager.getFavor());
+                MessageUtils.sendMessage(player, "<green>Your current favor is " + favorText);
             }
             return true;
         }
+
 
         if (args.length != 3) {
             plugin.sendMessage(player,Messages.FAVOR_CMD_USAGE);
@@ -89,8 +87,8 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        Component updatedFavorText = MessageUtils.getFavorText(favorManager.getFavor());
-        player.sendMessage(Component.text("§a" + targetPlayer.getName() + "'s favor has been set to ").append(updatedFavorText));
+        String updatedFavorText = MessageUtils.getFavorText(favorManager.getFavor());
+        MessageUtils.sendMessage(player, "§a" + targetPlayer.getName() + "'s favor has been set to " + updatedFavorText);
         return true;
     }
 

@@ -1,10 +1,9 @@
 package me.xidentified.devotions.util;
+
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -49,8 +48,7 @@ public class Placeholders extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("favor")) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            Component favorText = MessageUtils.getFavorText(favorManager.getFavor());
-            return LegacyComponentSerializer.legacySection().serialize(favorText);
+            return MessageUtils.getFavorText(favorManager.getFavor());
         }
 
         if (params.equalsIgnoreCase("favor_top")) {
@@ -59,9 +57,8 @@ public class Placeholders extends PlaceholderExpansion {
             for (int i = 0; i < Math.min(3, sortedFavorData.size()); i++) {
                 FavorManager data = sortedFavorData.get(i);
                 String playerName = Bukkit.getOfflinePlayer(data.getUuid()).getName();
-                Component favorText = MessageUtils.getFavorText(data.getFavor());
-                String favorTextString = LegacyComponentSerializer.legacySection().serialize(favorText);
-                topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ").append(favorTextString).append("\n");
+                String favorText = MessageUtils.getFavorText(data.getFavor());
+                topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ").append(favorText).append("\n");
             }
             return topPlayers.toString().trim();
         }

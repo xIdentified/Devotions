@@ -6,7 +6,6 @@ import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;

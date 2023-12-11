@@ -6,7 +6,6 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.util.MessageUtils;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -115,27 +114,6 @@ public class FavorManager {
         }
     }
 
-
-   /** public Player getPlayer() {
-        return Bukkit.getPlayer(uuid);
-    }
-
-    public UUID getPlayerUUID() { return uuid; }
-
-    public Deity getDeity() {
-        return deity;
-    }
-
-    public int getFavor() {
-        return favor;}
-
-    public void setFavor(int favor) {
-        this.favor = favor;
-    }
-
-    public void setDeity(Deity newDeity) { this.deity = newDeity; }
-**/
-
     public void increaseFavor(int amount) {
         this.favor += amount;
         Player player = Bukkit.getPlayer(uuid);
@@ -144,8 +122,8 @@ public class FavorManager {
             this.favor = maxFavor;
         }
         if (player != null && deity != null) {
-            Component favorMessage = MessageUtils.getFavorText(this.favor);
-            player.sendMessage(Component.text("§aYour favor with " + deity.getName() + " has increased to ").append(favorMessage));
+            String favorMessage = MessageUtils.getFavorText(this.favor);
+            MessageUtils.sendMessage(player, "§aYour favor with " + deity.getName() + " has increased to " + favorMessage);
 
             DevotionStorage devotionStorage = plugin.getDevotionStorage();
             devotionStorage.savePlayerDevotion(player.getUniqueId(), this);
@@ -169,8 +147,7 @@ public class FavorManager {
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
-            Component favorMessage = MessageUtils.getFavorText(this.favor);
-            player.sendMessage(Component.text("§cYour favor with " + deity.getName() + " has decreased to ").append(favorMessage));
+            player.sendMessage("§cYour favor with " + deity.getName() + " has decreased to " + MessageUtils.getFavorText(this.favor));
         }
 
         DevotionStorage devotionStorage = plugin.getDevotionStorage();
