@@ -1,5 +1,9 @@
 # Devotions - Deities and Blessings
 # Made by xIdentified - https://discord.gg/yRrbBjfbXp
+# https://github:com/xIdentified/Devotions/wiki
+
+use-player-client-locale: true  # Use player's client locale for plugin language
+default-locale: "en"
 
 initial-favor: 50 # Favor players start out with
 max-favor: 250 # Max amount of favor players can have

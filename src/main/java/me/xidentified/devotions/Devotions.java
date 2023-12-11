@@ -21,6 +21,7 @@ import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.*;
@@ -73,6 +74,20 @@ public class Devotions extends JavaPlugin {
         translations.addMessages(TranslationsFramework.messageFieldsFromClass(Messages.class));
 
         loadLanguages();
+
+        // Set the LocaleProvider
+        translations.setLocaleProvider(audience -> {
+            // Read settings from config
+            boolean usePlayerClientLocale = getConfig().getBoolean("use-player-client-locale", true);
+            String fallbackLocaleCode = getConfig().getString("default-locale", "en");
+            Locale fallbackLocale = Locale.forLanguageTag(fallbackLocaleCode);
+
+            if (audience == null || !usePlayerClientLocale) {
+                return fallbackLocale;
+            }
+
+            return audience.getOrDefault(Identity.LOCALE, fallbackLocale);
+        });
 
         // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
