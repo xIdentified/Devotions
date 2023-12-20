@@ -545,8 +545,6 @@ public class Devotions extends JavaPlugin {
 
         // Cancel tasks
         getServer().getScheduler().cancelTasks(this);
-        getServer().getAsyncScheduler().cancelTasks(this);
-
         ritualManager.ritualDroppedItems.clear();
 
         translations.close();
