@@ -3,10 +3,9 @@ version: '${project.version}'
 main: me.xidentified.devotions.Devotions
 api-version: '1.20'
 author: xIdentified
-description: Create and worship deities in Minecraft
+description: Create and worship deities on your server
 
 softdepend:
-  - MMOItems
   - PlaceholderAPI
 
 libraries:
@@ -20,8 +19,14 @@ libraries:
 commands:
   devotions:
     description: Manage the Devotions plugin
-    usage: /<command> reload
+    usage: /<command> <reload|saveitem>
     aliases: [dvo]
+    permission: devotions.admin
+    permission-message: You do not have permission to use this command.
+    subcommands:
+      saveitem:
+        description: Save an item
+        usage: /devotions saveitem <itemName>
   deity:
     description: Manage and view information about deities.
     usage: /<command> <select|info|list> [DeityName]

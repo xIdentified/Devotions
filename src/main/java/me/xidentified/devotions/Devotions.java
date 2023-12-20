@@ -115,6 +115,9 @@ public class Devotions extends JavaPlugin {
             List<ItemStack> favoredOfferings = offeringStrings.stream()
                     .map(offering -> {
                         String[] parts = offering.split(":");
+                        if ("Saved".equals(parts[0])) {
+                            return loadSavedItem(parts[1]);
+                        }
                         Material material = Material.matchMaterial(parts[0]);
                         if (material == null) {
                             getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + parts[0]);
@@ -274,7 +277,13 @@ public class Devotions extends JavaPlugin {
                 // Parse item
                 String itemType = ritualConfig.getString(path + "item.type");
                 String itemId = ritualConfig.getString(path + "item.id");
-                RitualItem ritualItem = new RitualItem(itemType, itemId);
+                RitualItem ritualItem;
+                if ("Saved".equals(itemType)) {
+                    ItemStack savedItem = loadSavedItem(itemId);
+                    ritualItem = new RitualItem("SAVED", savedItem);
+                } else {
+                    ritualItem = new RitualItem(itemType, itemId);
+                }
 
                 // Parse conditions
                 String time = ritualConfig.getString(path + "conditions.time");
@@ -578,6 +587,15 @@ public class Devotions extends JavaPlugin {
         } else {
             debugLog("Sound " + soundKey + " not found in sounds.yml!");
         }
+    }
+
+    private ItemStack loadSavedItem(String name) {
+        File itemsFile = new File(getDataFolder(), "savedItems.yml");
+        FileConfiguration config = YamlConfiguration.loadConfiguration(itemsFile);
+        if (config.contains("items." + name)) {
+            return ItemStack.deserialize(config.getConfigurationSection("items." + name).getValues(false));
+        }
+        return null;
     }
 
     public void sendMessage(CommandSender sender, ComponentLike componentLike) {

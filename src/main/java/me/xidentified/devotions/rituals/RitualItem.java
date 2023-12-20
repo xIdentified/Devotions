@@ -1,11 +1,23 @@
 package me.xidentified.devotions.rituals;
 
-// Item types for other plugins can be added here later
-/**
- * @param type VANILLA or MMOITEM
- * @param id   Minecraft ID or MMOItem ID
- */
-public record RitualItem(String type, String id) {
+import org.bukkit.inventory.ItemStack;
+
+public class RitualItem {
+    public final String type;
+    public String id;
+    public ItemStack itemStack;
+
+    // Constructor for regular items
+    public RitualItem(String type, String id) {
+        this.type = type;
+        this.id = id;
+    }
+
+    // Constructor for saved items
+    public RitualItem(String type, ItemStack itemStack) {
+        this.type = type;
+        this.itemStack = itemStack;
+    }
 
     // Creating a unique ID for usage in maps
     public String getUniqueId() {
@@ -21,4 +33,7 @@ public record RitualItem(String type, String id) {
         return type.equals(that.type) && id.equals(that.id);
     }
 
+    public String id() {
+        return this.id;
+    }
 }
