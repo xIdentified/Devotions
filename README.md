@@ -10,3 +10,5 @@ Devotions is a Minecraft plugin that allows players to worship various deities, 
 **Shrines/Altars:** Dedicate shrines to your chosen deity.<br>
 **PlaceholderAPI Support:** Integrate with other plugins using custom placeholders.<br>
 **Configurable Sounds:** Customizeable sounds.yml for certain events
+
+https://www.spigotmc.org/resources/devotions-deities-and-blessings-⛧†.113549/
