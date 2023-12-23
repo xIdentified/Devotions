@@ -43,11 +43,11 @@ commands:
     tab-completions: true
   ritual:
     description: View ritual information
-    usage: /<command> <info> [RitualName]
+    usage: /<command> <info> [ritualName]
     aliases: [rituals]
   testmiracle:
     description: Execute miracles to ensure they work.
-    usage: /<command> <Miracle>
+    usage: /<command> <number>
     tab-completions: true
 
 permissions:

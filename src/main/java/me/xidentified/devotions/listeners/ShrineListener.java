@@ -14,6 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -187,22 +189,45 @@ public class ShrineListener implements Listener {
     }
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
+        // Load saved items from configuration
+        FileConfiguration config = plugin.getSavedItemsConfig();
+        ConfigurationSection savedItemsSection = config.getConfigurationSection("items");
+
         // Get the favored offerings for the deity from the config
         List<String> validOfferings = plugin.getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
 
         for (String offering : validOfferings) {
             String[] parts = offering.split(":");
-            if (parts.length == 2) { // Ensure offering is in the correct format
-                String offeringItem = parts[0];
-                int favorValue;
+
+            if (parts.length < 2) { // Skip if not enough data
+                continue;
+            }
+
+            String offeringType = parts[0];
+            String offeringItemId = parts[1];
+            int favorValue = 0;
+
+            if (parts.length > 2) {
                 try {
-                    favorValue = Integer.parseInt(parts[1]);
+                    favorValue = Integer.parseInt(parts[2]);
                 } catch (NumberFormatException e) {
-                    plugin.getLogger().warning("Invalid favor value for offering " + offeringItem + " for deity " + deity.getName());
+                    plugin.getLogger().warning("Invalid favor value for offering " + offering + " for deity " + deity.getName());
                     continue;
                 }
+            }
 
-                if (offeringItem.equals(item.getType().toString())) {
+            if ("Saved".equalsIgnoreCase(offeringType)) {
+                // Handle saved items
+                if (savedItemsSection != null) {
+                    ItemStack savedItem = savedItemsSection.getItemStack(offeringItemId);
+                    if (savedItem != null && savedItem.isSimilar(item)) {
+                        return new Offering(item, deity, favorValue);
+                    }
+                }
+            } else {
+                // Handle vanilla items
+                Material material = Material.matchMaterial(offeringItemId);
+                if (material != null && item.getType() == material) {
                     return new Offering(item, deity, favorValue);
                 }
             }

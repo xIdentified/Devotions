@@ -6,17 +6,9 @@ import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.managers.ShrineManager;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
-import me.xidentified.devotions.util.Placeholders;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -31,7 +23,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class ShrineCommandExecutor implements CommandExecutor, Listener, TabCompleter {
     private final Map<Player, Deity> pendingShrineDesignations = new HashMap<>();
@@ -89,14 +80,10 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
 
             // Fetch the deity directly from the player's FavorManager
             Deity deity = favorManager.getDeity();
-            if (deity != null) {
-                pendingShrineDesignations.put(player, deity);
-                Devotions.getInstance().sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.formatted(
-                    Placeholder.unparsed("deity", deity.getName())
-                ));
-            } else {
-                Devotions.getInstance().sendMessage(player, Messages.SHRINE_DEITY_NOT_FOUND);
-            }
+            pendingShrineDesignations.put(player, deity);
+            Devotions.getInstance().sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.formatted(
+                Placeholder.unparsed("deity", deity.getName())
+            ));
             return true;
         } else {
             Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_SET);
@@ -110,14 +97,23 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
         Player player = event.getPlayer();
         if (pendingShrineDesignations.containsKey(player)) {
             Block clickedBlock = event.getClickedBlock();
-            if (clickedBlock != null && shrineManager.getShrineAtLocation(clickedBlock.getLocation()) == null) {
-                Deity deity = pendingShrineDesignations.remove(player);
-                // Store the clickedBlock location, deity, and player as a designated shrine
-                Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player.getUniqueId());
-                shrineManager.addShrine(newShrine);
-                Devotions.getInstance().sendMessage(player,Messages.SHRINE_SUCCESS.formatted(
-                    Placeholder.unparsed("deity", deity.getName())
-                ));
+            if (clickedBlock != null) {
+                Shrine existingShrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
+                if (existingShrine != null) {
+                    // Inform the player that a shrine already exists at this location
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_ALREADY_EXISTS.formatted(
+                            Placeholder.unparsed("deity", existingShrine.getDeity().getName()),
+                            Placeholder.unparsed("location", clickedBlock.getLocation().toString())
+                    ));
+                } else {
+                    Deity deity = pendingShrineDesignations.remove(player);
+                    // Store the clickedBlock location, deity, and player as a designated shrine
+                    Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player.getUniqueId());
+                    shrineManager.addShrine(newShrine);
+                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_SUCCESS.formatted(
+                            Placeholder.unparsed("deity", deity.getName())
+                    ));
+                }
             }
         }
     }

@@ -41,7 +41,7 @@ public class Messages {
 			.withPlaceholders("deity", "curse")
 			.build();
 	public static final Message DEITY_CMD_USAGE = new MessageBuilder("deity.cmd.usage")
-			.withDefault("<warning>Usage: /deity <select|info> [DeityName]")
+			.withDefault("<yellow>Usage: /deity <select|info> [DeityName]")
 			.build();
 	public static final Message DEITY_CMD_SPECIFY_DEITY = new MessageBuilder("deity.cmd.specify_deity")
 			.withDefault("<yellow>Please specify the deity you wish to worship.")
@@ -109,6 +109,9 @@ public class Messages {
 			.build();
 	public static final Message SHRINE_COOLDOWN = new MessageBuilder("shrines.cooldown")
 			.withDefault("<negative>You must wait <cooldown:'m'> minutes and <cooldown:'s'> before performing another ritual.")
+			.build();
+	public static final Message SHRINE_ALREADY_EXISTS = new MessageBuilder("shrines.cooldown")
+			.withDefault("<negative>A shrine already exists at this location!")
 			.build();
 	public static final Message SHRINE_CLICK_BLOCK_TO_DESIGNATE = new MessageBuilder("shrines.click_block_to_create")
 			.withDefault("<warning>Right-click on a block to designate it as a shrine for <deity>")
@@ -209,11 +212,7 @@ public class Messages {
 			.withPlaceholder("miracles")
 			.build();
 	public static final Message MIRACLE_CMD_UNKNOWN_MIRACLE = new MessageBuilder("miracle.cmd.unknown_miracle")
-			.withDefault("<negative>Unknown miracle: <miracle>")
-			.withPlaceholder("miracle")
-			.build();
-	public static final Message MIRACLE_CMD_APPLIED = new MessageBuilder("miracle.cmd.applied")
-			.withDefault("<positive>Applied miracle: <yellow><miracle>")
+			.withDefault("<negative>Unknown miracle")
 			.withPlaceholder("miracle")
 			.build();
 	public static final Message MIRACLE_BESTOWED = new MessageBuilder("miracle.bestowed")
