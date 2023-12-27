@@ -23,9 +23,7 @@ import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -122,16 +120,16 @@ public class Devotions extends JavaPlugin {
             List<ItemStack> favoredOfferings = offeringStrings.stream()
                     .map(offering -> {
                         String[] parts = offering.split(":");
-                        if (parts.length < 2) {
+                        if (parts.length < 3) {
                             getLogger().warning("Invalid offering format for deity " + deityKey + ": " + offering);
                             return null;
                         }
                         ItemStack itemStack;
                         int favor;
                         try {
-                            favor = Integer.parseInt(parts[1]);
+                            favor = Integer.parseInt(parts[2]);
                         } catch (NumberFormatException e) {
-                            getLogger().warning("Invalid favor value in offerings for deity " + deityKey + ": " + parts[1]);
+                            getLogger().warning("Invalid favor value in offerings for deity " + deityKey + ": " + parts[2]);
                             return null;
                         }
 
@@ -141,10 +139,11 @@ public class Devotions extends JavaPlugin {
                                 getLogger().warning("Saved item not found: " + parts[1] + " for deity: " + deityKey);
                                 return null;
                             }
+                            itemStack.setAmount(favor); // Set the correct quantity for saved items
                         } else {
-                            Material material = Material.matchMaterial(parts[0]);
+                            Material material = Material.matchMaterial(parts[1]);
                             if (material == null) {
-                                getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + parts[0]);
+                                getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + parts[1]);
                                 return null;
                             }
                             itemStack = new ItemStack(material, favor);
@@ -296,19 +295,29 @@ public class Devotions extends JavaPlugin {
                 // Parse item
                 String itemString = ritualConfig.getString(path + "item");
                 RitualItem ritualItem = null;
-                if (itemString != null && itemString.startsWith("saved:")) {
-                    String itemName = itemString.substring(6); // Remove 'saved:' prefix
-                    ItemStack savedItem = loadSavedItem(itemName);
-                    if (savedItem == null) {
-                        getLogger().warning("Saved item not found: " + itemName + " for ritual: " + key);
-                    }
-                    ritualItem = new RitualItem("SAVED", savedItem);
-                } else {
-                    Material material = Material.matchMaterial(itemString);
-                    if (material == null) {
-                        getLogger().warning("Invalid material: " + itemString + " for ritual: " + key);
-                    } else {
-                        ritualItem = new RitualItem("VANILLA", new ItemStack(material));
+                if (itemString != null) {
+                    String[] parts = itemString.split(":");
+                    if (parts.length == 2) {
+                        String type = parts[0];
+                        String itemId = parts[1];
+
+                        if ("SAVED".equalsIgnoreCase(type)) {
+                            ItemStack savedItem = loadSavedItem(itemId);
+                            if (savedItem == null) {
+                                getLogger().warning("Saved item not found: " + itemId + " for ritual: " + key);
+                            } else {
+                                ritualItem = new RitualItem("SAVED", savedItem);
+                            }
+                        } else if ("VANILLA".equalsIgnoreCase(type)) {
+                            Material material = Material.matchMaterial(itemId);
+                            if (material == null) {
+                                getLogger().warning("Invalid material: " + itemId + " for ritual: " + key);
+                            } else {
+                                ritualItem = new RitualItem("VANILLA", new ItemStack(material));
+                            }
+                        } else {
+                            getLogger().warning("Unknown item type: " + type + " for ritual: " + key);
+                        }
                     }
                 }
 
@@ -609,7 +618,7 @@ public class Devotions extends JavaPlugin {
     }
 
     public int getShrineLimit() {
-        return getConfig().getInt("shrine-limit", 3); // 3 is a default value if not set in config
+        return getConfig().getInt("shrine-limit", 3);
     }
 
     public void debugLog(String message) {
@@ -655,7 +664,4 @@ public class Devotions extends JavaPlugin {
         audience.sendMessage(componentLike);
     }
 
-    public String componentToString(Component component) {
-        return LegacyComponentSerializer.legacySection().serialize(component);
-    }
 }

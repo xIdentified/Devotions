@@ -5,16 +5,6 @@
 use-player-client-locale: true  # Use player's client locale for plugin language
 default-locale: "en"
 
-storage:
-  type: 'flatfile' # Options: 'flatfile', 'mysql'
-  mysql:
-    host: 'localhost'
-    port: 3306
-    database: 'devotions'
-    username: 'root'
-    password: 'password'
-    useSSL: false
-
 initial-favor: 50 # Favor players start out with
 max-favor: 250 # Max amount of favor players can have
 decay-rate: 5 # Rate at which favor decays over time

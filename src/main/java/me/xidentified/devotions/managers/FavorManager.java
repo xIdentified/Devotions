@@ -68,13 +68,6 @@ public class FavorManager {
         Bukkit.getScheduler().runTaskTimer(plugin, this::decayFavor, 0L, 300L * 20L); // Check every 5 minutes
     }
 
-    // Debug
-    public String logDeityInfo() {
-        String deityInfo = (deity != null) ? deity.getName() : "No Deity";
-        plugin.getLogger().warning("Deity for player UUID " + uuid + ": " + deityInfo);
-        return deityInfo;
-    }
-
     private void checkForEffects() {
         Player player = Bukkit.getPlayer(uuid);
 
@@ -131,7 +124,7 @@ public class FavorManager {
         if (player != null && deity != null) {
             // Construct and send message to player
             String favorText = MessageUtils.getFavorText(this.favor);
-            String message = "Your favor with " + deity.getName() + " has increased to " + favorText;
+            String message = "<green>Your favor with " + deity.getName() + " has increased to " + favorText;
             // TODO: Language support
             MessageUtils.sendMessage(player, message);
 
@@ -161,7 +154,7 @@ public class FavorManager {
         if (player != null && player.isOnline() && deity != null) {
             String favorText = MessageUtils.getFavorText(this.favor);
             // TODO: Language support
-            MessageUtils.sendMessage(player, "Your favor with " + deity.getName() + " has decreased to " + favorText);
+            MessageUtils.sendMessage(player, "<red>Your favor with " + deity.getName() + " has decreased to " + favorText);
         }
 
         DevotionStorage devotionStorage = plugin.getDevotionStorage();

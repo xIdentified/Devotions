@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FavorCommand implements CommandExecutor, TabCompleter {
-
     private final Devotions plugin;
 
     public FavorCommand(Devotions plugin) {
@@ -26,30 +25,28 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-
         // Display player's favor if they don't provide an argument
         Player player = (Player) sender;
-
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            if (favorManager == null || favorManager.getDeity() == null) {
-                plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
+            if (plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()) == null) {
+                //plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
             } else {
                 String favorText = MessageUtils.getFavorText(favorManager.getFavor());
-                String message = "Your current favor with " + favorManager.getDeity().getName() + " is " + favorText;
+                String message = "<yellow>Your current favor with " + favorManager.getDeity().getName() + " is " + favorText;
                 // TODO: Language support
                 MessageUtils.sendMessage(player, message);
             }
             return true;
         }
 
-        if (args.length != 3) {
+        else if (args.length != 3) {
             plugin.sendMessage(player,Messages.FAVOR_CMD_USAGE);
             return true;
         }
 
         // Check for permission
-        if (!player.hasPermission("devotions.admin")) {
+        else if (!player.hasPermission("devotions.admin")) {
             plugin.sendMessage(player, Messages.GENERAL_CMD_NO_PERM);
             return true;
         }
@@ -90,10 +87,9 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         }
 
         String favorText = MessageUtils.getFavorText(favorManager.getFavor());
-        plugin.sendMessage(player, Messages.FAVOR_SET_TO.formatted(
-                Placeholder.unparsed("player", targetPlayer.getName()),
-                Placeholder.unparsed("favor", favorText)
-        ));
+        String message = "<yellow>Your favor with " + favorManager.getDeity().getName() + " was set to " + favorText;
+        // TODO: Language support
+        MessageUtils.sendMessage(player, message);
         return true;
     }
 

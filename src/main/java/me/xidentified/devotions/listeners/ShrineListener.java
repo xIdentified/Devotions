@@ -31,7 +31,10 @@ import org.bukkit.util.Vector;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 // Begins rituals or player's offerings
 public class ShrineListener implements Listener {
@@ -39,7 +42,7 @@ public class ShrineListener implements Listener {
     private final DevotionManager devotionManager;
     private final ShrineManager shrineManager;
     private final CooldownManager cooldownManager;
-
+    private final Map<UUID, Long> lastShrineInteractionTime = new HashMap<>();
 
     public ShrineListener(Devotions plugin, ShrineManager shrineManager, CooldownManager cooldownManager) {
         this.plugin = plugin;
@@ -50,14 +53,11 @@ public class ShrineListener implements Listener {
 
     @EventHandler
     public void onShrineInteract(PlayerInteractEvent event) {
-        // Return if player isn't right-clicking the shrine or interacting with their hand.
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (event.getHand() != EquipmentSlot.HAND) return;
-
-        // Ensure player is clicking on a solid block
         Player player = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
-        if (clickedBlock == null) return;
+
+        // Return if player isn't right-clicking the shrine or interacting with their hand.
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || clickedBlock == null) return;
 
         // Make sure valid shrine is at location
         Shrine shrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
@@ -198,25 +198,21 @@ public class ShrineListener implements Listener {
 
         for (String offering : validOfferings) {
             String[] parts = offering.split(":");
-
-            if (parts.length < 2) { // Skip if not enough data
+            if (parts.length < 3) { // Ensure offering is in the correct format
                 continue;
             }
 
             String offeringType = parts[0];
             String offeringItemId = parts[1];
-            int favorValue = 0;
-
-            if (parts.length > 2) {
-                try {
-                    favorValue = Integer.parseInt(parts[2]);
-                } catch (NumberFormatException e) {
-                    plugin.getLogger().warning("Invalid favor value for offering " + offering + " for deity " + deity.getName());
-                    continue;
-                }
+            int favorValue;
+            try {
+                favorValue = Integer.parseInt(parts[2]);
+            } catch (NumberFormatException e) {
+                plugin.getLogger().warning("Invalid favor value for offering " + offering + " for deity " + deity.getName());
+                continue;
             }
 
-            if ("Saved".equalsIgnoreCase(offeringType)) {
+            if ("SAVED".equalsIgnoreCase(offeringType)) {
                 // Handle saved items
                 if (savedItemsSection != null) {
                     ItemStack savedItem = savedItemsSection.getItemStack(offeringItemId);
@@ -224,7 +220,7 @@ public class ShrineListener implements Listener {
                         return new Offering(item, deity, favorValue);
                     }
                 }
-            } else {
+            } else if ("VANILLA".equalsIgnoreCase(offeringType)) {
                 // Handle vanilla items
                 Material material = Material.matchMaterial(offeringItemId);
                 if (material != null && item.getType() == material) {

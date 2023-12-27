@@ -108,7 +108,7 @@ public class Messages {
 			.withPlaceholder("deity")
 			.build();
 	public static final Message SHRINE_COOLDOWN = new MessageBuilder("shrines.cooldown")
-			.withDefault("<negative>You must wait <cooldown:'m'> minutes and <cooldown:'s'> before performing another ritual.")
+			.withDefault("<negative>You must wait <cooldown:'m'>m and <cooldown:'s'>s before performing another ritual.")
 			.build();
 	public static final Message SHRINE_ALREADY_EXISTS = new MessageBuilder("shrines.cooldown")
 			.withDefault("<negative>A shrine already exists at this location!")

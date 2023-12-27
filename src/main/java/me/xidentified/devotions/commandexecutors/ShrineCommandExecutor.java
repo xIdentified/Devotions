@@ -19,7 +19,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -96,6 +98,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     @EventHandler
     public void onShrineDesignation(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
         if (pendingShrineDesignations.containsKey(player)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
@@ -123,6 +126,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     public void onShrineRemoval(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
         if (pendingShrineRemovals.containsKey(playerId)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
