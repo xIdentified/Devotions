@@ -4,7 +4,6 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionData;
 import me.xidentified.devotions.storage.DevotionStorage;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -37,7 +36,9 @@ public class DevotionManager {
     }
 
     public FavorManager getPlayerDevotion(UUID playerUUID) {
-        return playerDevotions.get(playerUUID);
+        FavorManager manager = playerDevotions.get(playerUUID);
+        plugin.debugLog("Retrieved FavorManager for UUID " + playerUUID + ": " + manager);
+        return manager;
     }
 
     public void setPlayerDevotion(UUID playerUUID, FavorManager devotion) {

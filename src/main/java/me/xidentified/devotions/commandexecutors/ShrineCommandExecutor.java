@@ -73,6 +73,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
 
             // If the player doesn't follow a deity, don't let them make a shrine
             FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
+
             if (favorManager == null || favorManager.getDeity() == null) {
                 Devotions.getInstance().sendMessage(player, Messages.SHRINE_FOLLOW_DEITY_TO_DESIGNATE);
                 return true;

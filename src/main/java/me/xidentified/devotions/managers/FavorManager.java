@@ -68,6 +68,13 @@ public class FavorManager {
         Bukkit.getScheduler().runTaskTimer(plugin, this::decayFavor, 0L, 300L * 20L); // Check every 5 minutes
     }
 
+    // Debug
+    public String logDeityInfo() {
+        String deityInfo = (deity != null) ? deity.getName() : "No Deity";
+        plugin.getLogger().warning("Deity for player UUID " + uuid + ": " + deityInfo);
+        return deityInfo;
+    }
+
     private void checkForEffects() {
         Player player = Bukkit.getPlayer(uuid);
 
@@ -122,15 +129,20 @@ public class FavorManager {
             this.favor = maxFavor;
         }
         if (player != null && deity != null) {
-            String favorMessage = MessageUtils.getFavorText(this.favor);
-            MessageUtils.sendMessage(player, "§aYour favor with " + deity.getName() + " has increased to " + favorMessage);
+            // Construct and send message to player
+            String favorText = MessageUtils.getFavorText(this.favor);
+            String message = "Your favor with " + deity.getName() + " has increased to " + favorText;
+            // TODO: Language support
+            MessageUtils.sendMessage(player, message);
 
+            // Save the player's devotion data
             DevotionStorage devotionStorage = plugin.getDevotionStorage();
             devotionStorage.savePlayerDevotion(player.getUniqueId(), this);
         } else {
             System.err.println("Error: Player or Deity is null in PlayerDevotion::increaseFavor");
         }
     }
+
 
     public void decreaseFavor(int amount) {
         // Ensure favor is 0 at the lowest
@@ -147,7 +159,9 @@ public class FavorManager {
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
-            player.sendMessage("§cYour favor with " + deity.getName() + " has decreased to " + MessageUtils.getFavorText(this.favor));
+            String favorText = MessageUtils.getFavorText(this.favor);
+            // TODO: Language support
+            MessageUtils.sendMessage(player, "Your favor with " + deity.getName() + " has decreased to " + favorText);
         }
 
         DevotionStorage devotionStorage = plugin.getDevotionStorage();

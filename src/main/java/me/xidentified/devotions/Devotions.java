@@ -23,7 +23,9 @@ import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -651,5 +653,9 @@ public class Devotions extends JavaPlugin {
             componentLike = msg.formatted(audience);
         }
         audience.sendMessage(componentLike);
+    }
+
+    public String componentToString(Component component) {
+        return LegacyComponentSerializer.legacySection().serialize(component);
     }
 }

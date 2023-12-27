@@ -161,13 +161,16 @@ public class Messages {
 			.withDefault("<negative>Invalid amount. Please enter a number.")
 			.build();
 	public static final Message FAVOR_CURRENT = new MessageBuilder("favor.current_favor")
-			.withDefault("Your current favor is: <favor>")
+			.withDefault("Your current favor with <deity> is <favor>")
+			.withPlaceholder("deity")
 			.withPlaceholder("favor")
 			.build();
 	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.no_devotion_set")
 			.withDefault("<negative>You don't have any devotion set.")
 			.build();
-
+	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.no_devotion_set")
+			.withDefault("<yellow>Your favor has been set to <favor>")
+			.build();
 	public static final Message RITUAL_CMD_USAGE = new MessageBuilder("ritual.cmd.usage")
 			.withDefault("<warning>Usage: /ritual <info> [RitualName]")
 			.build();

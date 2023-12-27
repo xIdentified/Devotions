@@ -40,7 +40,6 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-
         if (params.equalsIgnoreCase("deity")) {
             Deity deity = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()).getDeity();
             return deity != null ? "§e" + deity.getName() : "\u00A0"; // Non-breaking space
@@ -58,12 +57,14 @@ public class Placeholders extends PlaceholderExpansion {
                 FavorManager data = sortedFavorData.get(i);
                 String playerName = Bukkit.getOfflinePlayer(data.getUuid()).getName();
                 String favorText = MessageUtils.getFavorText(data.getFavor());
-                topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ").append(favorText).append("\n");
+                topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ")
+                        .append(favorText).append("\n");
             }
             return topPlayers.toString().trim();
         }
 
         return null; // Placeholder is unknown
     }
+
 
 }

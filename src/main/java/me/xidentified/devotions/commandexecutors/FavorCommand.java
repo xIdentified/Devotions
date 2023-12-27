@@ -27,19 +27,21 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
-        // Display player's devotion if they don't provide an argument
+        // Display player's favor if they don't provide an argument
         Player player = (Player) sender;
+
         if (args.length == 0) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            if (favorManager == null) {
-                MessageUtils.sendMessage(player, "<red>You don't have any devotion set.");
+            if (favorManager == null || favorManager.getDeity() == null) {
+                plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
             } else {
                 String favorText = MessageUtils.getFavorText(favorManager.getFavor());
-                MessageUtils.sendMessage(player, "<green>Your current favor is " + favorText);
+                String message = "Your current favor with " + favorManager.getDeity().getName() + " is " + favorText;
+                // TODO: Language support
+                MessageUtils.sendMessage(player, message);
             }
             return true;
         }
-
 
         if (args.length != 3) {
             plugin.sendMessage(player,Messages.FAVOR_CMD_USAGE);
@@ -87,8 +89,11 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        String updatedFavorText = MessageUtils.getFavorText(favorManager.getFavor());
-        MessageUtils.sendMessage(player, "§a" + targetPlayer.getName() + "'s favor has been set to " + updatedFavorText);
+        String favorText = MessageUtils.getFavorText(favorManager.getFavor());
+        plugin.sendMessage(player, Messages.FAVOR_SET_TO.formatted(
+                Placeholder.unparsed("player", targetPlayer.getName()),
+                Placeholder.unparsed("favor", favorText)
+        ));
         return true;
     }
 
