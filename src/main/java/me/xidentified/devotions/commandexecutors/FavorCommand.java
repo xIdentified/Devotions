@@ -2,6 +2,7 @@ package me.xidentified.devotions.commandexecutors;
 
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -33,7 +34,8 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
             plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
                     Placeholder.unparsed("deity", deityName),
-                    Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor()))
+                    Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor())),
+                    Placeholder.parsed("color", FavorUtils.getColorForFavor(favorManager.getFavor()))
             ));
             return true;
         }
@@ -86,7 +88,8 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
         plugin.sendMessage(player, Messages.FAVOR_SET_TO.formatted(
                 Placeholder.unparsed("deity", favorManager.getDeity().getName()),
-                Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor()))
+                Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor())),
+                Placeholder.parsed("color", FavorUtils.getColorForFavor(favorManager.getFavor()))
         ));
         return true;
     }

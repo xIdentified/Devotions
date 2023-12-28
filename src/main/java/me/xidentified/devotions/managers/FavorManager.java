@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
+import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -125,7 +126,8 @@ public class FavorManager {
         if (player != null && deity != null) {
             plugin.sendMessage(player, Messages.FAVOR_INCREASED.formatted(
                     Placeholder.unparsed("deity", deity.getName()),
-                    Placeholder.unparsed("favor", String.valueOf(this.favor))
+                    Placeholder.unparsed("favor", String.valueOf(this.favor)),
+                    Placeholder.parsed("color", FavorUtils.getColorForFavor(this.favor))
             ));
 
             // Save the player's devotion data
@@ -154,7 +156,8 @@ public class FavorManager {
         if (player != null && player.isOnline() && deity != null) {
             plugin.sendMessage(player, Messages.FAVOR_DECREASED.formatted(
                     Placeholder.unparsed("deity", deity.getName()),
-                    Placeholder.unparsed("favor", String.valueOf(this.favor))
+                    Placeholder.unparsed("favor", String.valueOf(this.favor)),
+                    Placeholder.parsed("color", FavorUtils.getColorForFavor(this.favor))
             ));
         }
 

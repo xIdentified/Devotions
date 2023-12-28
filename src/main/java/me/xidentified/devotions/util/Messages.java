@@ -17,7 +17,6 @@ public class Messages {
 	public static final Message GENERAL_PLAYER_NOT_FOUND = new MessageBuilder("general.player_not_found")
 			.withDefault("<negative>Player not found: <name>")
 			.build();
-
 	public static final Message DEVOTION_RELOAD_SUCCESS = new MessageBuilder("devotion.reload_success")
 			.withDefault("<positive>Devotions successfully reloaded!")
 			.build();
@@ -25,7 +24,6 @@ public class Messages {
 			.withDefault("<positive>You are now devoted to <name>. Your favor is <favor>.")
 			.withPlaceholder("name", "favor")
 			.build();
-
 	public static final Message DEITY_NOT_FOUND = new MessageBuilder("deity.not_found")
 			.withDefault("<negative>Unknown deity. Please choose a valid deity name.")
 			.build();
@@ -160,22 +158,22 @@ public class Messages {
 	public static final Message FAVOR_CMD_NUMBER_FORMAT = new MessageBuilder("favor.cmd.invalid_number_format")
 			.withDefault("<negative>Invalid amount. Please enter a number.")
 			.build();
-	public static final Message FAVOR_CURRENT = new MessageBuilder("favor.current_favor")
-			.withDefault("Your current favor with <deity> is <favor>")
+	public static final Message FAVOR_CURRENT = new MessageBuilder("favor.amount.current_favor")
+			.withDefault("<yellow>Your current favor with <deity> is <color><favor>")
 			.withPlaceholder("deity")
 			.withPlaceholder("favor")
 			.build();
-	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.no_devotion_set")
+	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.cmd.no_devotion_set")
 			.withDefault("<negative>You don't have any devotion set.")
 			.build();
-	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.set_to")
-			.withDefault("<yellow>Your favor has been set to <favor>")
+	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.amount.set_to")
+			.withDefault("<yellow>Your favor has been set to <color><favor>")
 			.build();
-	public static final Message FAVOR_INCREASED = new MessageBuilder("favor.favor_increased")
-			.withDefault("<positive>Your favor with <deity> has increased to <favor>")
+	public static final Message FAVOR_INCREASED = new MessageBuilder("favor.amount.favor_increased")
+			.withDefault("<positive>Your favor with <deity> has increased to <color><favor>")
 			.build();
-	public static final Message FAVOR_DECREASED = new MessageBuilder("favor.favor_decreased")
-			.withDefault("<negative>Your favor with <deity> has decreased to <favor>")
+	public static final Message FAVOR_DECREASED = new MessageBuilder("favor.amount.favor_decreased")
+			.withDefault("<negative>Your favor with <deity> has decreased to <color><favor>")
 			.build();
 	public static final Message RITUAL_CMD_USAGE = new MessageBuilder("ritual.cmd.usage")
 			.withDefault("<warning>Usage: /ritual <info> [RitualName]")
@@ -211,7 +209,7 @@ public class Messages {
 			.build();
 
 	public static final Message MIRACLE_CMD_USAGE = new MessageBuilder("miracle.cmd.usage")
-			.withDefault("\"<warning>Usage: /testmiracle <miracleName>\"")
+			.withDefault("<warning>Usage: /testmiracle <number>")
 			.build();
 	public static final Message MIRACLE_CMD_NO_MIRACLES = new MessageBuilder("miracle.cmd.no_miracles")
 			.withDefault("<negative>No miracles are loaded.")
