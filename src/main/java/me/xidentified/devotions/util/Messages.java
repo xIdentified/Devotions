@@ -108,7 +108,7 @@ public class Messages {
 			.withPlaceholder("deity")
 			.build();
 	public static final Message SHRINE_COOLDOWN = new MessageBuilder("shrines.cooldown")
-			.withDefault("<negative>You must wait <cooldown:'m'>m and <cooldown:'s'>s before performing another ritual.")
+			.withDefault("<negative>You must wait <cooldown:'m'>m <cooldown:'s'>s before performing another ritual.")
 			.build();
 	public static final Message SHRINE_ALREADY_EXISTS = new MessageBuilder("shrines.cooldown")
 			.withDefault("<negative>A shrine already exists at this location!")
@@ -168,8 +168,14 @@ public class Messages {
 	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.no_devotion_set")
 			.withDefault("<negative>You don't have any devotion set.")
 			.build();
-	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.no_devotion_set")
+	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.set_to")
 			.withDefault("<yellow>Your favor has been set to <favor>")
+			.build();
+	public static final Message FAVOR_INCREASED = new MessageBuilder("favor.favor_increased")
+			.withDefault("<positive>Your favor with <deity> has increased to <favor>")
+			.build();
+	public static final Message FAVOR_DECREASED = new MessageBuilder("favor.favor_decreased")
+			.withDefault("<negative>Your favor with <deity> has decreased to <favor>")
 			.build();
 	public static final Message RITUAL_CMD_USAGE = new MessageBuilder("ritual.cmd.usage")
 			.withDefault("<warning>Usage: /ritual <info> [RitualName]")

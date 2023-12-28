@@ -5,7 +5,8 @@ import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
-import me.xidentified.devotions.util.MessageUtils;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -122,11 +123,10 @@ public class FavorManager {
             this.favor = maxFavor;
         }
         if (player != null && deity != null) {
-            // Construct and send message to player
-            String favorText = MessageUtils.getFavorText(this.favor);
-            String message = "<green>Your favor with " + deity.getName() + " has increased to " + favorText;
-            // TODO: Language support
-            MessageUtils.sendMessage(player, message);
+            plugin.sendMessage(player, Messages.FAVOR_INCREASED.formatted(
+                    Placeholder.unparsed("deity", deity.getName()),
+                    Placeholder.unparsed("favor", String.valueOf(this.favor))
+            ));
 
             // Save the player's devotion data
             DevotionStorage devotionStorage = plugin.getDevotionStorage();
@@ -152,9 +152,10 @@ public class FavorManager {
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
-            String favorText = MessageUtils.getFavorText(this.favor);
-            // TODO: Language support
-            MessageUtils.sendMessage(player, "<red>Your favor with " + deity.getName() + " has decreased to " + favorText);
+            plugin.sendMessage(player, Messages.FAVOR_DECREASED.formatted(
+                    Placeholder.unparsed("deity", deity.getName()),
+                    Placeholder.unparsed("favor", String.valueOf(this.favor))
+            ));
         }
 
         DevotionStorage devotionStorage = plugin.getDevotionStorage();

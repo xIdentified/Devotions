@@ -6,9 +6,7 @@ rituals:
     display_name: "Ritual of the Harvest Festival"
     description: "Celebrate the bounties of the earth and create prime farming conditions"
     favor: 30
-    item:
-      type: "VANILLA" # Can be VANILLA or MMOITEM
-      id: "GOLDEN_HOE"
+    item: "VANILLA:GOLDEN_HOE"
     conditions:
       weather: "STORM"
     objectives:
@@ -23,9 +21,7 @@ rituals:
     display_name: "Ritual of Purification"
     description: "Purify the lands by vanquishing dark entities"
     favor: 40
-    item:
-      type: "VANILLA"
-      id: "IRON_SWORD"
+    item: "VANILLA:IRON_SWORD"
     conditions:
       time: "NIGHT"
     objectives:
@@ -41,9 +37,7 @@ rituals:
     display_name: "Ritual of Deep Meditation"
     description: "Attain inner peace and spiritual enlightenment"
     favor: 25
-    item:
-      type: "VANILLA"
-      id: "BOOK"
+    item: "VANILLA:BOOK"
     conditions:
       time: "DAY"
     objectives:

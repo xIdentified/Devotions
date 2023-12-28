@@ -5,8 +5,8 @@ deities:
     domain: "Occultism"
     alignment: "Evil"
     offerings:
-      - "GOLD_INGOT:5" # ITEM:FAVOR
-      - "NETHER_STAR:50"
+      - "VANILLA:GOLD_INGOT:5" # TYPE:ITEM:FAVOR
+      - "VANILLA:NETHER_STAR:50" # Types are VANILLA or SAVED
     rituals:
       - "purification_ritual"
     blessings:
@@ -25,8 +25,8 @@ deities:
     domain: "Nature"
     alignment: "Good"
     offerings:
-      - "OAK_SAPLING:10"
-      - "DIAMOND_HOE:1"
+      - "VANILLA:OAK_SAPLING:10"
+      - "VANILLA:DIAMOND_HOE:1"
     rituals:
       - "harvest_festival"
     blessings:
@@ -45,8 +45,8 @@ deities:
     domain: "Afterlife"
     alignment: "Neutral"
     offerings:
-      - "BONE:20"
-      - "GOLDEN_SWORD:1"
+      - "VANILLA:BONE:20"
+      - "VANILLA:GOLDEN_SWORD:1"
     rituals:
       - "meditation_ritual"
     blessings:

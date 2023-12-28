@@ -2,7 +2,6 @@ package me.xidentified.devotions.commandexecutors;
 
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -28,15 +27,14 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         // Display player's favor if they don't provide an argument
         Player player = (Player) sender;
         if (args.length == 0) {
+            // Get player's devotion
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            if (plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()) == null) {
-                //plugin.sendMessage(player, Messages.FAVOR_NO_DEVOTION_SET);
-            } else {
-                String favorText = MessageUtils.getFavorText(favorManager.getFavor());
-                String message = "<yellow>Your current favor with " + favorManager.getDeity().getName() + " is " + favorText;
-                // TODO: Language support
-                MessageUtils.sendMessage(player, message);
-            }
+            String deityName = favorManager.getDeity().getName();
+
+            plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
+                    Placeholder.unparsed("deity", deityName),
+                    Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor()))
+            ));
             return true;
         }
 
@@ -86,10 +84,10 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        String favorText = MessageUtils.getFavorText(favorManager.getFavor());
-        String message = "<yellow>Your favor with " + favorManager.getDeity().getName() + " was set to " + favorText;
-        // TODO: Language support
-        MessageUtils.sendMessage(player, message);
+        plugin.sendMessage(player, Messages.FAVOR_SET_TO.formatted(
+                Placeholder.unparsed("deity", favorManager.getDeity().getName()),
+                Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor()))
+        ));
         return true;
     }
 

@@ -47,7 +47,7 @@ public class Placeholders extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("favor")) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            return MessageUtils.getFavorText(favorManager.getFavor());
+            return favorManager.getFavor() + "";
         }
 
         if (params.equalsIgnoreCase("favor_top")) {
@@ -56,9 +56,8 @@ public class Placeholders extends PlaceholderExpansion {
             for (int i = 0; i < Math.min(3, sortedFavorData.size()); i++) {
                 FavorManager data = sortedFavorData.get(i);
                 String playerName = Bukkit.getOfflinePlayer(data.getUuid()).getName();
-                String favorText = MessageUtils.getFavorText(data.getFavor());
                 topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ")
-                        .append(favorText).append("\n");
+                        .append(data.getFavor()).append("\n");
             }
             return topPlayers.toString().trim();
         }

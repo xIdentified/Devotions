@@ -1,11 +1,9 @@
 package me.xidentified.devotions.managers;
 
-import io.lumine.mythic.lib.api.item.NBTItem;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualItem;
 import me.xidentified.devotions.rituals.RitualObjective;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -146,25 +144,9 @@ public class RitualManager {
 
     // Translates item ID from config to match ritual ID in rituals table
     private String getItemId(ItemStack item) {
-        String computedId;
-
-        plugin.debugLog("Checking for MMOItem ritual key");
-        if (Bukkit.getPluginManager().isPluginEnabled("MMOItems")) {
-            NBTItem nbtItem = NBTItem.get(item);
-            if (nbtItem.hasType()) {
-                // constructs an MMOItem ID
-                computedId = "MMOITEM:" + nbtItem.getType() + ":" + nbtItem.getString("MMOITEMS_ITEM_ID");
-            } else {
-                // constructs vanilla item IDs
-                computedId = "VANILLA:" + item.getType().name();
-            }
-        } else {
             plugin.debugLog("Checking for vanilla item ritual key");
             // constructs vanilla item IDs
-            computedId = "VANILLA:" + item.getType().name();
-        }
-
-        return computedId;
+            return "VANILLA:" + item.getType().name();
     }
 
     public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {

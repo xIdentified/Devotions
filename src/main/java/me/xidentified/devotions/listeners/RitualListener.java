@@ -6,7 +6,6 @@ import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.Material;

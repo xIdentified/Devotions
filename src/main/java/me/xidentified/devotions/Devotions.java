@@ -647,8 +647,10 @@ public class Devotions extends JavaPlugin {
     }
 
     private ItemStack loadSavedItem(String name) {
-        File itemsFile = new File(getDataFolder(), "savedItems.yml");
+        File storageFolder = new File(getDataFolder(), "storage");
+        File itemsFile = new File(storageFolder, "savedItems.yml");
         FileConfiguration config = YamlConfiguration.loadConfiguration(itemsFile);
+
         if (config.contains("items." + name)) {
             return ItemStack.deserialize(config.getConfigurationSection("items." + name).getValues(false));
         }

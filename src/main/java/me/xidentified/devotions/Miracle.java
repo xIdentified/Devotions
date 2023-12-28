@@ -1,7 +1,6 @@
 package me.xidentified.devotions;
 
 import de.cubbossa.translations.Message;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

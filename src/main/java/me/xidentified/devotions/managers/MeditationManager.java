@@ -3,7 +3,6 @@ package me.xidentified.devotions.managers;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

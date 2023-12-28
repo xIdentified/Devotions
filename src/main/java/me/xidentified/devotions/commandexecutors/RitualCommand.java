@@ -2,7 +2,6 @@ package me.xidentified.devotions.commandexecutors;
 
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
-import me.xidentified.devotions.util.MessageUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
