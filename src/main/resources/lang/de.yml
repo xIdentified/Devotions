@@ -1,96 +1,96 @@
 general:
-  must_be_player: <negative>Nur Spieler können diesen Befehl verwenden.
-  no_perm: <negative>Dir fehlt die notwendige Berechtigung.
+  must_be_player: <prefix_negative>Nur Spieler können diesen Befehl verwenden.
+  no_perm: <prefix_negative>Dir fehlt die notwendige Berechtigung.
   cmd:
-    no_perm: <negative>Du hast keine Berechtigung für diesen Befehl.
-  player_not_found: '<negative>Spieler nicht gefunden: <name>'
+    no_perm: <prefix_negative>Du hast keine Berechtigung für diesen Befehl.
+  player_not_found: '<prefix_negative>Spieler nicht gefunden: {name}'
 ritual:
-  failure: <positive><ritual> war erfolgreich! Du seist gesegnet!
-  success: <negative><ritual> ist gescheitert - Bedingungen nicht erfüllt!
-  start: <light_purple>The <ritual> hat begonnen...
+  failure: <prefix>{ritual} war erfolgreich! Du seist gesegnet!
+  success: <prefix_negative>{ritual} ist gescheitert - Bedingungen nicht erfüllt!
+  start: <light_purple>The {ritual} hat begonnen...
   return_to_resume: <light_purple>Kehre zum Schrein zurück um das Ritual zu beenden.
   cmd:
     specify_ritual: <yellow>Gebe ein Ritual an, um Information dazu zu erhalten.
-    usage: '<warning>Verwendung: /ritual <info> [RitualName]'
-  not_found: <negative>Unbekanntes Ritual. Bitte wähle einen gültigen Namen.
+    usage: '<prefix_warning>Verwendung: <cmd_syntax>/ritual <arg>info</arg> <arg_opt>RitualName</arg_opt></cmd_syntax>'
+  not_found: <prefix_negative>Unbekanntes Ritual. Bitte wähle einen gültigen Namen.
   info: |-
-    <gold>Details zu <display-name>
-    <yellow>Beschreibung: <gray><description>
-    <yellow>Schlüssel Item: <gray><item-name>
-    <yellow>Gunst ausgezahlt: <gray><favour-amount>
+    <gold>Details zu {display-name}
+    <yellow>Beschreibung: <gray>{description}
+    <yellow>Schlüssel Item: <gray>{item-name}
+    <yellow>Gunst ausgezahlt: <gray>{favour-amount}
 favor:
   cmd:
-    usage: '<warning>Usage: /favor <set|give|take> <playername> <amount>'
-    player_does_not_worship: <negative><player> verehrt keine Gottheit.
-    invalid_number_format: <negative>Ungültige Anzahl. Bitte gib eine Ganzzahl an.
-    invalid_action: <negative>Ungültige Aktion. Verwende set, give, oder take.
-  current_favor: 'Deine aktuelle Gunst beträgt: <favor>'
-  no_devotion_set: <negative>Du hast keine Ergebenheit gesetzt.
+    usage: '<prefix_warning>Usage: <cmd_syntax>/favor set|give|take <arg>playername</arg> <arg>amount</arg></cmd_syntax>'
+    player_does_not_worship: <prefix_negative><player> verehrt keine Gottheit.
+    invalid_number_format: <prefix_negative>Ungültige Anzahl. Bitte gib eine Ganzzahl an.
+    invalid_action: <prefix_negative>Ungültige Aktion. Verwende set, give, oder take.
+  current_favor: '<prefix>Deine aktuelle Gunst bei {deity} beträgt: <favor_col>{favor}'
+  no_devotion_set: <prefix_negative>Du hast keine Ergebenheit gesetzt.
 meditation:
-  cancelled: <negative>Du hast dich beim Meditieren bewegt! Starte Timer neu...
-  complete: <positive>Meditation abgeschlossen! Du kannst dich nun bewegen.
+  cancelled: <prefix_negative>Du hast dich beim Meditieren bewegt! Starte Timer neu...
+  complete: <prefix>Meditation abgeschlossen! Du kannst dich nun bewegen.
 devotion:
-  set: <positive>Du bist nun <deity> ergeben. Deine Gunst beträgt <favor>.
-  reload_success: <positive>Devotions erfolgreich neu geladen!
+  set: <prefix>Du bist nun {deity} ergeben. Deine Gunst beträgt <favor_col>{favor}.
+  reload_success: <prefix>Devotions erfolgreich neu geladen!
 miracle:
-  repair: <positive>Ein Wunder hat all deine Items repariert!
-  iron_golem: <positive>Ein Wunder hat Eisengolems beschworen, um dich zu beschützen!
-  harvest: <positive>Ein Wunder segnet dich mit reicher Ernte!
-  hero_of_the_village: <positive>Ein Wunder macht dich zum Held des Dorfes!
-  bestowed: <positive>Dir wurde ein Wunder beschert!
-  fire_resistance: <positive>Ein Wunder schützt dich vor Verbrennungen!
+  repair: <prefix>Ein Wunder hat all deine Items repariert!
+  iron_golem: <prefix>Ein Wunder hat Eisengolems beschworen, um dich zu beschützen!
+  harvest: <prefix>Ein Wunder segnet dich mit reicher Ernte!
+  hero_of_the_village: <prefix>Ein Wunder macht dich zum Held des Dorfes!
+  bestowed: <prefix>Dir wurde ein Wunder beschert!
+  fire_resistance: <prefix>Ein Wunder schützt dich vor Verbrennungen!
   cmd:
-    unknown_miracle: '<negative>Unbekanntes Wunder: <miracle>'
-    applied: '<positive>Wunder angewandt: <yellow><miracle>'
-    usage: '"<warning>Verwendung: /testmiracle <miracleName>"'
-    no_miracles: <negative>Es wurden keine Wunder geladen.
-  saved_from_death: <positive>Ein Wunder hat dich vor dem Tod bewahrt!
-  wolves: <positive>Ein Wunder beschwört freundliche Wölfe, um dich zu beschützen!
+    unknown_miracle: '<prefix_negative>Unbekanntes Wunder: {miracle}'
+    applied: '<prefix>Wunder angewandt: <yellow>{miracle}'
+    usage: '"<prefix_warning>Verwendung: <cmd_syntax>/testmiracle <arg>miracleName</arg></cmd_syntax>"'
+    no_miracles: <prefix_negative>Es wurden keine Wunder geladen.
+  saved_from_death: <prefix>Ein Wunder hat dich vor dem Tod bewahrt!
+  wolves: <prefix>Ein Wunder beschwört freundliche Wölfe, um dich zu beschützen!
 shrines:
   set:
-    no_perm: <negative>Du hast keine Berechtigung, um Schreine zu setzen.
-  follow_deity_to_designate: <negative>Du musst einer Gottheit folgen, um einen Schrein zu bestimmen!
-  click_block_to_create: <warning>Rechtsklicke einen Block, um ein Heiligtum für <deity> zu bestimmen!
-  cannot_place_on_top: <negative>Du kannst keine Blöcke auf einen Schrein platzieren
+    no_perm: <prefix_negative>Du hast keine Berechtigung, um Schreine zu setzen.
+  follow_deity_to_designate: <prefix_negative>Du musst einer Gottheit folgen, um einen Schrein zu bestimmen!
+  click_block_to_create: <prefix_warning>Rechtsklicke einen Block, um ein Heiligtum für {deity} zu bestimmen!
+  cannot_place_on_top: <prefix_negative>Du kannst keine Blöcke auf einen Schrein platzieren
   list:
-    no_shrines: <negative>Es gibt keine Schreine.
-    no_perm: <negative>Du hast keine Berechtigung, um Schreine aufzulisten.
+    no_shrines: <prefix_negative>Es gibt keine Schreine.
+    no_perm: <prefix_negative>Du hast keine Berechtigung, um Schreine aufzulisten.
     header: '<yellow>Schreine:'
-    shrine: <hover:show_text:Click to teleport><click:run_cmd:/teleport <x> <y>
-      <z>><deity> bei <x:#.#>, <y:#.#>, <z:#.#>
-  offering_accepted: <positive>Dein Opfer wurde akzeptiert!
+    shrine: <hover:show_text:Click to teleport><click:run_command:'/teleport {x} {y}
+      {z}'>{deity} bei {x:#.#}, {y:#.#}, {z:#.#}
+  offering_accepted: <prefix>Dein Opfer wurde akzeptiert!
   remove:
-    success: <positive>Schrein erfolgreich entfernt!
-    no_perm: <negative>Du hast keine Berechtigung, um Schreine zu entfernen.
-    not_found: <negative>Kein Schrein an der Position gefunden.
-  right_click_to_remove: <warning>Rechtsklicke einen Schrein, um ihn zu entfernen.
-  deity_not_found: <negative>Konnte deine Gottheit nicht ermitteln, kontaktiere einen Administrator.
-  limit_reached: <negative>Du hast dein Limit für Schreine erreicht (<limit>).
-  cannot_break_shrines: <negative>Du kannst Schreine nicht abbauen. Entferne sie mit <warning>/shrine
-    remove</warning>.
-  cooldown: <negative>Du musst weitere <cooldown:'m'> Minuten und <cooldown:'s'> warten, um ein weiteres Ritual auszuführen.
-  offering_declined: <negative>Dein Opfer wurde von <subject> nicht akzeptiert.
-  not_following_deity: <negative>Nur Anhänger von <deity> können diesen Schrein anbeten.
-  shrine_created: <positive>Erfolgreich einen Schrein für <deity> bestimmt!
+    success: <prefix>Schrein erfolgreich entfernt!
+    no_perm: <prefix_negative>Du hast keine Berechtigung, um Schreine zu entfernen.
+    not_found: <prefix_negative>Kein Schrein an der Position gefunden.
+  right_click_to_remove: <prefix_warning>Rechtsklicke einen Schrein, um ihn zu entfernen.
+  deity_not_found: <prefix_negative>Konnte deine Gottheit nicht ermitteln, kontaktiere einen Administrator.
+  limit_reached: <prefix_negative>Du hast dein Limit für Schreine erreicht ({limit}).
+  cannot_break_shrines: <prefix_negative>Du kannst Schreine nicht abbauen. Entferne sie mit <cmd_syntax>/shrine
+    remove</cmd_syntax>.
+  cooldown: "<prefix_negative>Du musst {cooldown:'m'}m und {cooldown:'s'}s warten, um ein weiteres Ritual auszuführen."
+  offering_declined: <prefix_negative>Dein Opfer wurde von {subject} nicht akzeptiert.
+  not_following_deity: <prefix_negative>Nur Anhänger von {deity} können diesen Schrein anbeten.
+  shrine_created: <prefix>Erfolgreich einen Schrein für {deity} bestimmt!
 deity:
-  no_deity_found: <negative>Keine Gottheiten gefunden.
-  cursed: <positive><deity> verflucht dich mit <curse>!
-  blessed: <positive><deity> segnet dich mit <blessing>!
+  no_deity_found: <prefix_negative>Keine Gottheiten gefunden.
+  cursed: <prefix>{deity} verflucht dich mit {curse}!
+  blessed: <prefix>{deity} segnet dich mit {blessing}!
   cmd:
     specify_deity: <yellow>Bitte gebe eine Gottheit an, der du folgen möchtest.
-    specify_player: <warning>Bitte gebe eine Gottheit an, um Informationen zu ihr zu erhalten.
-    usage: '<warning>Verwendung: /Verwendung <select|info> [Gottheit]'
+    specify_player: <prefix_warning>Bitte gebe eine Gottheit an, um Informationen zu ihr zu erhalten.
+    usage: '<prefix_warning>Verwendung: <cmd_syntax>/Verwendung <arg>select|info</arg> <arg_opt>Gottheit</arg_opt></cmd_syntax>'
   list:
-    entry: <gray>- <name></gray>
+    entry: <gray>- {name}</gray>
     header: '<gold>Mögliche Gottheiten:'
-  not_found: <negative>Unbekannte Gottheit, bitte gebe einen gültigen Namen an.
+  not_found: <prefix_negative>Unbekannte Gottheit, bitte gebe einen gültigen Namen an.
   info: |-
-    <gold>Details zu <name>
-    <yellow>Beschreibung: <gray><lore>
-    <yellow>Domain: <gray><domain>
-    <yellow>Alignment: <gray><alignment>
-    <yellow>Favored Rituals: <gray><rituals>
-    <yellow>Favored Offerings: <gray><offerings>
+    <gold>Details zu {name}
+    <yellow>Beschreibung: <gray>{lore}
+    <yellow>Domain: <gray>{domain}
+    <yellow>Alignment: <gray>{alignment}
+    <yellow>Favored Rituals: <gray>{rituals}
+    <yellow>Favored Offerings: <gray>{offerings}
 miracles:
   cmd:
-    list_available: '<positive>Verfügbare Wunder: <yellow><miracles>'
+    list_available: '<prefix>Verfügbare Wunder: <yellow>{miracles}'

@@ -33,13 +33,13 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>de.cubbossa:Translations</include>
+                  <include>de.cubbossa:TinyTranslations</include>
                 </includes>
               </artifactSet>
               <relocations>
                 <relocation>
-                  <pattern>de.cubbossa.translations</pattern>
-                  <shadedPattern>me.xidentified.devotions.libs.translations</shadedPattern>
+                  <pattern>de.cubbossa.tinytranslations</pattern>
+                  <shadedPattern>me.xidentified.devotions.libs.tinytranslations</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>

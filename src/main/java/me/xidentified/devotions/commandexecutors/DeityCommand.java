@@ -1,5 +1,6 @@
 package me.xidentified.devotions.commandexecutors;
 
+import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
@@ -26,7 +27,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            Devotions.getInstance().sendMessage(sender, Messages.GENERAL_CMD_PLAYER_ONLY);
+            Devotions.getInstance().sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
             return true;
         }
 

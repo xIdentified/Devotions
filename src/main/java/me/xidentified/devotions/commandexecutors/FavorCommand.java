@@ -1,10 +1,14 @@
 package me.xidentified.devotions.commandexecutors;
 
+import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +39,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
             plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
                     Placeholder.unparsed("deity", deityName),
                     Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor())),
-                    Placeholder.parsed("color", FavorUtils.getColorForFavor(favorManager.getFavor()))
+                    TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(favorManager.getFavor()))))
             ));
             return true;
         }
@@ -47,7 +51,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
         // Check for permission
         else if (!player.hasPermission("devotions.admin")) {
-            plugin.sendMessage(player, Messages.GENERAL_CMD_NO_PERM);
+            plugin.sendMessage(player, GlobalMessages.NO_PERM_CMD);
             return true;
         }
 
@@ -89,7 +93,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         plugin.sendMessage(player, Messages.FAVOR_SET_TO.formatted(
                 Placeholder.unparsed("deity", favorManager.getDeity().getName()),
                 Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor())),
-                Placeholder.parsed("color", FavorUtils.getColorForFavor(favorManager.getFavor()))
+                TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(favorManager.getFavor()))))
         ));
         return true;
     }

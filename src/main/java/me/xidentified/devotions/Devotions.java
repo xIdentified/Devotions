@@ -1,11 +1,10 @@
 package me.xidentified.devotions;
 
-import de.cubbossa.translations.Message;
-import de.cubbossa.translations.StyleSet;
-import de.cubbossa.translations.Translations;
-import de.cubbossa.translations.TranslationsFramework;
-import de.cubbossa.translations.persistent.YamlMessageStorage;
-import de.cubbossa.translations.persistent.YamlStyleStorage;
+import de.cubbossa.tinytranslations.Message;
+import de.cubbossa.tinytranslations.Translator;
+import de.cubbossa.tinytranslations.TinyTranslations;
+import de.cubbossa.tinytranslations.persistent.YamlMessageStorage;
+import de.cubbossa.tinytranslations.persistent.YamlStyleStorage;
 import lombok.Getter;
 import me.xidentified.devotions.commandexecutors.*;
 import me.xidentified.devotions.effects.Blessing;
@@ -59,7 +58,7 @@ public class Devotions extends JavaPlugin {
     @Getter private StorageManager storageManager;
     @Getter private DevotionStorage devotionStorage;
     private BukkitAudiences audiences;
-    @Getter private Translations translations;
+    @Getter private Translator translations;
     private FileConfiguration savedItemsConfig = null;
     private File savedItemsConfigFile = null;
 
@@ -71,12 +70,12 @@ public class Devotions extends JavaPlugin {
         reloadSavedItemsConfig();
 
         audiences = BukkitAudiences.create(this);
-        TranslationsFramework.enable(new File(getDataFolder(), "/../"));
-        translations = TranslationsFramework.application("Devotions");
+        TinyTranslations.enable(new File(getDataFolder(), "/../"));
+        translations = TinyTranslations.application("Devotions");
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
         translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
 
-        translations.addMessages(TranslationsFramework.messageFieldsFromClass(Messages.class));
+        translations.addMessages(TinyTranslations.messageFieldsFromClass(Messages.class));
 
         loadLanguages();
 
@@ -504,28 +503,11 @@ public class Devotions extends JavaPlugin {
      * Run to reload changes to message files
      */
     public void loadLanguages() {
-        // load so that we can check if certain styles are present and potentially modified already
-        translations.loadStyles();
 
-        boolean saveStyles = false;
-        // if any of "negative", "positive" or "warning" is missing, it will be added. If present, it won't be overridden.
-        StyleSet set = translations.getStyleSet();
-        if (!set.containsKey("negative")) {
-            translations.getStyleSet().put("negative", "<red>");
-            saveStyles = true;
+        if (!new File(getDataFolder(), "/lang/styles.yml").exists()) {
+            saveResource("lang/styles.yml", false);
         }
-        if (!set.containsKey("positive")) {
-            translations.getStyleSet().put("positive", "<green>");
-            saveStyles = true;
-        }
-        if (!set.containsKey("warning")) {
-            translations.getStyleSet().put("warning", "<yellow>");
-            saveStyles = true;
-        }
-        if (saveStyles) {
-            // we only do it conditionally to save performance
-            translations.saveStyles();
-        }
+        translations.loadStyles();
 
         // save default translations
         translations.saveLocale(Locale.ENGLISH);
@@ -661,7 +643,7 @@ public class Devotions extends JavaPlugin {
         Audience audience = audiences.sender(sender);
         if (componentLike instanceof Message msg) {
             // Translate the message into the locale of the command sender
-            componentLike = msg.formatted(audience);
+            componentLike = translations.process(msg, audience);
         }
         audience.sendMessage(componentLike);
     }

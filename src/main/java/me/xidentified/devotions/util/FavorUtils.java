@@ -1,23 +1,25 @@
 package me.xidentified.devotions.util;
 
 import me.xidentified.devotions.Devotions;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 
 public class FavorUtils {
 
-    public static String getColorForFavor(int favor) {
+    public static TextColor getColorForFavor(int favor) {
         Devotions plugin = Devotions.getInstance();
         int curseThreshold = plugin.getConfig().getInt("curse-threshold");
         int blessingThreshold = plugin.getConfig().getInt("blessing-threshold");
         int miracleThreshold = plugin.getConfig().getInt("miracle-threshold");
 
         if (favor <= curseThreshold) {
-            return "<red>";
+            return NamedTextColor.RED;
         } else if (favor <= blessingThreshold) {
-            return "<yellow>";
+            return NamedTextColor.YELLOW;
         } else if (favor <= miracleThreshold) {
-            return "<green>";
+            return NamedTextColor.GREEN;
         } else {
-            return "<aqua>";
+            return NamedTextColor.AQUA;
         }
     }
 }
