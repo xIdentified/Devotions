@@ -7,7 +7,10 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -127,7 +130,7 @@ public class FavorManager {
             plugin.sendMessage(player, Messages.FAVOR_INCREASED.formatted(
                     Placeholder.unparsed("deity", deity.getName()),
                     Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                    Placeholder.parsed("color", FavorUtils.getColorForFavor(this.favor))
+                    TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
             ));
 
             // Save the player's devotion data
@@ -157,7 +160,7 @@ public class FavorManager {
             plugin.sendMessage(player, Messages.FAVOR_DECREASED.formatted(
                     Placeholder.unparsed("deity", deity.getName()),
                     Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                    Placeholder.parsed("color", FavorUtils.getColorForFavor(this.favor))
+                    TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
             ));
         }
 

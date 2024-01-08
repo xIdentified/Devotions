@@ -40,13 +40,13 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>de.cubbossa:Translations</include>
+                                    <include>de.cubbossa:TinyTranslations</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>de.cubbossa.translations</pattern>
-                                    <shadedPattern>me.xidentified.devotions.libs.translations</shadedPattern>
+                                    <pattern>de.cubbossa.tinytranslations</pattern>
+                                    <shadedPattern>me.xidentified.devotions.libs.tinytranslations</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -84,8 +84,8 @@
     <dependencies>
         <dependency>
             <groupId>de.cubbossa</groupId>
-            <artifactId>Translations</artifactId>
-            <version>3.2.3</version>
+            <artifactId>TinyTranslations</artifactId>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>

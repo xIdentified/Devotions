@@ -1,5 +1,6 @@
 package me.xidentified.devotions.commandexecutors;
 
+import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.ChatColor;
@@ -35,7 +36,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
         if ("reload".equalsIgnoreCase(args[0])) {
             if (!sender.hasPermission("devotions.reload")) {
-                plugin.sendMessage(sender, Messages.GENERAL_CMD_NO_PERM);
+                plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                 return true;
             }
 
@@ -45,12 +46,12 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         }
         if ("saveitem".equalsIgnoreCase(args[0])) {
             if (!sender.hasPermission("devotions.admin")) {
-                plugin.sendMessage(sender, Messages.GENERAL_CMD_NO_PERM);
+                plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                 return true;
             }
 
             if (!(sender instanceof Player player)) {
-                sender.sendMessage("This command can only be used by players.");
+                plugin.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
                 return true;
             }
 
