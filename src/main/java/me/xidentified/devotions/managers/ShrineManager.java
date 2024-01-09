@@ -25,7 +25,6 @@ public class ShrineManager {
         this.shrineStorage = new ShrineStorage(plugin, plugin.getStorageManager());  // Initialize the ShrineStorage
     }
 
-
     public void addShrine(Shrine newShrine) {
         if (newShrine != null) {
             if (getShrineAtLocation(newShrine.getLocation()) != null) {

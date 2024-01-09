@@ -154,7 +154,6 @@ public class Deity {
                 .collect(Collectors.joining(", "));
     }
 
-
     // Return rituals as a well formatted list
     public String getRituals() {
         return rituals.stream()

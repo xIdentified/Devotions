@@ -43,6 +43,7 @@ public class RitualManager {
     public Ritual getRitualByKey(String ritualKey) {
         plugin.debugLog("Attempting to get ritual with key: " + ritualKey);
         Ritual ritual = rituals.get(ritualKey);
+
         if (ritual != null) {
             plugin.debugLog("Found ritual: " + ritual.getDisplayName());
         } else {
@@ -126,24 +127,26 @@ public class RitualManager {
     }
 
     public Ritual getRitualByItem(ItemStack item) {
+        plugin.debugLog("Itemstack in getRitualbyItem returns: " + item);
         if (item == null) return null;
 
         String itemId = getItemId(item);
         plugin.debugLog("Looking for ritual associated with item ID " + itemId);
+        plugin.debugLog("Current rituals map: " + rituals);
 
         for (Ritual ritual : rituals.values()) {
             RitualItem keyRitualItem = ritual.getItem();
             if (keyRitualItem != null && keyRitualItem.getUniqueId().equals(itemId)) {
+                plugin.debugLog("Checking if Ritual item " + keyRitualItem + " equals Item ID " + itemId);
                 return ritual;
             }
         }
         return null;
     }
 
-
     // Translates item ID from config to match ritual ID in rituals table
     private String getItemId(ItemStack item) {
-            plugin.debugLog("Checking for vanilla item ritual key");
+            plugin.debugLog("Checking for vanilla item ritual key: VANILLA:" + item.getType().name());
             // constructs vanilla item IDs
             return "VANILLA:" + item.getType().name();
     }

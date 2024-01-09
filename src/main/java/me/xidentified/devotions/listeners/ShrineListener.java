@@ -62,13 +62,18 @@ public class ShrineListener implements Listener {
         Shrine shrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
         if (shrine == null) return;
 
-        // If the shrine doesn't belong to player's deity, inform them
-        Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
-        if (!shrine.getDeity().equals(playerDeity)) {
-            plugin.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.formatted(
-                Placeholder.unparsed("deity", shrine.getDeity().getName())
-            ));
-            return;
+        // Check config setting for shrine interaction
+        boolean allPlayersCanInteract = plugin.getConfig().getBoolean("all-players-can-interact-with-shrines", true);
+
+        // If the shrine doesn't belong to player's deity inform them if config is configured to
+        if (!allPlayersCanInteract) {
+            Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
+            if (!shrine.getDeity().equals(playerDeity)) {
+                plugin.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.formatted(
+                        Placeholder.unparsed("deity", shrine.getDeity().getName())
+                ));
+                return;
+            }
         }
 
         // Check for ritual initiation
@@ -102,7 +107,7 @@ public class ShrineListener implements Listener {
             }
             try {
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
-                handleOfferingInteraction(player, clickedBlock, itemInHand, droppedItem, shrine);
+                handleOfferingInteraction(player, clickedBlock, itemInHand, droppedItem);
             } catch (Exception e) {
                 plugin.getLogger().severe("Error while handling offering interaction: " + e.getMessage());
                 e.printStackTrace();
@@ -147,38 +152,41 @@ public class ShrineListener implements Listener {
         event.setCancelled(true);
     }
 
-    private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem, Shrine shrine) {
-        Offering offering = getOfferingForItem(itemInHand, shrine.getDeity());
+    private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem) {
+        // Get the player's deity
         FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
+        Deity playerDeity = favorManager.getDeity();
+
+        // Check if the offering is valid for the player's deity
+        Offering offering = getOfferingForItem(itemInHand, playerDeity);
 
         if (offering != null) {
             long offeringCooldown = cooldownManager.getCooldownFromConfig("offering-cooldown", "5s");
             cooldownManager.setCooldown(player, "offering", offeringCooldown);
 
-            if (favorManager != null) {
-                takeItemInHand(player, itemInHand);
-                plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
+            takeItemInHand(player, itemInHand);
+            plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    favorManager.increaseFavor(offering.getValue());
-                    if (droppedItem != null) droppedItem.remove();
-                    plugin.playConfiguredSound(player, "offeringAccepted");
-                    spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                favorManager.increaseFavor(offering.getValue());
+                if (droppedItem != null) droppedItem.remove();
+                plugin.playConfiguredSound(player, "offeringAccepted");
+                spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);
 
-                    // Execute commands
-                    for (String cmd : offering.getCommands()) {
-                        String command = cmd.replace("{player}", player.getName());
-                        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                            command = PlaceholderAPI.setPlaceholders(player, command);
-                        }
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-                        plugin.debugLog("Command executed: " + command);
+                // Execute commands
+                for (String cmd : offering.getCommands()) {
+                    String command = cmd.replace("{player}", player.getName());
+                    // Replace placeholders if PlaceholderAPI is present
+                    if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                        command = PlaceholderAPI.setPlaceholders(player, command);
                     }
-                }, 100L);
-            }
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                    plugin.debugLog("Command executed: " + command);
+                }
+            }, 100L);
         } else {
             plugin.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED.formatted(
-                Placeholder.unparsed("subject", favorManager.getDeity().getName())
+                    Placeholder.unparsed("subject", playerDeity.getName())
             ));
             if (droppedItem != null) droppedItem.remove();
         }
