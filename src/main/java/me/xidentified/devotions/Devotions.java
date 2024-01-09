@@ -317,12 +317,7 @@ public class Devotions extends JavaPlugin {
                                 ritualItem = new RitualItem("SAVED", savedItem);
                             }
                         } else if ("VANILLA".equalsIgnoreCase(type)) {
-                            Material material = Material.matchMaterial(itemId);
-                            if (material == null) {
-                                getLogger().warning("Invalid material: " + itemId + " for ritual: " + key);
-                            } else {
-                                ritualItem = new RitualItem("VANILLA", new ItemStack(material));
-                            }
+                            ritualItem = new RitualItem("VANILLA", itemId);
                         } else {
                             getLogger().warning("Unknown item type: " + type + " for ritual: " + key);
                         }

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RitualManager {
     private final Devotions plugin;
     private static volatile RitualManager instance; // Use this instance throughout plugin
-    public final ConcurrentHashMap<String, Ritual> rituals; // Defined rituals
+    public final Map<String, Ritual> rituals; // Defined rituals
     private final Map<Player, Ritual> playerRituals = new ConcurrentHashMap<>(); // Track what ritual each player is doing
     public final Map<Player, Item> ritualDroppedItems = new ConcurrentHashMap<>(); // Track dropped item so we can remove later
 
@@ -67,7 +67,6 @@ public class RitualManager {
         plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
 
         ritual.reset();
-        plugin.debugLog("After reset: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
         associateDroppedItem(player, droppedItem);
 
         // Validate the ritual and its conditions
@@ -132,7 +131,6 @@ public class RitualManager {
 
         String itemId = getItemId(item);
         plugin.debugLog("Looking for ritual associated with item ID " + itemId);
-        plugin.debugLog("Current rituals map: " + rituals);
 
         for (Ritual ritual : rituals.values()) {
             RitualItem keyRitualItem = ritual.getItem();

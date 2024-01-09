@@ -12,22 +12,17 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@Getter
 public class Ritual {
     public boolean isCompleted = false;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
-    @Getter
     private final String displayName;
-    @Getter
     private final String description;
-    @Getter
     private final RitualItem item;
-    @Getter
     private final int favorAmount;
     private final RitualConditions conditions;
-    @Getter
     private final RitualOutcome outcome;
-    @Getter
     private final List<RitualObjective> objectives;
 
     public Ritual(Devotions plugin, String displayName, String description, RitualItem item, int favorAmount,
@@ -91,12 +86,9 @@ public class Ritual {
         }
 
         // Hunger condition
-        if (conditions.minHunger() != 0 && player.getFoodLevel() < conditions.minHunger()) {
-            return false;
-        }
+        return conditions.minHunger() == 0 || player.getFoodLevel() >= conditions.minHunger();
 
         // All conditions are met
-        return true;
     }
 
 
@@ -137,7 +129,7 @@ public class Ritual {
         StringBuilder readableName = new StringBuilder();
         String[] words = id.split("_");
         for (String word : words) {
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 readableName.append(word.substring(0, 1).toUpperCase())
                         .append(word.substring(1).toLowerCase())
                         .append(" ");
