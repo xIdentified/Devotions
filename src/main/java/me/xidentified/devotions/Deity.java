@@ -23,14 +23,15 @@ public class Deity {
     @Getter private final String lore;
     @Getter private final String alignment;
     private final String domain;
-    private final List<ItemStack> offerings;
+    private final List<Offering> offerings;
     private final List<String> rituals;
     private final List<Blessing> blessings;
     private final List<Curse> curses;
     private final List<Miracle> miracles;
 
-    public Deity(Devotions plugin, String name, String lore, String domain, String alignment, List<ItemStack> offerings,
-                 List<String> rituals, List<Blessing> blessings, List<Curse> curses, List<Miracle> miracles) {
+    public Deity(Devotions plugin, String name, String lore, String domain, String alignment,
+                 List<Offering> offerings, List<String> rituals, List<Blessing> blessings,
+                 List<Curse> curses, List<Miracle> miracles) {
         this.plugin = plugin;
         this.name = name;
         this.lore = lore;
@@ -142,9 +143,9 @@ public class Deity {
 
     // Return offerings as a well formatted list
     public String getOfferings() {
-        plugin.debugLog("getOfferings method called!");
         return offerings.stream()
-                .map(itemStack -> {
+                .map(offering -> {
+                    ItemStack itemStack = offering.getItemStack();
                     String[] parts = itemStack.getType().name().split("_");
                     return Arrays.stream(parts)
                             .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
@@ -152,6 +153,7 @@ public class Deity {
                 })
                 .collect(Collectors.joining(", "));
     }
+
 
     // Return rituals as a well formatted list
     public String getRituals() {

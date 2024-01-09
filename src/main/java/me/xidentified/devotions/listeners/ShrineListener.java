@@ -1,5 +1,6 @@
 package me.xidentified.devotions.listeners;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Offering;
@@ -31,10 +32,9 @@ import org.bukkit.util.Vector;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 // Begins rituals or player's offerings
 public class ShrineListener implements Listener {
@@ -42,7 +42,6 @@ public class ShrineListener implements Listener {
     private final DevotionManager devotionManager;
     private final ShrineManager shrineManager;
     private final CooldownManager cooldownManager;
-    private final Map<UUID, Long> lastShrineInteractionTime = new HashMap<>();
 
     public ShrineListener(Devotions plugin, ShrineManager shrineManager, CooldownManager cooldownManager) {
         this.plugin = plugin;
@@ -165,6 +164,16 @@ public class ShrineListener implements Listener {
                     if (droppedItem != null) droppedItem.remove();
                     plugin.playConfiguredSound(player, "offeringAccepted");
                     spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);
+
+                    // Execute commands
+                    for (String cmd : offering.getCommands()) {
+                        String command = cmd.replace("{player}", player.getName());
+                        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                            command = PlaceholderAPI.setPlaceholders(player, command);
+                        }
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                        plugin.debugLog("Command executed: " + command);
+                    }
                 }, 100L);
             }
         } else {
@@ -212,19 +221,25 @@ public class ShrineListener implements Listener {
                 continue;
             }
 
+            List<String> commands = new ArrayList<>();
+            if (parts.length > 3) {
+                // Parts[3] contains the commands separated by a semicolon
+                commands = Arrays.asList(parts[3].split(";"));
+            }
+
             if ("SAVED".equalsIgnoreCase(offeringType)) {
                 // Handle saved items
                 if (savedItemsSection != null) {
                     ItemStack savedItem = savedItemsSection.getItemStack(offeringItemId);
                     if (savedItem != null && savedItem.isSimilar(item)) {
-                        return new Offering(item, deity, favorValue);
+                        return new Offering(item, favorValue, commands);
                     }
                 }
             } else if ("VANILLA".equalsIgnoreCase(offeringType)) {
                 // Handle vanilla items
                 Material material = Material.matchMaterial(offeringItemId);
                 if (material != null && item.getType() == material) {
-                    return new Offering(item, deity, favorValue);
+                    return new Offering(item, favorValue, commands);
                 }
             }
         }

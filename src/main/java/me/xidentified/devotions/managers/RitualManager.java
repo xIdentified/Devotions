@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +19,8 @@ public class RitualManager {
     private final Devotions plugin;
     private static volatile RitualManager instance; // Use this instance throughout plugin
     public final ConcurrentHashMap<String, Ritual> rituals; // Defined rituals
-    private final Map<Player, Ritual> playerRituals = new HashMap<>(); // Track what ritual each player is doing
-    public final Map<Player, Item> ritualDroppedItems = new HashMap<>(); // Track dropped item so we can remove later
+    private final Map<Player, Ritual> playerRituals = new ConcurrentHashMap<>(); // Track what ritual each player is doing
+    public final Map<Player, Item> ritualDroppedItems = new ConcurrentHashMap<>(); // Track dropped item so we can remove later
 
     public RitualManager(Devotions plugin) {
         this.plugin = plugin;

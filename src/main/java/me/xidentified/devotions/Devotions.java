@@ -1,8 +1,8 @@
 package me.xidentified.devotions;
 
 import de.cubbossa.tinytranslations.Message;
-import de.cubbossa.tinytranslations.Translator;
 import de.cubbossa.tinytranslations.TinyTranslations;
+import de.cubbossa.tinytranslations.Translator;
 import de.cubbossa.tinytranslations.persistent.YamlMessageStorage;
 import de.cubbossa.tinytranslations.persistent.YamlStyleStorage;
 import lombok.Getter;
@@ -42,13 +42,14 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Devotions extends JavaPlugin {
     @Getter private static Devotions instance;
     @Getter private DevotionManager devotionManager;
     @Getter private RitualManager ritualManager;
-    private final Map<String, Miracle> miraclesMap = new HashMap<>();
+    private final Map<String, Miracle> miraclesMap = new ConcurrentHashMap<>();
     @Getter private CooldownManager cooldownManager;
     @Getter private MeditationManager meditationManager;
     @Getter private ShrineListener shrineListener;
@@ -116,38 +117,46 @@ public class Devotions extends JavaPlugin {
 
             // Load offerings
             List<String> offeringStrings = deityConfig.getStringList("offerings");
-            List<ItemStack> favoredOfferings = offeringStrings.stream()
-                    .map(offering -> {
-                        String[] parts = offering.split(":");
+            List<Offering> favoredOfferings = offeringStrings.stream()
+                    .map(offeringString -> {
+                        String[] parts = offeringString.split(":");
                         if (parts.length < 3) {
-                            getLogger().warning("Invalid offering format for deity " + deityKey + ": " + offering);
+                            getLogger().warning("Invalid offering format for deity " + deityKey + ": " + offeringString);
                             return null;
                         }
-                        ItemStack itemStack;
-                        int favor;
+
+                        String type = parts[0];
+                        String itemId = parts[1];
+                        int favorValue;
                         try {
-                            favor = Integer.parseInt(parts[2]);
+                            favorValue = Integer.parseInt(parts[2]);
                         } catch (NumberFormatException e) {
                             getLogger().warning("Invalid favor value in offerings for deity " + deityKey + ": " + parts[2]);
                             return null;
                         }
 
-                        if ("Saved".equalsIgnoreCase(parts[0])) {
-                            itemStack = loadSavedItem(parts[1]);
-                            if (itemStack == null) {
-                                getLogger().warning("Saved item not found: " + parts[1] + " for deity: " + deityKey);
-                                return null;
-                            }
-                            itemStack.setAmount(favor); // Set the correct quantity for saved items
-                        } else {
-                            Material material = Material.matchMaterial(parts[1]);
-                            if (material == null) {
-                                getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + parts[1]);
-                                return null;
-                            }
-                            itemStack = new ItemStack(material, favor);
+                        List<String> commands = new ArrayList<>();
+                        if (parts.length > 3) {
+                            commands = Arrays.asList(parts[3].split(";"));
+                            debugLog("Loaded commands for offering: " + commands);
                         }
-                        return itemStack;
+
+                        ItemStack itemStack;
+                        if ("Saved".equalsIgnoreCase(type)) {
+                            itemStack = loadSavedItem(itemId);
+                            if (itemStack == null) {
+                                getLogger().warning("Saved item not found: " + itemId + " for deity: " + deityKey);
+                                return null;
+                            }
+                        } else {
+                            Material material = Material.matchMaterial(itemId);
+                            if (material == null) {
+                                getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + itemId);
+                                return null;
+                            }
+                            itemStack = new ItemStack(material);
+                        }
+                        return new Offering(itemStack, favorValue, commands);
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
