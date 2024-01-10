@@ -1,6 +1,7 @@
 package me.xidentified.devotions;
 
 import de.cubbossa.tinytranslations.Message;
+import de.cubbossa.tinytranslations.TinyTranslationsBukkit;
 import de.cubbossa.tinytranslations.Translator;
 import de.cubbossa.tinytranslations.TinyTranslations;
 import de.cubbossa.tinytranslations.persistent.YamlMessageStorage;
@@ -19,9 +20,7 @@ import me.xidentified.devotions.storage.ShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Placeholders;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -57,7 +56,6 @@ public class Devotions extends JavaPlugin {
     private FileConfiguration soundsConfig;
     @Getter private StorageManager storageManager;
     @Getter private DevotionStorage devotionStorage;
-    private BukkitAudiences audiences;
     @Getter private Translator translations;
     private FileConfiguration savedItemsConfig = null;
     private File savedItemsConfigFile = null;
@@ -69,9 +67,8 @@ public class Devotions extends JavaPlugin {
         loadSoundsConfig();
         reloadSavedItemsConfig();
 
-        audiences = BukkitAudiences.create(this);
-        TinyTranslations.enable(new File(getDataFolder(), "/../"));
-        translations = TinyTranslations.application("Devotions");
+        TinyTranslationsBukkit.enable(this);
+        translations = TinyTranslationsBukkit.application(this);
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
         translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
 
@@ -596,7 +593,6 @@ public class Devotions extends JavaPlugin {
         ritualManager.ritualDroppedItems.clear();
 
         translations.close();
-        audiences.close();
     }
 
     public int getShrineLimit() {
@@ -640,12 +636,11 @@ public class Devotions extends JavaPlugin {
     }
 
     public void sendMessage(CommandSender sender, ComponentLike componentLike) {
-        Audience audience = audiences.sender(sender);
         if (componentLike instanceof Message msg) {
             // Translate the message into the locale of the command sender
-            componentLike = translations.process(msg, audience);
+            componentLike = translations.process(msg, TinyTranslationsBukkit.getLocale(sender));
         }
-        audience.sendMessage(componentLike);
+        TinyTranslationsBukkit.sendMessage(sender, componentLike);
     }
 
 }
