@@ -40,7 +40,8 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>de.cubbossa:TinyTranslations</include>
+                                    <include>de.cubbossa:TinyTranslations-bukkit</include>
+                                    <include>de.cubbossa:TinyTranslations-common</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -84,8 +85,8 @@
     <dependencies>
         <dependency>
             <groupId>de.cubbossa</groupId>
-            <artifactId>TinyTranslations</artifactId>
-            <version>4.1.1</version>
+            <artifactId>TinyTranslations-bukkit</artifactId>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
