@@ -73,7 +73,7 @@ public class Messages {
 			.withDefault("<offset>Shrines:")
 			.build();
 	public static final Message SHRINE_INFO = new MessageBuilder("shrines.list.shrine")
-			.withDefault("<click:run_command:\"/teleport @p {x} {y} {z}\"><hover:show_text:Click to teleport>{deity} at {x:#.#}, {y:#.#}, {z:#.#}</hover></click>")
+			.withDefault("<hover:show_text:Click to teleport><click:run_command:'/teleport @p {x:'#.#'} {y:'#.#'} {z:'#.#'}'>{deity} at {x:#}, {y:#}, {z:#}")
 			.withPlaceholders("deity", "x", "y", "z")
 			.build();
 	public static final Message SHRINE_NO_PERM_REMOVE = new MessageBuilder("shrines.remove.no_perm")

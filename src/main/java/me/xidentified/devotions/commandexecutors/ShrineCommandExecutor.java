@@ -176,8 +176,8 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             Devotions.getInstance().sendMessage(player, Messages.SHRINE_INFO.formatted(
                 Placeholder.unparsed("deity", shrine.getDeity().getName()),
                 Formatter.number("x", loc.getBlockX()),
-                Formatter.number("y", loc.getBlockZ()),
-                Formatter.number("z", loc.getBlockY())
+                Formatter.number("y", loc.getBlockY()),
+                Formatter.number("z", loc.getBlockZ())
             ));
         }
     }
