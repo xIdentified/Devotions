@@ -191,11 +191,11 @@ public class Messages {
 			.withPlaceholder("ritual")
 			.build();
 	public static final Message RITUAL_FAILURE = new MessageBuilder("ritual.failure")
-			.withDefault("<prefix>{ritual} was a success! Blessings upon ye!")
+			.withDefault("<prefix_negative>{ritual} has failed - the conditions were not met!")
 			.withPlaceholder("ritual")
 			.build();
 	public static final Message RITUAL_SUCCESS = new MessageBuilder("ritual.success")
-			.withDefault("<prefix_negative>{ritual} has failed - the conditions were not met!")
+			.withDefault("<prefix>{ritual} was a success! Blessings upon ye!")
 			.withPlaceholder("ritual")
 			.build();
 	public static final Message RITUAL_RETURN_TO_RESUME = new MessageBuilder("ritual.return_to_resume")

@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Getter
@@ -50,7 +49,7 @@ public class Devotions extends JavaPlugin {
     @Getter private static Devotions instance;
     private DevotionManager devotionManager;
     private RitualManager ritualManager;
-    private final Map<String, Miracle> miraclesMap = new ConcurrentHashMap<>();
+    private final Map<String, Miracle> miraclesMap = new HashMap<>();
     private CooldownManager cooldownManager;
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;

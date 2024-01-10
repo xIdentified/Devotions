@@ -115,32 +115,6 @@ public class ShrineListener implements Listener {
         }
     }
 
-    private Item dropItemOnShrine(Block clickedBlock, ItemStack itemInHand) {
-        plugin.debugLog("Attempting to place item on shrine.");
-
-        if (!itemInHand.getType().equals(Material.AIR)) {
-            Location dropLocation = clickedBlock.getLocation().add(0.5, 1, 0.5);
-
-            // Create a new ItemStack with only 1 quantity
-            ItemStack singleItemStack = new ItemStack(itemInHand.getType(), 1);
-
-            Item droppedItem = clickedBlock.getWorld().dropItem(dropLocation, singleItemStack);
-
-            // Set item properties
-            droppedItem.setInvulnerable(true);
-            droppedItem.setPickupDelay(Integer.MAX_VALUE);
-            droppedItem.setGravity(false);
-            // Set velocity to zero to prevent it from shooting into the air
-            droppedItem.setVelocity(new Vector(0, 0, 0));
-
-            plugin.debugLog("Dropped item spawned at: " + dropLocation + " with item " + singleItemStack.getType());
-            return droppedItem;
-        }
-        plugin.debugLog("Dropped item not spawned.");
-        return null;
-    }
-
-
     private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem, PlayerInteractEvent event) {
         boolean ritualStarted = RitualManager.getInstance(plugin).startRitual(player, itemInHand, droppedItem);
         if (ritualStarted) {
@@ -274,6 +248,31 @@ public class ShrineListener implements Listener {
             event.setCancelled(true);
             plugin.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
         }
+    }
+
+    private Item dropItemOnShrine(Block clickedBlock, ItemStack itemInHand) {
+        plugin.debugLog("Attempting to place item on shrine.");
+
+        if (!itemInHand.getType().equals(Material.AIR)) {
+            Location dropLocation = clickedBlock.getLocation().add(0.5, 1, 0.5);
+
+            // Create a new ItemStack with only 1 quantity
+            ItemStack singleItemStack = new ItemStack(itemInHand.getType(), 1);
+
+            Item droppedItem = clickedBlock.getWorld().dropItem(dropLocation, singleItemStack);
+
+            // Set item properties
+            droppedItem.setInvulnerable(true);
+            droppedItem.setPickupDelay(Integer.MAX_VALUE);
+            droppedItem.setGravity(false);
+            // Set velocity to zero to prevent it from shooting into the air
+            droppedItem.setVelocity(new Vector(0, 0, 0));
+
+            plugin.debugLog("Dropped item spawned at: " + dropLocation + " with item " + singleItemStack.getType());
+            return droppedItem;
+        }
+        plugin.debugLog("Dropped item not spawned.");
+        return null;
     }
 
 }

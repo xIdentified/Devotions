@@ -11,20 +11,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RitualManager {
     private final Devotions plugin;
     private static volatile RitualManager instance; // Use this instance throughout plugin
     public final Map<String, Ritual> rituals; // Defined rituals
-    private final Map<Player, Ritual> playerRituals = new ConcurrentHashMap<>(); // Track what ritual each player is doing
-    public final Map<Player, Item> ritualDroppedItems = new ConcurrentHashMap<>(); // Track dropped item so we can remove later
+    private final Map<Player, Ritual> playerRituals = new HashMap<>(); // Track what ritual each player is doing
+    public final Map<Player, Item> ritualDroppedItems = new HashMap<>(); // Track dropped item so we can remove later
 
     public RitualManager(Devotions plugin) {
         this.plugin = plugin;
-        rituals = new ConcurrentHashMap<>();
+        rituals = new HashMap<>();
     }
 
     // Use one instance of RitualManager throughout the plugin!
@@ -92,11 +92,30 @@ public class RitualManager {
             // Set the ritual for the player, so we can track it
             RitualManager.getInstance(plugin).setRitualForPlayer(player, ritual);
             return true; // Ritual started successfully
-        } else {
-            if (droppedItem != null) droppedItem.remove();
+        } else if (droppedItem != null) {
+            droppedItem.remove();
             ritual.provideFeedback(player, "FAILURE");
             return false; // Ritual did not start
         }
+        return false;
+    }
+
+    public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
+        // Get rid of item on shrine
+        Item ritualDroppedItem = getAssociatedDroppedItem(player);
+        if (ritualDroppedItem != null) ritualDroppedItem.remove();
+        removeDroppedItemAssociation(player);
+
+        // Execute outcome and provide feedback
+        ritual.getOutcome().executeOutcome(player);
+        ritual.provideFeedback(player, "SUCCESS");
+
+        // Mark ritual as complete and clear data
+        ritual.isCompleted = true;
+        playerRituals.remove(player);
+        meditationManager.cancelMeditationTimer(player);
+        meditationManager.clearMeditationData(player);
+        ritual.reset();
     }
 
     public void addRitual(String key, Ritual ritual) {
@@ -117,10 +136,6 @@ public class RitualManager {
 
     public void setRitualForPlayer(Player player, Ritual ritual) {
         playerRituals.put(player, ritual);
-    }
-
-    public void removeRitualForPlayer(Player player) {
-        playerRituals.remove(player);
     }
 
     public Ritual getRitualByItem(ItemStack item) {
@@ -145,23 +160,6 @@ public class RitualManager {
             plugin.debugLog("Checking for vanilla item ritual key: VANILLA:" + item.getType().name());
             // constructs vanilla item IDs
             return "VANILLA:" + item.getType().name();
-    }
-
-    public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
-        // Get rid of item on shrine
-        Item ritualDroppedItem = getAssociatedDroppedItem(player);
-        if (ritualDroppedItem != null) ritualDroppedItem.remove();
-        removeDroppedItemAssociation(player);
-
-        // Execute outcome and provide feedback
-        ritual.getOutcome().executeOutcome(player);
-        ritual.provideFeedback(player, "SUCCESS");
-
-        // Mark ritual as complete and clear data
-        ritual.isCompleted = true;
-        removeRitualForPlayer(player);
-        meditationManager.cancelMeditationTimer(player);
-        meditationManager.clearMeditationData(player);
     }
 
     /**
