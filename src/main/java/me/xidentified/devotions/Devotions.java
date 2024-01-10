@@ -45,21 +45,22 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Getter
 public class Devotions extends JavaPlugin {
     @Getter private static Devotions instance;
-    @Getter private DevotionManager devotionManager;
-    @Getter private RitualManager ritualManager;
+    private DevotionManager devotionManager;
+    private RitualManager ritualManager;
     private final Map<String, Miracle> miraclesMap = new ConcurrentHashMap<>();
-    @Getter private CooldownManager cooldownManager;
-    @Getter private MeditationManager meditationManager;
-    @Getter private ShrineListener shrineListener;
+    private CooldownManager cooldownManager;
+    private MeditationManager meditationManager;
+    private ShrineListener shrineListener;
     private YamlConfiguration deitiesConfig;
     private FileConfiguration ritualConfig;
     private FileConfiguration soundsConfig;
-    @Getter private StorageManager storageManager;
-    @Getter private DevotionStorage devotionStorage;
+    private StorageManager storageManager;
+    private DevotionStorage devotionStorage;
     private BukkitAudiences audiences;
-    @Getter private Translator translations;
+    private Translator translations;
     private FileConfiguration savedItemsConfig = null;
     private File savedItemsConfigFile = null;
 
@@ -325,15 +326,17 @@ public class Devotions extends JavaPlugin {
                 }
 
                 // Parse conditions
+                String expression = ritualConfig.getString(path + "conditions.expression", "");
                 String time = ritualConfig.getString(path + "conditions.time");
                 String biome = ritualConfig.getString(path + "conditions.biome");
                 String weather = ritualConfig.getString(path + "conditions.weather");
                 String moonPhase = ritualConfig.getString(path + "conditions.moon_phase");
-                double minAltitude = ritualConfig.getDouble(path + "conditions.min_altitude", 0.0); // Default to 0 if not found
-                int minExperience = ritualConfig.getInt(path + "conditions.min_experience", 0); // Default to 0 if not found
-                double minHealth = ritualConfig.getDouble(path + "conditions.min_health", 0.0); // Default to 0 if not found
-                int minHunger = ritualConfig.getInt(path + "conditions.min_hunger", 0); // Default to 0 if not found
-                RitualConditions ritualConditions = new RitualConditions(time, biome, weather, moonPhase,
+                double minAltitude = ritualConfig.getDouble(path + "conditions.min_altitude", 0.0);
+                int minExperience = ritualConfig.getInt(path + "conditions.min_experience", 0);
+                double minHealth = ritualConfig.getDouble(path + "conditions.min_health", 0.0);
+                int minHunger = ritualConfig.getInt(path + "conditions.min_hunger", 0);
+
+                RitualConditions ritualConditions = new RitualConditions(expression, time, biome, weather, moonPhase,
                         minAltitude, minExperience, minHealth, minHunger);
 
                 // Parse outcome

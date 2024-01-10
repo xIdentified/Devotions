@@ -57,8 +57,6 @@ public class RitualManager {
     }
 
     public boolean startRitual(Player player, ItemStack item, Item droppedItem) {
-        plugin.debugLog("Inside startRitual method");
-
         // Make sure player isn't already in a ritual before starting another one
         if (RitualManager.getInstance(plugin).getCurrentRitualForPlayer(player) != null) return false;
 

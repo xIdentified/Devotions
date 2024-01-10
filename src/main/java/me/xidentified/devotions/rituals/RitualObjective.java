@@ -39,8 +39,6 @@ public class RitualObjective {
         boolean complete = this.currentCount >= this.count;
         if (complete) {
             plugin.debugLog("Objective is marked as complete.");
-        } else {
-            plugin.debugLog("Objective is not yet complete. Current/Required: " + this.currentCount + "/" + this.count);
         }
         return complete;
     }

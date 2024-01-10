@@ -8,7 +8,7 @@ rituals:
     favor: 30
     item: "VANILLA:GOLDEN_HOE"
     conditions:
-      weather: "STORM"
+      expression: "%vault_eco_balance% >= 100"
     objectives:
       - type: "GATHERING"
         description: "Bring 20 wheat to the shrine"
