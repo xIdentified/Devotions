@@ -25,7 +25,6 @@ public class ShrineManager {
         this.shrineStorage = new ShrineStorage(plugin, plugin.getStorageManager());  // Initialize the ShrineStorage
     }
 
-
     public void addShrine(Shrine newShrine) {
         if (newShrine != null) {
             if (getShrineAtLocation(newShrine.getLocation()) != null) {
@@ -36,7 +35,7 @@ public class ShrineManager {
             this.allShrinesList.add(newShrine);
             this.shrines.put(newShrine.getLocation(), newShrine);
             shrineStorage.saveShrine(newShrine);
-            plugin.debugLog("New shrine added for deity: " + newShrine.getDeity().getName() + " at " + newShrine.getLocation());
+            plugin.debugLog("New shrine added for " + newShrine.getDeity().getName() + " at " + newShrine.getLocation());
         }
     }
 
@@ -57,7 +56,7 @@ public class ShrineManager {
         shrines.remove(location);
         allShrinesList.remove(shrine);
         shrineStorage.removeShrine(location, playerId);
-        plugin.debugLog("Shrine removed for deity " + shrine.getDeity().getName() + " at " + shrine.getLocation());
+        plugin.debugLog("Shrine removed for " + shrine.getDeity().getName() + " at " + shrine.getLocation());
         return true;
     }
 
@@ -68,7 +67,6 @@ public class ShrineManager {
     public Shrine getShrineAtLocation(Location location) {
         for (Shrine shrine : allShrinesList) {
             Location shrineLocation = shrine.getLocation();
-            plugin.debugLog("Shrine location from getShrineAtLocation: " + shrineLocation);
             if (isSameBlockLocation(shrineLocation, location)) {
                 plugin.debugLog("Shrine found at location: " + shrineLocation);
                 return shrine;

@@ -6,7 +6,7 @@
 
     <groupId>me.xIdentified</groupId>
     <artifactId>Devotions</artifactId>
-    <version>1.2.3-beta</version>
+    <version>1.2.4-beta</version>
     <packaging>jar</packaging>
 
     <name>Devotions</name>
@@ -40,8 +40,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>de.cubbossa:TinyTranslations-bukkit</include>
-                                    <include>de.cubbossa:TinyTranslations-common</include>
+                                    <include>de.cubbossa:TinyTranslations</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -111,6 +110,11 @@
             <artifactId>adventure-text-minimessage</artifactId>
             <version>4.14.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <version>15.4</version>
         </dependency>
     </dependencies>
 </project>

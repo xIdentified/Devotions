@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.Devotions;
 
+@Getter
 public class RitualObjective {
 
     // Other ritual objectives should be added later, but I'm going to keep it simple for right now
@@ -12,12 +13,11 @@ public class RitualObjective {
     }
 
     private final Devotions plugin;
-    @Getter private final Type type;
-    @Getter private final String description;
-    @Getter private final String target;  // Can be an item or a mob type
-    @Getter private final int count;
-    @Setter
-    private int currentCount;  // To track objective progress
+    private final Type type;
+    private final String description;
+    private final String target;  // Can be an item or a mob type
+    private final int count;
+    @Setter private int currentCount;  // To track objective progress
 
     public RitualObjective(Devotions plugin, Type type, String description, String target, int count) {
         this.plugin = plugin;
@@ -39,8 +39,6 @@ public class RitualObjective {
         boolean complete = this.currentCount >= this.count;
         if (complete) {
             plugin.debugLog("Objective is marked as complete.");
-        } else {
-            plugin.debugLog("Objective is not yet complete. Current/Required: " + this.currentCount + "/" + this.count);
         }
         return complete;
     }

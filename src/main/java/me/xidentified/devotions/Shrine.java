@@ -10,8 +10,7 @@ import java.util.UUID;
 public class Shrine {
     private final Location location;
     private final UUID owner;
-    @Setter
-    private Deity deity;
+    @Setter private Deity deity;
 
     public Shrine(Location location, Deity deity, UUID owner) {
         this.location = location;

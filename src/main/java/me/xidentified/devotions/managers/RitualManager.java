@@ -14,18 +14,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RitualManager {
     private final Devotions plugin;
     private static volatile RitualManager instance; // Use this instance throughout plugin
-    public final ConcurrentHashMap<String, Ritual> rituals; // Defined rituals
+    public final Map<String, Ritual> rituals; // Defined rituals
     private final Map<Player, Ritual> playerRituals = new HashMap<>(); // Track what ritual each player is doing
     public final Map<Player, Item> ritualDroppedItems = new HashMap<>(); // Track dropped item so we can remove later
 
     public RitualManager(Devotions plugin) {
         this.plugin = plugin;
-        rituals = new ConcurrentHashMap<>();
+        rituals = new HashMap<>();
     }
 
     // Use one instance of RitualManager throughout the plugin!
@@ -44,6 +43,7 @@ public class RitualManager {
     public Ritual getRitualByKey(String ritualKey) {
         plugin.debugLog("Attempting to get ritual with key: " + ritualKey);
         Ritual ritual = rituals.get(ritualKey);
+
         if (ritual != null) {
             plugin.debugLog("Found ritual: " + ritual.getDisplayName());
         } else {
@@ -57,8 +57,6 @@ public class RitualManager {
     }
 
     public boolean startRitual(Player player, ItemStack item, Item droppedItem) {
-        plugin.debugLog("Inside startRitual method");
-
         // Make sure player isn't already in a ritual before starting another one
         if (RitualManager.getInstance(plugin).getCurrentRitualForPlayer(player) != null) return false;
 
@@ -67,7 +65,6 @@ public class RitualManager {
         plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
 
         ritual.reset();
-        plugin.debugLog("After reset: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
         associateDroppedItem(player, droppedItem);
 
         // Validate the ritual and its conditions
@@ -95,11 +92,30 @@ public class RitualManager {
             // Set the ritual for the player, so we can track it
             RitualManager.getInstance(plugin).setRitualForPlayer(player, ritual);
             return true; // Ritual started successfully
-        } else {
-            if (droppedItem != null) droppedItem.remove();
+        } else if (droppedItem != null) {
+            droppedItem.remove();
             ritual.provideFeedback(player, "FAILURE");
             return false; // Ritual did not start
         }
+        return false;
+    }
+
+    public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
+        // Get rid of item on shrine
+        Item ritualDroppedItem = getAssociatedDroppedItem(player);
+        if (ritualDroppedItem != null) ritualDroppedItem.remove();
+        removeDroppedItemAssociation(player);
+
+        // Execute outcome and provide feedback
+        ritual.getOutcome().executeOutcome(player);
+        ritual.provideFeedback(player, "SUCCESS");
+
+        // Mark ritual as complete and clear data
+        ritual.isCompleted = true;
+        playerRituals.remove(player);
+        meditationManager.cancelMeditationTimer(player);
+        meditationManager.clearMeditationData(player);
+        ritual.reset();
     }
 
     public void addRitual(String key, Ritual ritual) {
@@ -122,11 +138,8 @@ public class RitualManager {
         playerRituals.put(player, ritual);
     }
 
-    public void removeRitualForPlayer(Player player) {
-        playerRituals.remove(player);
-    }
-
     public Ritual getRitualByItem(ItemStack item) {
+        plugin.debugLog("Itemstack in getRitualbyItem returns: " + item);
         if (item == null) return null;
 
         String itemId = getItemId(item);
@@ -135,35 +148,18 @@ public class RitualManager {
         for (Ritual ritual : rituals.values()) {
             RitualItem keyRitualItem = ritual.getItem();
             if (keyRitualItem != null && keyRitualItem.getUniqueId().equals(itemId)) {
+                plugin.debugLog("Checking if Ritual item " + keyRitualItem + " equals Item ID " + itemId);
                 return ritual;
             }
         }
         return null;
     }
 
-
     // Translates item ID from config to match ritual ID in rituals table
     private String getItemId(ItemStack item) {
-            plugin.debugLog("Checking for vanilla item ritual key");
+            plugin.debugLog("Checking for vanilla item ritual key: VANILLA:" + item.getType().name());
             // constructs vanilla item IDs
             return "VANILLA:" + item.getType().name();
-    }
-
-    public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
-        // Get rid of item on shrine
-        Item ritualDroppedItem = getAssociatedDroppedItem(player);
-        if (ritualDroppedItem != null) ritualDroppedItem.remove();
-        removeDroppedItemAssociation(player);
-
-        // Execute outcome and provide feedback
-        ritual.getOutcome().executeOutcome(player);
-        ritual.provideFeedback(player, "SUCCESS");
-
-        // Mark ritual as complete and clear data
-        ritual.isCompleted = true;
-        removeRitualForPlayer(player);
-        meditationManager.cancelMeditationTimer(player);
-        meditationManager.clearMeditationData(player);
     }
 
     /**

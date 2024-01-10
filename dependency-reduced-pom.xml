@@ -4,7 +4,7 @@
   <groupId>me.xIdentified</groupId>
   <artifactId>Devotions</artifactId>
   <name>Devotions</name>
-  <version>1.2.3-beta</version>
+  <version>1.2.4-beta</version>
   <build>
     <resources>
       <resource>
@@ -89,6 +89,12 @@
       <groupId>net.kyori</groupId>
       <artifactId>adventure-text-minimessage</artifactId>
       <version>4.14.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.nashorn</groupId>
+      <artifactId>nashorn-core</artifactId>
+      <version>15.4</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

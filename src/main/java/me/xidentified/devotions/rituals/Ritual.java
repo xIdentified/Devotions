@@ -1,9 +1,11 @@
 package me.xidentified.devotions.rituals;
 
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.util.JavaScriptEngine;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
@@ -12,22 +14,17 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@Getter
 public class Ritual {
     public boolean isCompleted = false;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
-    @Getter
     private final String displayName;
-    @Getter
     private final String description;
-    @Getter
     private final RitualItem item;
-    @Getter
     private final int favorAmount;
     private final RitualConditions conditions;
-    @Getter
     private final RitualOutcome outcome;
-    @Getter
     private final List<RitualObjective> objectives;
 
     public Ritual(Devotions plugin, String displayName, String description, RitualItem item, int favorAmount,
@@ -47,58 +44,105 @@ public class Ritual {
     public boolean validateConditions(Player player) {
         plugin.debugLog("Validating Conditions for ritual " + this.getDisplayName());
 
+        // JavaScript expression condition
+        if (!conditions.expression().isEmpty()) {
+            // Replace placeholders with actual values
+            String parsedExpression = PlaceholderAPI.setPlaceholders(player, conditions.expression());
+            plugin.debugLog("Evaluating JavaScript expression condition. Expression: " + parsedExpression);
+
+            // Evaluate the expression using the JavaScript engine
+            boolean expressionResult = JavaScriptEngine.evaluateExpression(parsedExpression);
+            if (!expressionResult) {
+                plugin.debugLog("JavaScript expression condition failed.");
+                return false;
+            }
+        }
+
         // Time condition
         if (conditions.time() != null) {
             long time = player.getWorld().getTime();
+            plugin.debugLog("Checking time condition. Current time: " + time + ", Required: " + conditions.time());
             if (("DAY".equalsIgnoreCase(conditions.time()) && time >= 12300) ||
                     ("NIGHT".equalsIgnoreCase(conditions.time()) && time < 12300)) {
+                plugin.debugLog("Time condition failed.");
                 return false;
             }
         }
 
         // Biome condition
-        if (conditions.biome() != null && !player.getLocation().getBlock().getBiome().toString().equalsIgnoreCase(conditions.biome())) {
-            return false;
+        if (conditions.biome() != null) {
+            String currentBiome = player.getLocation().getBlock().getBiome().toString();
+            plugin.debugLog("Checking biome condition. Current biome: " + currentBiome + ", Required: " + conditions.biome());
+            if (!currentBiome.equalsIgnoreCase(conditions.biome())) {
+                plugin.debugLog("Biome condition failed.");
+                return false;
+            }
         }
 
         // Weather condition
         if (conditions.weather() != null) {
             boolean isRaining = player.getWorld().hasStorm();
+            plugin.debugLog("Checking weather condition. Is raining: " + isRaining + ", Required: " + conditions.weather());
             if (("RAIN".equalsIgnoreCase(conditions.weather()) && !isRaining) ||
                     ("CLEAR".equalsIgnoreCase(conditions.weather()) && isRaining)) {
+                plugin.debugLog("Weather condition failed.");
                 return false;
             }
         }
 
         // Moon phase condition
-        if (conditions.moonPhase() != null && player.getWorld().getFullTime() / 24000L % 8 != conditions.getMoonPhaseNumber(conditions.moonPhase())) {
-            return false;
+        if (conditions.moonPhase() != null) {
+            long moonPhase = player.getWorld().getFullTime() / 24000L % 8;
+            plugin.debugLog("Checking moon phase condition. Current phase: " + moonPhase + ", Required: " + conditions.moonPhase());
+            if (moonPhase != conditions.getMoonPhaseNumber(conditions.moonPhase())) {
+                plugin.debugLog("Moon phase condition failed.");
+                return false;
+            }
         }
 
         // Altitude condition
-        if (conditions.minAltitude() != 0.0 && player.getLocation().getY() < conditions.minAltitude()) {
-            return false;
+        if (conditions.minAltitude() != 0.0) {
+            double altitude = player.getLocation().getY();
+            plugin.debugLog("Checking altitude condition. Current altitude: " + altitude + ", Minimum required: " + conditions.minAltitude());
+            if (altitude < conditions.minAltitude()) {
+                plugin.debugLog("Altitude condition failed.");
+                return false;
+            }
         }
 
         // Experience condition
-        if (conditions.minExperience() != 0 && player.getTotalExperience() < conditions.minExperience()) {
-            return false;
+        if (conditions.minExperience() != 0) {
+            int experience = player.getTotalExperience();
+            plugin.debugLog("Checking experience condition. Current experience: " + experience + ", Minimum required: " + conditions.minExperience());
+            if (experience < conditions.minExperience()) {
+                plugin.debugLog("Experience condition failed.");
+                return false;
+            }
         }
 
         // Health condition
-        if (conditions.minHealth() != 0.0 && player.getHealth() < conditions.minHealth()) {
-            return false;
+        if (conditions.minHealth() != 0.0) {
+            double health = player.getHealth();
+            plugin.debugLog("Checking health condition. Current health: " + health + ", Minimum required: " + conditions.minHealth());
+            if (health < conditions.minHealth()) {
+                plugin.debugLog("Health condition failed.");
+                return false;
+            }
         }
 
         // Hunger condition
-        if (conditions.minHunger() != 0 && player.getFoodLevel() < conditions.minHunger()) {
-            return false;
+        if (conditions.minHunger() != 0) {
+            int hunger = player.getFoodLevel();
+            plugin.debugLog("Checking hunger condition. Current hunger: " + hunger + ", Minimum required: " + conditions.minHunger());
+            if (hunger < conditions.minHunger()) {
+                plugin.debugLog("Hunger condition failed.");
+                return false;
+            }
         }
 
-        // All conditions are met
+        plugin.debugLog("All conditions passed.");
         return true;
     }
-
 
     public void provideFeedback(Player player, String feedbackType) {
         FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
@@ -137,7 +181,7 @@ public class Ritual {
         StringBuilder readableName = new StringBuilder();
         String[] words = id.split("_");
         for (String word : words) {
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 readableName.append(word.substring(0, 1).toUpperCase())
                         .append(word.substring(1).toLowerCase())
                         .append(" ");

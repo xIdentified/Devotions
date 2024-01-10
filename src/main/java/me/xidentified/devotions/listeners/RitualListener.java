@@ -55,7 +55,7 @@ public class RitualListener implements Listener {
         }
 
         // Check if player moved, if in meditation. Reset timer if they moved.
-        if (meditationManager().hasPlayerMovedSince(player) && meditationManager().isPlayerInMeditation(player)) {
+        else if (meditationManager().hasPlayerMovedSince(player) && meditationManager().isPlayerInMeditation(player)) {
             plugin.debugLog("Player " + player.getName() + " moved during meditation.");
             plugin.sendMessage(player, Messages.MEDIDATION_CANCELLED);
             meditationManager().startMeditation(player, ritual, getMeditationObjective(ritual));

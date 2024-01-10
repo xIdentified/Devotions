@@ -31,5 +31,7 @@ miracle-cooldown: "5m"
 
 # How many shrines can a player have at once?
 shrine-limit: 3
+# If false, players can only interact with a shrine dedicated to their deity
+all-players-can-interact-with-shrines: true
 
 debug_mode: false

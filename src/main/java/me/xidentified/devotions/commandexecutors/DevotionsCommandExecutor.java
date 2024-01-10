@@ -3,7 +3,6 @@ package me.xidentified.devotions.commandexecutors;
 import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.Messages;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -56,7 +55,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
             }
 
             if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Please provide a name for the item.");
+                player.sendMessage("Please provide a name for the item.");
                 return true;
             }
 
@@ -64,7 +63,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
             if (itemInHand.getType() == Material.AIR) {
-                player.sendMessage(ChatColor.RED + "You must hold an item in your hand.");
+                player.sendMessage("You must hold an item in your hand.");
                 return true;
             }
 
