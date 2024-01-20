@@ -3,6 +3,8 @@ package me.xidentified.devotions.commandexecutors;
 import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -27,52 +29,55 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
 
-    @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             return false;
         }
 
-        if ("reload".equalsIgnoreCase(args[0])) {
-            if (!sender.hasPermission("devotions.reload")) {
-                plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+        switch (args[0].toLowerCase()) {
+            case "reload":
+                if (!sender.hasPermission("devotions.reload")) {
+                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    return true;
+                }
+                plugin.reloadConfigurations();
+                plugin.sendMessage(sender, Messages.DEVOTION_RELOAD_SUCCESS);
                 return true;
-            }
 
-            plugin.reloadConfigurations();
-            plugin.sendMessage(sender,Messages.DEVOTION_RELOAD_SUCCESS);
-            return true;
+            case "saveitem":
+                if (!sender.hasPermission("devotions.admin")) {
+                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    return true;
+                }
+                if (!(sender instanceof Player player)) {
+                    plugin.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
+                    return true;
+                }
+                if (args.length < 2) {
+                    player.sendMessage("Please provide a name for the item.");
+                    return true;
+                }
+                String itemName = args[1];
+                ItemStack itemInHand = player.getInventory().getItemInMainHand();
+                if (itemInHand.getType() == Material.AIR) {
+                    player.sendMessage("You must hold an item in your hand.");
+                    return true;
+                }
+                saveItem(itemName, itemInHand);
+                player.sendMessage("Item saved as " + itemName);
+                return true;
+
+            case "version":
+                if (!sender.hasPermission("devotions.admin")) {
+                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    return true;
+                }
+                displayVersionInfo(sender);
+
+                default:
+                // You can handle unknown commands or provide a default message here
+                return false;
         }
-        if ("saveitem".equalsIgnoreCase(args[0])) {
-            if (!sender.hasPermission("devotions.admin")) {
-                plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
-                return true;
-            }
-
-            if (!(sender instanceof Player player)) {
-                plugin.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
-                return true;
-            }
-
-            if (args.length < 2) {
-                player.sendMessage("Please provide a name for the item.");
-                return true;
-            }
-
-            String itemName = args[1];
-            ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
-            if (itemInHand.getType() == Material.AIR) {
-                player.sendMessage("You must hold an item in your hand.");
-                return true;
-            }
-
-            saveItem(itemName, itemInHand);
-            player.sendMessage("Item saved as " + itemName);
-            return true;
-        }
-
-        return false;
     }
 
     private void saveItem(String name, ItemStack item) {
@@ -89,6 +94,20 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void displayVersionInfo(CommandSender sender) {
+        // Fetch server info, ie paper or spigot, plugin version, and java version for debugging
+        String serverVersion = Bukkit.getServer().getVersion();
+        String pluginVersion = plugin.getDescription().getVersion();
+        String javaVersion = System.getProperty("java.version");
+
+        // Displaying info
+        plugin.sendMessage(sender, Messages.VERSION_INFO.formatted(
+                Placeholder.unparsed("server-ver", serverVersion),
+                Placeholder.unparsed("plugin-ver", pluginVersion),
+                Placeholder.unparsed("java-ver", javaVersion)
+        ));
     }
 
     @Override
