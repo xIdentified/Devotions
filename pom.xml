@@ -84,8 +84,8 @@
     <dependencies>
         <dependency>
             <groupId>de.cubbossa</groupId>
-            <artifactId>TinyTranslations</artifactId>
-            <version>4.1.2</version>
+            <artifactId>TinyTranslations-bukkit</artifactId>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
