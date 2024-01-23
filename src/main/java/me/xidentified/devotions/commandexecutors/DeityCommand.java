@@ -3,6 +3,7 @@ package me.xidentified.devotions.commandexecutors;
 import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -70,18 +71,20 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         // Fetch or create the player's FavorManager
         UUID playerUniqueId = player.getUniqueId();
-        FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(playerUniqueId);
+        DevotionManager devotionManager = plugin.getDevotionManager();
+
+        // Fetch or create FavorManager for the specified deity
+        // FavorManager favorManager = devotionManager.getFavorForDeity(playerUniqueId, selectedDeity.getName());
+
+        FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
 
         if (favorManager == null) {
-            // Create a new FavorManager if the player doesn't have one
+            // Initialize favor for the new deity
             favorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
-        } else {
-            // Update the existing FavorManager with the new deity
-            favorManager.setDeity(selectedDeity);
         }
 
         // Set the player's devotion with the updated FavorManager
-        plugin.getDevotionManager().setPlayerDevotion(playerUniqueId, favorManager);
+        devotionManager.setPlayerDevotion(playerUniqueId, favorManager);
 
         return true;
     }

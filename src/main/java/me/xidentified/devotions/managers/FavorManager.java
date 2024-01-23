@@ -7,7 +7,6 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.DevotionStorage;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
