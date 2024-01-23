@@ -175,7 +175,8 @@ public class ShrineListener implements Listener {
         if (itemInHand.getAmount() > 1) {
             itemInHand.setAmount(itemInHand.getAmount() - 1);
         } else {
-            player.getInventory().removeItemAnySlot(itemInHand);
+            // Use removeItem instead of removeItemAnySlot
+            player.getInventory().removeItem(itemInHand);
         }
     }
 
