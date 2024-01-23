@@ -169,10 +169,18 @@ public class FavorManager {
     }
 
     private void decayFavor() {
-        long currentTime = System.currentTimeMillis();
+        Player player = Bukkit.getPlayer(uuid);
+        boolean decayWhenOffline = plugin.getConfig().getBoolean("decay-when-offline", false);
 
+        // If the configuration is set to not decay when offline, and the player is offline, return
+        if (!decayWhenOffline && (player == null || !player.isOnline())) {
+            return;
+        }
+
+        long currentTime = System.currentTimeMillis();
         // Calculate the time since the last decay in ticks
         long timeSinceLastDecay = (currentTime - lastDecayTime) / 50; // Convert milliseconds to ticks (1 tick = 50ms)
+
         if (timeSinceLastDecay >= decayInterval) {
             // Update the last decay time
             lastDecayTime = currentTime;

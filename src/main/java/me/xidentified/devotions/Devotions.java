@@ -4,7 +4,6 @@ import de.cubbossa.tinytranslations.Message;
 import de.cubbossa.tinytranslations.TinyTranslationsBukkit;
 import de.cubbossa.tinytranslations.Translator;
 import de.cubbossa.tinytranslations.TinyTranslations;
-import de.cubbossa.tinytranslations.Translator;
 import de.cubbossa.tinytranslations.persistent.YamlMessageStorage;
 import de.cubbossa.tinytranslations.persistent.YamlStyleStorage;
 import lombok.Getter;
