@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
@@ -172,12 +173,9 @@ public class ShrineListener implements Listener {
 
     // Takes item from player's hand to place on the shrine
     public void takeItemInHand(Player player, ItemStack itemInHand) {
-        if (itemInHand.getAmount() > 1) {
-            itemInHand.setAmount(itemInHand.getAmount() - 1);
-        } else {
-            // Use removeItem instead of removeItemAnySlot
-            player.getInventory().removeItem(itemInHand);
-        }
+        ItemStack singleItemStack = new ItemStack(itemInHand.getType(), 1);
+        player.getInventory().removeItem(singleItemStack);
+        player.updateInventory();
     }
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
@@ -233,11 +231,28 @@ public class ShrineListener implements Listener {
     @EventHandler
     public void onBlockPlacedOnShrine(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        Shrine shrine = shrineManager.getShrineAtLocation(block.getLocation().subtract(0, 1, 0)); // Check the block below
-        if (shrine != null) {
-            event.setCancelled(true);
-            plugin.sendMessage(event.getPlayer(), Messages.SHRINE_PLACE_ON_TOP);
+        Player player = event.getPlayer();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (isBlockAdjacentToShrine(block)) {
+            FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
+            Deity playerDeity = favorManager.getDeity();
+            Offering offering = getOfferingForItem(itemInHand, playerDeity);
+            if (offering != null) {
+                event.setCancelled(true); // Prevent block from being placed if it's being used for an offering
+            }
         }
+    }
+
+    // See if blocks are placed next to shrines
+    private boolean isBlockAdjacentToShrine(Block block) {
+        // Check all adjacent blocks to see if any is a shrine
+        for (BlockFace face : BlockFace.values()) {
+            if (shrineManager.getShrineAtLocation(block.getRelative(face).getLocation()) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Don't allow players to destroy shrines

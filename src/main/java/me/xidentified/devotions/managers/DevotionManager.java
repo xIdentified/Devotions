@@ -41,24 +41,29 @@ public class DevotionManager {
         return manager;
     }
 
-    public void setPlayerDevotion(UUID playerUUID, FavorManager devotion) {
-        if (playerUUID == null || devotion == null) {
-            // Log for debugging
-            plugin.getLogger().warning("Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = " + devotion);
+    public void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
+        if (playerUUID == null || newDevotion == null) {
+            plugin.getLogger().warning("Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = " + newDevotion);
             return;
         }
 
-        removeDevotion(playerUUID); // Remove current devotion before setting new one
-        playerDevotions.put(playerUUID, devotion);
+        FavorManager currentDevotion = playerDevotions.get(playerUUID);
+        if (currentDevotion != null && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
+            // Player is switching to a new deity, reset their favor
+            newDevotion.setFavor(plugin.getConfig().getInt("initial-favor"));
+        }
+
+        // Update the player's devotion with the new or reset FavorManager
+        playerDevotions.put(playerUUID, newDevotion);
         Player player = Bukkit.getPlayer(playerUUID);
 
         if (player != null) {
-            Deity deity = devotion.getDeity();
-            devotionStorage.savePlayerDevotion(playerUUID, devotion); // Set new devotion
+            Deity deity = newDevotion.getDeity();
+            devotionStorage.savePlayerDevotion(playerUUID, newDevotion); // Save new devotion
             plugin.playConfiguredSound(player, "deitySelected");
             plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
-                Placeholder.unparsed("name", deity.getName()),
-                Formatter.number("favor", devotion.getFavor())
+                    Placeholder.unparsed("name", deity.getName()),
+                    Formatter.number("favor", newDevotion.getFavor())
             ));
         } else {
             plugin.getLogger().warning("Tried to set devotion for a player that is not online: " + playerUUID);

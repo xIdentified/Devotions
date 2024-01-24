@@ -69,23 +69,11 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return false;
         }
 
-        // Fetch or create the player's FavorManager
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
 
-        // Fetch or create FavorManager for the specified deity
-        // FavorManager favorManager = devotionManager.getFavorForDeity(playerUniqueId, selectedDeity.getName());
-
-        FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
-
-        if (favorManager == null) {
-            // Initialize favor for the new deity
-            favorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
-        }
-
-        // Set the player's devotion with the updated FavorManager
-        devotionManager.setPlayerDevotion(playerUniqueId, favorManager);
-
+        FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
+        devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
         return true;
     }
 
