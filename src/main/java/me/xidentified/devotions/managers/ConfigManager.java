@@ -5,6 +5,7 @@ import me.xidentified.devotions.*;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.rituals.*;
+import me.xidentified.devotions.Miracle;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 @Getter
 public class ConfigManager {
     private final Devotions plugin;
-    private FileConfiguration config;
-    private FileConfiguration soundsConfig;
-    private FileConfiguration savedItemsConfig;
-    private FileConfiguration deitiesConfig;
+    private YamlConfiguration config;
+    private YamlConfiguration soundsConfig;
+    private YamlConfiguration savedItemsConfig;
+    private YamlConfiguration deitiesConfig;
+    private YamlConfiguration ritualConfig;
+    private File savedItemsConfigFile;
 
     public int getShrineLimit() {
         return getConfig().getInt("shrine-limit", 3);
@@ -36,14 +39,14 @@ public class ConfigManager {
     }
 
     public void reloadConfigs() {
-        reloadConfig();
+        plugin.reloadConfig();
         reloadRitualConfig();
         reloadSoundsConfig();
-        loadLanguages();
+        plugin.loadLanguages();
 
         // Reset the DevotionManager
-        if (devotionManager != null) {
-            devotionManager.reset();
+        if (plugin.getDevotionManager() != null) {
+            plugin.getDevotionManager().reset();
         }
 
         plugin.initializePlugin();
@@ -152,7 +155,7 @@ public class ConfigManager {
                         String target = (String) objectiveMap.get("target");
                         int count = (Integer) objectiveMap.get("count");
 
-                        RitualObjective objective = new RitualObjective(this, type, objDescription, target, count);
+                        RitualObjective objective = new RitualObjective(plugin, type, objDescription, target, count);
                         objectives.add(objective);
                         plugin.debugLog("Loaded objective " + objDescription + " for ritual " + key);
                     }

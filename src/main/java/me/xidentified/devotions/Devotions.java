@@ -152,7 +152,7 @@ public class Devotions extends JavaPlugin {
         translations.loadLocales();
     }
 
-    private void initializePlugin() {
+    public void initializePlugin() {
         HandlerList.unregisterAll(this);
         instance = this;
         configManager.loadRitualConfig();
