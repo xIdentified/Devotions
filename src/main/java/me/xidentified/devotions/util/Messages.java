@@ -15,6 +15,10 @@ public class Messages {
 			.withDefault("<prefix>You are now devoted to {name}. Your favor is {favor}.")
 			.withPlaceholder("name", "favor")
 			.build();
+	public static final Message DEVOTION_ALREADY_SET = new MessageBuilder("devotion.already_set")
+			.withDefault("<prefix>You are already devoted to {name}.")
+			.withPlaceholder("name", "favor")
+			.build();
 	public static final Message DEITY_NOT_FOUND = new MessageBuilder("deity.not_found")
 			.withDefault("<prefix_negative>Unknown deity. Please choose a valid deity name.")
 			.build();

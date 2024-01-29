@@ -30,6 +30,7 @@ commands:
   deity:
     description: Manage and view information about deities.
     usage: /<command> <select|info|list> [DeityName]
+    permission: devotions.select
     aliases: [god, gods]
     tab-completions: true
   shrine:
@@ -54,9 +55,12 @@ permissions:
   devotions.shrine.list:
     description: Allows listing of all shrines on server.
     default: op
-  devotions.shrine.set:
-    description: Allows dedication of shrines to your deity.
-    default: true
   devotions.admin:
     description: Allows use of all admin commands.
     default: op
+  devotions.shrine.set:
+    description: Allows dedication of shrines to your deity.
+    default: true
+  devotions.select:
+    description: Allows selection of a chosen deity.
+    default: true

@@ -32,6 +32,11 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!player.hasPermission("devotions.select")) {
+            plugin.sendMessage(player, GlobalMessages.NO_PERM_CMD);
+            return true;
+        }
+
         if (args.length < 1) {
             plugin.sendMessage(player, Messages.DEITY_CMD_USAGE);
             return true;
@@ -72,8 +77,28 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
 
-        FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
-        devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
+        // Check if the player already has a devotion
+        FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
+        if (currentFavorManager != null) {
+            // Player has an existing devotion
+            if (!currentFavorManager.getDeity().equals(selectedDeity)) {
+                // Player is switching to a new deity, so reset the favor and update the deity
+                currentFavorManager.resetFavor();
+                currentFavorManager.setDeity(selectedDeity);
+                // Save the updated devotion
+                devotionManager.setPlayerDevotion(playerUniqueId, currentFavorManager);
+            } else {
+                // Player selected the same deity they're already devoted to
+                plugin.sendMessage(player, Messages.DEVOTION_ALREADY_SET.formatted(
+                        Placeholder.unparsed("deity", selectedDeity.getName())
+                ));
+            }
+        } else {
+            // Player does not have an existing devotion, create a new FavorManager
+            FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
+            devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
+        }
+
         return true;
     }
 

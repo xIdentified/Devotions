@@ -189,4 +189,8 @@ public class FavorManager {
         }
     }
 
+    public void resetFavor() {
+        favor = plugin.getConfig().getInt("initial-favor");
+    }
+
 }

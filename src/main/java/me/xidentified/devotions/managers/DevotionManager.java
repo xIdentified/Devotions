@@ -50,7 +50,7 @@ public class DevotionManager {
         FavorManager currentDevotion = playerDevotions.get(playerUUID);
         if (currentDevotion != null && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
             // Player is switching to a new deity, reset their favor
-            newDevotion.setFavor(plugin.getConfig().getInt("initial-favor"));
+            newDevotion.resetFavor();
         }
 
         // Update the player's devotion with the new or reset FavorManager
@@ -61,6 +61,7 @@ public class DevotionManager {
             Deity deity = newDevotion.getDeity();
             devotionStorage.savePlayerDevotion(playerUUID, newDevotion); // Save new devotion
             plugin.playConfiguredSound(player, "deitySelected");
+
             plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
                     Placeholder.unparsed("name", deity.getName()),
                     Formatter.number("favor", newDevotion.getFavor())
