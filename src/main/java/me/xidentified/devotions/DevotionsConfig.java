@@ -1,11 +1,10 @@
-package me.xidentified.devotions.managers;
+package me.xidentified.devotions;
 
 import lombok.Getter;
-import me.xidentified.devotions.*;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
+import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.*;
-import me.xidentified.devotions.Miracle;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,9 +19,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-public class ConfigManager {
+public class DevotionsConfig {
     private final Devotions plugin;
-    private YamlConfiguration config;
+    private final Map<String, Miracle> miraclesMap = new HashMap<>();
     private YamlConfiguration soundsConfig;
     private YamlConfiguration savedItemsConfig;
     private YamlConfiguration deitiesConfig;
@@ -30,10 +29,10 @@ public class ConfigManager {
     private File savedItemsConfigFile;
 
     public int getShrineLimit() {
-        return getConfig().getInt("shrine-limit", 3);
+        return plugin.getConfig().getInt("shrine-limit", 3);
     }
 
-    public ConfigManager(Devotions plugin) {
+    public DevotionsConfig(Devotions plugin) {
         this.plugin = plugin;
         reloadConfigs();
     }
@@ -349,7 +348,7 @@ public class ConfigManager {
                 if (parts.length > 1) {
                     try {
                         int duration = Integer.parseInt(parts[1]);
-                        effect = new DoubleCropDropsEffect(this, duration);
+                        effect = new DoubleCropDropsEffect(plugin, duration);
                         conditions.add(new NearCropsCondition());
                     } catch (NumberFormatException e) {
                         plugin.debugLog("Invalid duration provided for double_crops miracle.");

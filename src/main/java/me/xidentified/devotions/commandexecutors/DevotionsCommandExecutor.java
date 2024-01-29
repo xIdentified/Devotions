@@ -40,7 +40,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
                     plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                     return true;
                 }
-                plugin.getConfigManager().reloadConfigs();
+                plugin.getDevotionsConfig().reloadConfigs();
                 plugin.sendMessage(sender, Messages.DEVOTION_RELOAD_SUCCESS);
                 return true;
 

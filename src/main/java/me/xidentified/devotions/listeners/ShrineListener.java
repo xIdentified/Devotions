@@ -180,11 +180,11 @@ public class ShrineListener implements Listener {
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
         // Load saved items from configuration
-        FileConfiguration config = plugin.getConfigManager().getSavedItemsConfig();
+        FileConfiguration config = plugin.getDevotionsConfig().getSavedItemsConfig();
         ConfigurationSection savedItemsSection = config.getConfigurationSection("items");
 
         // Get the favored offerings for the deity from the config
-        List<String> validOfferings = plugin.getConfigManager().getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
+        List<String> validOfferings = plugin.getDevotionsConfig().getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
 
         for (String offering : validOfferings) {
             String[] parts = offering.split(":");

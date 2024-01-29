@@ -36,10 +36,9 @@ import java.util.*;
 @Getter
 public class Devotions extends JavaPlugin {
     @Getter private static Devotions instance;
-    private final ConfigManager configManager = new ConfigManager(this);
+    private final DevotionsConfig devotionsConfig = new DevotionsConfig(this);
     private DevotionManager devotionManager;
     private RitualManager ritualManager;
-    private final Map<String, Miracle> miraclesMap = new HashMap<>();
     private CooldownManager cooldownManager;
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
@@ -51,8 +50,8 @@ public class Devotions extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         initializePlugin();
-        configManager.loadSoundsConfig();
-        configManager.reloadSavedItemsConfig();
+        devotionsConfig.loadSoundsConfig();
+        devotionsConfig.reloadSavedItemsConfig();
 
         TinyTranslationsBukkit.enable(this);
         translations = TinyTranslationsBukkit.application(this);
@@ -155,7 +154,7 @@ public class Devotions extends JavaPlugin {
     public void initializePlugin() {
         HandlerList.unregisterAll(this);
         instance = this;
-        configManager.loadRitualConfig();
+        devotionsConfig.loadRitualConfig();
 
         // Initiate manager classes
         this.storageManager = new StorageManager(this);
@@ -165,11 +164,11 @@ public class Devotions extends JavaPlugin {
             devotionManager.clearData();
         }
 
-        Map<String, Deity> loadedDeities = configManager.reloadDeitiesConfig();
+        Map<String, Deity> loadedDeities = devotionsConfig.reloadDeitiesConfig();
         this.devotionStorage = new DevotionStorage(storageManager);
         this.devotionManager = new DevotionManager(this, loadedDeities);
         ShrineManager shrineManager = new ShrineManager(this);
-        configManager.loadRituals();
+        devotionsConfig.loadRituals();
         ShrineStorage shrineStorage = new ShrineStorage(this, storageManager);
         shrineManager.setShrineStorage(shrineStorage);
         ritualManager = RitualManager.getInstance(this);
@@ -192,7 +191,7 @@ public class Devotions extends JavaPlugin {
         Objects.requireNonNull(getCommand("ritual")).setTabCompleter(ritualCommand);
 
         // Register admin commands
-        TestMiracleCommand testMiracleCmd = new TestMiracleCommand(miraclesMap);
+        TestMiracleCommand testMiracleCmd = new TestMiracleCommand(devotionsConfig.getMiraclesMap());
         Objects.requireNonNull(getCommand("testmiracle")).setExecutor(testMiracleCmd);
 
         // Register listeners
@@ -231,13 +230,13 @@ public class Devotions extends JavaPlugin {
     }
 
     public void playConfiguredSound(Player player, String key) {
-        if (configManager.getSoundsConfig() == null) {
+        if (devotionsConfig.getSoundsConfig() == null) {
             debugLog("soundsConfig is null.");
             return;
         }
 
         String soundKey = "sounds." + key;
-        FileConfiguration soundsConfig = configManager.getSoundsConfig();
+        FileConfiguration soundsConfig = devotionsConfig.getSoundsConfig();
 
         if (soundsConfig.contains(soundKey)) {
             String soundName = soundsConfig.getString(soundKey + ".sound");
