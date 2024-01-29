@@ -514,7 +514,9 @@ public class Devotions extends JavaPlugin {
 
         // save default translations
         translations.saveLocale(Locale.ENGLISH);
-        saveResource("lang/de.yml", false);
+        if (!new File(getDataFolder(), "/lang/de.yml").exists()) {
+            this.saveResource("lang/de.yml", false);
+        }
 
         // load
         translations.loadLocales();
