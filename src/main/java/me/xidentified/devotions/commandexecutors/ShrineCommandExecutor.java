@@ -65,7 +65,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             }
         } else if (player.hasPermission("devotions.shrine.set")) {
             int currentShrineCount = shrineManager.getShrineCount(player);
-            int shrineLimit = shrineManager.getPlugin().getShrineLimit();
+            int shrineLimit = shrineManager.getPlugin().getConfigManager().getShrineLimit();
 
             if (currentShrineCount >= shrineLimit) {
                 Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIMIT_REACHED.formatted(
