@@ -89,7 +89,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         }
 
         ritualManager.cancelRitualFor(player);
-        plugin.sendMessage(player, Messages.RITUAL_CANCELED.formatted(
+        plugin.sendMessage(player, Messages.RITUAL_CANCELLED.formatted(
                 Placeholder.unparsed("ritual", currentRitual.getDisplayName())
         ));
 

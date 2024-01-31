@@ -1,9 +1,11 @@
 package me.xidentified.devotions.managers;
 
 import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.rituals.MeditationData;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MeditationManager {
-
     private final Devotions plugin;
     private final Map<Player, MeditationData> meditationStartData = new HashMap<>();
     private final Map<Player, BukkitRunnable> meditationTimers = new HashMap<>();
@@ -21,44 +22,66 @@ public class MeditationManager {
         this.plugin = plugin;
     }
 
+    public MeditationData getMeditationData(Player player) {
+        return meditationStartData.get(player);
+    }
+
     public void startMeditation(Player player, Ritual ritual, RitualObjective objective) {
         meditationStartData.put(player, new MeditationData(System.currentTimeMillis(), player.getLocation()));
 
         // Cancel any existing timer for the player
-        BukkitRunnable existingTimer = meditationTimers.get(player);
-        if (existingTimer != null) {
-            existingTimer.cancel();
-        }
+        cancelMeditationTimer(player);
 
         BukkitRunnable newTimer = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!hasPlayerMovedSince(player)) {
-                    objective.setCurrentCount(objective.getCount());
-
-                    if (objective.isComplete()) {
-                        plugin.debugLog("[DEBUG] Meditation objective complete for player: " + player.getName());
-                        plugin.sendMessage(player, Messages.MEDITATION_COMPLETE);
-                        plugin.getRitualManager().completeRitual(player, ritual, plugin.getMeditationManager());
-                    }
+                MeditationData meditationData = meditationStartData.get(player);
+                if (meditationData != null && !hasPlayerMovedSince(player, meditationData)) {
+                    completeMeditationObjective(player, ritual, objective);
                 } else {
-                    plugin.debugLog("[DEBUG] Player moved. Restarting meditation for player: " + player.getName());
-                    plugin.sendMessage(player, Messages.MEDIDATION_CANCELLED);
-                    startMeditation(player, ritual, objective); // Restart meditation timer
-                    meditationTimers.remove(player);
+                    applyMeditationPenalties(player, meditationData);
                 }
             }
         };
 
         meditationTimers.put(player, newTimer);
-        newTimer.runTaskLater(plugin, 20L * objective.getCount());  // 20 ticks/second * config value
+        newTimer.runTaskLater(plugin, 20L * objective.getCount());
     }
 
-    public boolean hasPlayerMovedSince(Player player) {
-        MeditationData meditationData = meditationStartData.get(player);
-        if (meditationData == null) {
-            return true; // If there's no recorded start data, assume the player has moved
+    private void completeMeditationObjective(Player player, Ritual ritual, RitualObjective objective) {
+        objective.setCurrentCount(objective.getCount());
+        if (objective.isComplete()) {
+            plugin.debugLog("[DEBUG] Meditation objective complete for player: " + player.getName());
+            plugin.sendMessage(player, Messages.MEDITATION_COMPLETE);
+            plugin.getRitualManager().completeRitual(player, ritual, this);
         }
+        clearMeditationData(player);
+    }
+
+    public void applyMeditationPenalties(Player player, MeditationData meditationData) {
+        if (meditationData != null) {
+            int moveCount = meditationData.moveCounter().incrementAndGet();
+
+            // Smite the player as a warning
+            if (moveCount == 1) {
+                player.getWorld().strikeLightningEffect(player.getLocation());
+                plugin.sendMessage(player, Messages.MEDITATION_PENALTY);
+            }
+
+            // Cancel the ritual if they keep moving
+            else if (moveCount > 1) {
+                String ritualName = plugin.getRitualManager().getCurrentRitualForPlayer(player).getDisplayName();
+                cancelMeditationTimer(player);
+                clearMeditationData(player);
+                plugin.sendMessage(player, Messages.RITUAL_CANCELLED.formatted(
+                        Placeholder.unparsed("ritual", ritualName)
+                ));
+                plugin.getRitualManager().cancelRitualFor(player);
+            }
+        }
+    }
+
+    public boolean hasPlayerMovedSince(Player player, MeditationData meditationData) {
         Location initialLocation = meditationData.initialLocation();
         return !locationsAreEqual(initialLocation, player.getLocation());
     }
@@ -87,5 +110,3 @@ public class MeditationManager {
 
 }
 
-record MeditationData(long startTime, Location initialLocation) {
-}

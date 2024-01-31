@@ -202,8 +202,8 @@ public class Messages {
 			.withDefault("<prefix_negative>{ritual} has failed - the conditions were not met!")
 			.withPlaceholder("ritual")
 			.build();
-	public static final Message RITUAL_CANCELED = new MessageBuilder("ritual.canceled")
-			.withDefault("<prefix_negative>{ritual} was canceled!")
+	public static final Message RITUAL_CANCELLED = new MessageBuilder("ritual.cancelled")
+			.withDefault("<prefix_negative>{ritual} was cancelled!")
 			.withPlaceholder("ritual")
 			.build();
 	public static final Message RITUAL_SUCCESS = new MessageBuilder("ritual.success")
@@ -216,7 +216,9 @@ public class Messages {
 	public static final Message RITUAL_RETURN_TO_RESUME = new MessageBuilder("ritual.return_to_resume")
 			.withDefault("<accent>Return to the shrine to complete the ritual.")
 			.build();
-
+	public static final Message MEDITATION_PENALTY = new MessageBuilder("ritual.meditation_penalty")
+			.withDefault("<prefix_negative>Foolish mortal! Stop moving during meditation!")
+			.build();
 	public static final Message MIRACLE_CMD_USAGE = new MessageBuilder("miracle.cmd.usage")
 			.withDefault("<prefix_warning>Usage: <cmd_syntax>/testmiracle <arg>number</arg></cmd_syntax>")
 			.build();

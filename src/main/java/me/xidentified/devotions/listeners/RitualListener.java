@@ -4,6 +4,7 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.MeditationManager;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.managers.ShrineManager;
+import me.xidentified.devotions.rituals.MeditationData;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
@@ -54,11 +55,14 @@ public class RitualListener implements Listener {
             return;
         }
 
-        // Check if player moved, if in meditation. Reset timer if they moved.
-        else if (meditationManager().hasPlayerMovedSince(player) && meditationManager().isPlayerInMeditation(player)) {
-            plugin.debugLog("Player " + player.getName() + " moved during meditation.");
-            plugin.sendMessage(player, Messages.MEDIDATION_CANCELLED);
-            meditationManager().startMeditation(player, ritual, getMeditationObjective(ritual));
+        // Handle meditation penalties and checks
+        if (meditationManager().isPlayerInMeditation(player)) {
+            MeditationData meditationData = meditationManager().getMeditationData(player);
+            if (meditationData != null && hasPlayerMoved(event)) {
+                plugin.debugLog("Player " + player.getName() + " moved during meditation.");
+                meditationManager().applyMeditationPenalties(player, meditationData);
+                return;
+            }
         }
 
         // Check and update gathering objectives
@@ -90,13 +94,10 @@ public class RitualListener implements Listener {
         return count;
     }
 
-    private RitualObjective getMeditationObjective(Ritual ritual) {
-        for (RitualObjective objective : ritual.getObjectives()) {
-            if (objective.getType() == RitualObjective.Type.MEDITATION) {
-                return objective;
-            }
-        }
-        return null;
+    private boolean hasPlayerMoved(PlayerMoveEvent event) {
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        return to != null && (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ());
     }
 
     @EventHandler
