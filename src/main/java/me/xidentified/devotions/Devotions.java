@@ -57,7 +57,6 @@ public class Devotions extends JavaPlugin {
         translations = TinyTranslationsBukkit.application(this);
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
         translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
-
         translations.addMessages(TinyTranslations.messageFieldsFromClass(Messages.class));
 
         loadLanguages();

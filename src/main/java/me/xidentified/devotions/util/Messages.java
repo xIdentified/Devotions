@@ -194,6 +194,10 @@ public class Messages {
 			.withDefault("<accent>The {ritual} has begun...")
 			.withPlaceholder("ritual")
 			.build();
+	public static final Message RITUAL_WRONG_DEITY = new MessageBuilder("ritual.wrong_deity")
+			.withDefault("<accent>The {ritual} is not allowed by your selected deity")
+			.withPlaceholder("ritual")
+			.build();
 	public static final Message RITUAL_FAILURE = new MessageBuilder("ritual.failure")
 			.withDefault("<prefix_negative>{ritual} has failed - the conditions were not met!")
 			.withPlaceholder("ritual")

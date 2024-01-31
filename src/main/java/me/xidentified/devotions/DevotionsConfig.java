@@ -34,7 +34,6 @@ public class DevotionsConfig {
 
     public DevotionsConfig(Devotions plugin) {
         this.plugin = plugin;
-        reloadConfigs();
     }
 
     public void reloadConfigs() {
@@ -165,7 +164,7 @@ public class DevotionsConfig {
 
 
                 // Create and store the ritual
-                Ritual ritual = new Ritual(plugin, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
+                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
                 RitualManager.getInstance(plugin).addRitual(key, ritual);  // Store the ritual and key
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to load ritual with key: " + key);

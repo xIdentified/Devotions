@@ -168,4 +168,7 @@ public class Deity {
                 .collect(Collectors.joining(", "));
     }
 
+    public List<String> getRitualKeys() {
+        return rituals;
+    }
 }

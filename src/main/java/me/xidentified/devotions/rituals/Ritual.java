@@ -19,6 +19,7 @@ public class Ritual {
     public boolean isCompleted = false;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
+    private final String key;
     private final String displayName;
     private final String description;
     private final RitualItem item;
@@ -27,10 +28,11 @@ public class Ritual {
     private final RitualOutcome outcome;
     private final List<RitualObjective> objectives;
 
-    public Ritual(Devotions plugin, String displayName, String description, RitualItem item, int favorAmount,
+    public Ritual(Devotions plugin, String key, String displayName, String description, RitualItem item, int favorAmount,
                   RitualConditions conditions, RitualOutcome outcome, List<RitualObjective> objectives) {
         this.plugin = plugin;
         this.devotionManager = plugin.getDevotionManager();
+        this.key = key;
         this.displayName = displayName;
         this.description = description;
         this.item = item;

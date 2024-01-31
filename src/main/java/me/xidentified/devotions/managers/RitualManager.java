@@ -1,9 +1,12 @@
 package me.xidentified.devotions.managers;
 
+import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualItem;
 import me.xidentified.devotions.rituals.RitualObjective;
+import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -63,6 +66,17 @@ public class RitualManager {
         // Retrieve the ritual associated with the item
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(item);
         plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
+
+        // Retrieve the player's current deity
+        FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
+        Deity playerDeity = favorManager != null ? favorManager.getDeity() : null;
+        if (playerDeity == null || !playerDeity.getRitualKeys().contains(ritual.getKey())) {
+            plugin.debugLog("Ritual not allowed by chosen deity");
+            plugin.sendMessage(player, Messages.RITUAL_WRONG_DEITY.formatted(
+                    Placeholder.unparsed("ritual", ritual.getDisplayName())
+            ));
+            return false;
+        }
 
         ritual.reset();
         associateDroppedItem(player, droppedItem);
