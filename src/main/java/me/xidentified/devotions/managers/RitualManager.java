@@ -144,6 +144,18 @@ public class RitualManager {
         rituals.put(key, ritual);
     }
 
+    public void cancelRitualFor(Player player) {
+        Ritual ritual = playerRituals.remove(player);
+
+        if (ritual != null) {
+            Item droppedItem = ritualDroppedItems.remove(player);
+            if (droppedItem != null) {
+                droppedItem.remove();
+            }
+            ritual.reset();
+        }
+    }
+
     public Ritual getCurrentRitualForPlayer(Player player) {
         return playerRituals.get(player);
     }

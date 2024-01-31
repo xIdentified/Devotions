@@ -202,9 +202,16 @@ public class Messages {
 			.withDefault("<prefix_negative>{ritual} has failed - the conditions were not met!")
 			.withPlaceholder("ritual")
 			.build();
+	public static final Message RITUAL_CANCELED = new MessageBuilder("ritual.canceled")
+			.withDefault("<prefix_negative>{ritual} was canceled!")
+			.withPlaceholder("ritual")
+			.build();
 	public static final Message RITUAL_SUCCESS = new MessageBuilder("ritual.success")
 			.withDefault("<prefix>{ritual} was a success! Blessings upon ye!")
 			.withPlaceholder("ritual")
+			.build();
+	public static final Message RITUAL_NOT_IN_PROGRESS = new MessageBuilder("ritual.failure")
+			.withDefault("<prefix_negative>There is no ritual in progress.")
 			.build();
 	public static final Message RITUAL_RETURN_TO_RESUME = new MessageBuilder("ritual.return_to_resume")
 			.withDefault("<accent>Return to the shrine to complete the ritual.")

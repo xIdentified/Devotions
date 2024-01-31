@@ -2,6 +2,7 @@ package me.xidentified.devotions.commandexecutors;
 
 import de.cubbossa.tinytranslations.GlobalMessages;
 import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,7 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            Devotions.getInstance().sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
+            plugin.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
             return true;
         }
 
@@ -37,11 +39,15 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         }
 
         String subCommand = args[0].toLowerCase();
-        if (subCommand.equals("info")) {
-            return handleInfo(player, args);
+        switch (subCommand) {
+            case "info":
+                return handleInfo(player, args);
+            case "cancel":
+                return handleCancel(player);
+            default:
+                plugin.sendMessage(player, Messages.RITUAL_CMD_USAGE);
+                return true;
         }
-        plugin.sendMessage(player, Messages.RITUAL_CMD_USAGE);
-        return true;
     }
 
     private boolean handleInfo(Player player, String[] args) {
@@ -73,21 +79,38 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         ));
     }
 
+    private boolean handleCancel(Player player) {
+        RitualManager ritualManager = plugin.getRitualManager();
+        Ritual currentRitual = ritualManager.getCurrentRitualForPlayer(player);
+
+        if (currentRitual == null) {
+            plugin.sendMessage(player, Messages.RITUAL_NOT_IN_PROGRESS);
+            return true;
+        }
+
+        ritualManager.cancelRitualFor(player);
+        plugin.sendMessage(player, Messages.RITUAL_CANCELED.formatted(
+                Placeholder.unparsed("ritual", currentRitual.getDisplayName())
+        ));
+
+        return true;
+    }
+
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
 
         if (args.length == 1) {
-            suggestions.add("info");
+            suggestions.addAll(Arrays.asList("info", "cancel"));
         } else if (args.length == 2 && "info".equalsIgnoreCase(args[0])) {
-            // Suggestions for the second argument (e.g., ritual names)
             List<String> ritualNames = plugin.getRitualManager().getAllRitualNames();
             suggestions.addAll(ritualNames);
         }
 
-        // Filter based on what the player has already typed
         return suggestions.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
     }
+
 }
