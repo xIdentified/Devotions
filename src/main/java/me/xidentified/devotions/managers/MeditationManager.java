@@ -69,7 +69,7 @@ public class MeditationManager {
             }
 
             // Cancel the ritual if they keep moving
-            else if (moveCount > 1) {
+            else if (moveCount > 2) {
                 String ritualName = plugin.getRitualManager().getCurrentRitualForPlayer(player).getDisplayName();
                 cancelMeditationTimer(player);
                 clearMeditationData(player);

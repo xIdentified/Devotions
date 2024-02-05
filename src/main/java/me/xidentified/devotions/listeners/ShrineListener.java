@@ -81,13 +81,6 @@ public class ShrineListener implements Listener {
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
         if (ritual != null) {
-            long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
-            if (remainingCooldown > 0) {
-                plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-                ));
-                return;
-            }
             try {
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleRitualInteraction(player, itemInHand, droppedItem, event);
@@ -99,13 +92,6 @@ public class ShrineListener implements Listener {
 
         // Check if the player is holding a valid offering
         else if (!itemInHand.getType().equals(Material.AIR)) {
-            long remainingCooldown = cooldownManager.isActionAllowed(player, "offering");
-            if (remainingCooldown > 0) {
-                plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-                ));
-                return;
-            }
             try {
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleOfferingInteraction(player, clickedBlock, itemInHand, droppedItem);
@@ -116,7 +102,18 @@ public class ShrineListener implements Listener {
         }
     }
 
+    private void checkForCooldown(Player player, String type) {
+        long remainingCooldown = cooldownManager.isActionAllowed(player, type);
+        if (remainingCooldown > 0) {
+            plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
+                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
+            ));
+        }
+    }
+
     private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem, PlayerInteractEvent event) {
+        checkForCooldown(player, "ritual");
+
         boolean ritualStarted = RitualManager.getInstance(plugin).startRitual(player, itemInHand, droppedItem);
         if (ritualStarted) {
             long ritualCooldown = cooldownManager.getCooldownFromConfig("ritual-cooldown", "5s");
@@ -128,6 +125,8 @@ public class ShrineListener implements Listener {
     }
 
     private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem) {
+        checkForCooldown(player, "offering");
+
         // Get the player's deity
         FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
         Deity playerDeity = favorManager.getDeity();
