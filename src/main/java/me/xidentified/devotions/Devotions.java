@@ -12,10 +12,11 @@ import me.xidentified.devotions.listeners.PlayerListener;
 import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.*;
-import me.xidentified.devotions.storage.DevotionStorage;
-import me.xidentified.devotions.storage.ShrineStorage;
+import me.xidentified.devotions.storage.YamlStorage;
+import me.xidentified.devotions.storage.YamlShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;
+import me.xidentified.devotions.util.Metrics;
 import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.ComponentLike;
@@ -43,7 +44,7 @@ public class Devotions extends JavaPlugin {
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
     private StorageManager storageManager;
-    private DevotionStorage devotionStorage;
+    private YamlStorage YamlStorage;
     private Translator translations;
 
     @Override
@@ -80,6 +81,10 @@ public class Devotions extends JavaPlugin {
             new Placeholders(this).register();
             debugLog("PlaceholderAPI expansion enabled!");
         }
+
+        // Register bStats
+        int pluginId = 20922;
+        Metrics metrics = new Metrics(this, pluginId);
     }
 
     public void spawnParticles(Location location, Particle particle, int count, double radius, double velocity) {
@@ -164,12 +169,12 @@ public class Devotions extends JavaPlugin {
         }
 
         Map<String, Deity> loadedDeities = devotionsConfig.reloadDeitiesConfig();
-        this.devotionStorage = new DevotionStorage(storageManager);
+        this.YamlStorage = new YamlStorage(storageManager);
         this.devotionManager = new DevotionManager(this, loadedDeities);
         ShrineManager shrineManager = new ShrineManager(this);
         devotionsConfig.loadRituals();
-        ShrineStorage shrineStorage = new ShrineStorage(this, storageManager);
-        shrineManager.setShrineStorage(shrineStorage);
+        YamlShrineStorage yamlShrineStorage = new YamlShrineStorage(this, storageManager);
+        shrineManager.setYamlShrineStorage(yamlShrineStorage);
         ritualManager = RitualManager.getInstance(this);
         this.cooldownManager = new CooldownManager(this);
         this.meditationManager = new MeditationManager(this);
