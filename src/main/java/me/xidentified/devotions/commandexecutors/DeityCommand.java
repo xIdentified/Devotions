@@ -37,6 +37,17 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args.length == 0) {
+            UUID playerUUID = player.getUniqueId();
+            FavorManager playerDevotion = plugin.getDevotionManager().getPlayerDevotion(playerUUID);
+
+            if (playerDevotion != null) {
+                String deityName = playerDevotion.getDeity().name;
+                handleInfo(player, new String[]{"info", deityName});
+                return true;
+            }
+        }
+
         if (args.length < 1) {
             plugin.sendMessage(player, Messages.DEITY_CMD_USAGE);
             return true;

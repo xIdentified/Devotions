@@ -34,7 +34,7 @@ public class Messages {
 			.withPlaceholders("deity", "curse")
 			.build();
 	public static final Message DEITY_CMD_USAGE = new MessageBuilder("deity.cmd.usage")
-			.withDefault("<offset>Usage: <cmd_syntax>/deity select|info DeityName</cmd_syntax>")
+			.withDefault("<offset>Usage: <cmd_syntax>/deity list|select|info DeityName</cmd_syntax>")
 			.build();
 	public static final Message DEITY_CMD_SPECIFY_DEITY = new MessageBuilder("deity.cmd.specify_deity")
 			.withDefault("<prefix_warning>Please specify the deity you wish to worship.")
