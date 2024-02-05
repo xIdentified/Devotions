@@ -81,17 +81,23 @@ public class DevotionsConfig {
             return;
         }
 
+        Set<String> usedItems = new HashSet<>();
+
         for (String key : ritualsSection.getKeys(false)) {
             try {
                 String path = "rituals." + key + ".";
+
+                // Check for duplicate items and warn
+                String itemString = ritualConfig.getString(path + "item");
+                if (itemString != null && !usedItems.add(itemString.toLowerCase())) {
+                    plugin.getLogger().warning("Duplicate item detected for ritual: " + key + ". Use unique items for each ritual.");
+                }
 
                 // Parse general info
                 String displayName = ritualConfig.getString(path + "display_name");
                 String description = ritualConfig.getString(path + "description");
                 int favorReward = ritualConfig.getInt(path + "favor");
 
-                // Parse item
-                String itemString = ritualConfig.getString(path + "item");
                 RitualItem ritualItem = null;
                 if (itemString != null) {
                     String[] parts = itemString.split(":");
