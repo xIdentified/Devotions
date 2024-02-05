@@ -34,7 +34,7 @@ public class Messages {
 			.withPlaceholders("deity", "curse")
 			.build();
 	public static final Message DEITY_CMD_USAGE = new MessageBuilder("deity.cmd.usage")
-			.withDefault("<offset>Usage: <cmd_syntax>/deity <arg>select|info</arg> <arg_opt>DeityName</arg_opt></cmd_syntax>")
+			.withDefault("<offset>Usage: <cmd_syntax>/deity select|info DeityName</cmd_syntax>")
 			.build();
 	public static final Message DEITY_CMD_SPECIFY_DEITY = new MessageBuilder("deity.cmd.specify_deity")
 			.withDefault("<prefix_warning>Please specify the deity you wish to worship.")
@@ -103,7 +103,7 @@ public class Messages {
 	public static final Message SHRINE_COOLDOWN = new MessageBuilder("shrines.cooldown")
 			.withDefault("<prefix_negative>You must wait {cooldown:'m'}m {cooldown:'s'}s before performing another ritual.")
 			.build();
-	public static final Message SHRINE_ALREADY_EXISTS = new MessageBuilder("shrines.cooldown")
+	public static final Message SHRINE_ALREADY_EXISTS = new MessageBuilder("shrines.already_exists")
 			.withDefault("<prefix_negative>A shrine already exists at this location!")
 			.build();
 	public static final Message SHRINE_CLICK_BLOCK_TO_DESIGNATE = new MessageBuilder("shrines.click_block_to_create")
