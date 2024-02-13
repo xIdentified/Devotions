@@ -259,7 +259,7 @@ public class Messages {
 			.build();
 
 	public static final Message VERSION_INFO = new MessageBuilder("devotions.admin")
-			.withDefault("<prefix_warning>Server version: <gray>{server-ver}</gray>\nArchGPT version: <gray>{plugin-ver}</gray>\nJava version: <gray>{java-ver}</gray>")
+			.withDefault("<prefix_warning>Server version: <gray>{server-ver}</gray>\nDevotions version: <gray>{plugin-ver}</gray>\nJava version: <gray>{java-ver}</gray>")
 			.withPlaceholder("server-ver")
 			.withPlaceholder("plugin-ver")
 			.withPlaceholder("java-ver")

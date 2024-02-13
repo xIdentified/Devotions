@@ -117,6 +117,7 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             completions.add("reload");
             completions.add("saveitem");
+            completions.add("version");
         }
 
         return completions;

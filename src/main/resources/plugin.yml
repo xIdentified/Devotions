@@ -19,7 +19,7 @@ libraries:
 commands:
   devotions:
     description: Manage the Devotions plugin
-    usage: /<command> <reload|saveitem>
+    usage: /<command> <reload|saveitem|version>
     aliases: [dvo]
     permission: devotions.admin
     permission-message: You do not have permission to use this command.

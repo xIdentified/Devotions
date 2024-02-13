@@ -13,7 +13,6 @@ import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.*;
 import me.xidentified.devotions.storage.YamlStorage;
-import me.xidentified.devotions.storage.YamlShrineStorage;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Metrics;
@@ -44,7 +43,6 @@ public class Devotions extends JavaPlugin {
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
     private StorageManager storageManager;
-    private YamlStorage YamlStorage;
     private Translator translations;
 
     @Override
@@ -161,7 +159,7 @@ public class Devotions extends JavaPlugin {
         devotionsConfig.loadRitualConfig();
 
         // Initiate manager classes
-        this.storageManager = new StorageManager(this);
+        this.storageManager = new StorageManager(this, );
 
         // Clear existing data before re-initializing
         if (devotionManager != null) {
@@ -169,12 +167,14 @@ public class Devotions extends JavaPlugin {
         }
 
         Map<String, Deity> loadedDeities = devotionsConfig.reloadDeitiesConfig();
-        this.YamlStorage = new YamlStorage(storageManager);
-        this.devotionManager = new DevotionManager(this, loadedDeities);
+        YamlStorage yamlStorage = new YamlStorage(this, storageManager);
+        this.devotionManager = new DevotionManager(this, loadedDeities, yamlStorage);
         ShrineManager shrineManager = new ShrineManager(this);
+
+        // Load all shrines using the ShrineManager
+        shrineManager.setStorage(storageManager.getStorage());
         devotionsConfig.loadRituals();
-        YamlShrineStorage yamlShrineStorage = new YamlShrineStorage(this, storageManager);
-        shrineManager.setYamlShrineStorage(yamlShrineStorage);
+
         ritualManager = RitualManager.getInstance(this);
         this.cooldownManager = new CooldownManager(this);
         this.meditationManager = new MeditationManager(this);

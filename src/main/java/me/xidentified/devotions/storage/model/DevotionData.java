@@ -1,4 +1,4 @@
-package me.xidentified.devotions.storage;
+package me.xidentified.devotions.storage.model;
 
 public record DevotionData(String deityName, int favor) {
 

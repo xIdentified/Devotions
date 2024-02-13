@@ -1,0 +1,23 @@
+package me.xidentified.devotions.storage.model;
+
+import me.xidentified.devotions.Shrine;
+import me.xidentified.devotions.managers.DevotionManager;
+import me.xidentified.devotions.storage.model.DevotionData;
+import org.bukkit.Location;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface IStorage {
+    void savePlayerDevotion(UUID playerUniqueId, DevotionData devotionData);
+    DevotionData getPlayerDevotion(UUID playerUUID);
+    void removePlayerDevotion(UUID playerUUID);
+
+    List<Shrine> loadAllShrines(DevotionManager devotionManager);
+
+    void removeShrine(Location location, UUID playerId);
+
+    void saveShrine(Shrine newShrine);
+    // Add more methods as needed, such as methods for shrine storage
+}
+

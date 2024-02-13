@@ -4,6 +4,8 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.DevotionManager;
+import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.storage.model.DevotionData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,24 +18,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ShrineStorage {
+// Store player devotions (what god they're following) and their favor amounts
+public class YamlStorage {
     private final Devotions plugin;
-    private final File shrineFile;
+    private final File devotionFile;
     private final YamlConfiguration yaml;
 
-    public ShrineStorage(Devotions plugin, StorageManager storageManager) {
+    public YamlStorage(Devotions plugin, StorageManager storageManager) {
         this.plugin = plugin;
-        shrineFile = new File(storageManager.getStorageFolder(), "shrines.yml");
-        if (!shrineFile.exists()) {
+        devotionFile = new File(storageManager.getStorageFolder(), "storage.yml");
+        if (!devotionFile.exists()) {
             try {
-                shrineFile.createNewFile();
+                devotionFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        yaml = YamlConfiguration.loadConfiguration(shrineFile);
+        yaml = YamlConfiguration.loadConfiguration(devotionFile);
     }
 
+    public void savePlayerDevotion(UUID playerUniqueId, FavorManager devotion) {
+        String key = "playerdata." + playerUniqueId;
+        yaml.set(key + ".deity", devotion.getDeity().getName());
+        yaml.set(key + ".favor", devotion.getFavor());
+        save();
+    }
+
+    public DevotionData getPlayerDevotion(UUID playerUUID) {
+        String key = "playerdata." + playerUUID.toString();
+        String deityName = yaml.getString(key + ".deity");
+        int favor = yaml.getInt(key + ".favor", 0);  // Returns 0 if not found
+        return new DevotionData(deityName, favor);
+    }
+
+    public void removePlayerDevotion(UUID playerUUID) {
+        String key = "playerdata." + playerUUID.toString();
+        yaml.set(key, null);
+        save();
+    }
+
+    // Shrine stuff below
     public void saveShrine(Shrine shrine) {
         String key = generateShrineKey(shrine);
         String deityName = shrine.getDeity().getName();
@@ -84,7 +108,6 @@ public class ShrineStorage {
         return null;
     }
 
-
     public List<Shrine> loadAllShrines(DevotionManager devotionManager) {
         List<Shrine> loadedShrines = new ArrayList<>();
         ConfigurationSection shrineSection = yaml.getConfigurationSection("shrines");
@@ -123,10 +146,15 @@ public class ShrineStorage {
 
     private void save() {
         try {
-            yaml.save(shrineFile);
+            yaml.save(devotionFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public ConfigurationSection getYaml() {
+        return yaml;
+    }
 }
+
+
