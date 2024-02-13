@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
-import me.xidentified.devotions.storage.YamlStorage;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -133,8 +132,7 @@ public class FavorManager {
             ));
 
             // Save the player's devotion data
-            YamlStorage YamlStorage = plugin.getYamlStorage();
-            YamlStorage.savePlayerDevotion(player.getUniqueId(), this);
+            plugin.getStorageManager().getStorage().savePlayerDevotion(player.getUniqueId(), this);
         } else {
             System.err.println("Error: Player or Deity is null in PlayerDevotion::increaseFavor");
         }
@@ -163,8 +161,7 @@ public class FavorManager {
             ));
         }
 
-        YamlStorage YamlStorage = plugin.getYamlStorage();
-        YamlStorage.savePlayerDevotion(uuid, this);
+        plugin.getStorageManager().getStorage().savePlayerDevotion(uuid, this);
     }
 
     private void decayFavor() {

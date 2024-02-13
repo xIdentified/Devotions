@@ -6,6 +6,7 @@ import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.storage.model.DevotionData;
+import me.xidentified.devotions.storage.model.IStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,12 +15,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // Store player devotions (what god they're following) and their favor amounts
-public class YamlStorage {
+public class YamlStorage implements IStorage {
     private final Devotions plugin;
     private final File devotionFile;
     private final YamlConfiguration yaml;
@@ -152,8 +152,15 @@ public class YamlStorage {
         }
     }
 
-    public ConfigurationSection getYaml() {
-        return yaml;
+    @Override
+    public Set<UUID> getAllStoredPlayerUUIDs() {
+        ConfigurationSection section = yaml.getConfigurationSection("playerdata");
+        if (section != null) {
+            return section.getKeys(false).stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
     }
 }
 

@@ -14,6 +14,7 @@ import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.*;
 import me.xidentified.devotions.storage.YamlStorage;
 import me.xidentified.devotions.storage.StorageManager;
+import me.xidentified.devotions.storage.model.IStorage;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Metrics;
 import me.xidentified.devotions.util.Placeholders;
@@ -43,6 +44,7 @@ public class Devotions extends JavaPlugin {
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
     private StorageManager storageManager;
+    private IStorage storage;
     private Translator translations;
 
     @Override
@@ -167,8 +169,7 @@ public class Devotions extends JavaPlugin {
         }
 
         Map<String, Deity> loadedDeities = devotionsConfig.reloadDeitiesConfig();
-        YamlStorage yamlStorage = new YamlStorage(this, storageManager);
-        this.devotionManager = new DevotionManager(this, loadedDeities, yamlStorage);
+        this.devotionManager = new DevotionManager(this, loadedDeities);
         ShrineManager shrineManager = new ShrineManager(this);
 
         // Load all shrines using the ShrineManager
@@ -202,7 +203,7 @@ public class Devotions extends JavaPlugin {
         this.shrineListener = new ShrineListener(this, shrineManager, cooldownManager);
         RitualListener.initialize(this, shrineManager);
         getServer().getPluginManager().registerEvents(new DoubleCropDropsEffect(this, 90), this);
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this, storageManager), this);
 
         // Register events
         getServer().getPluginManager().registerEvents(RitualListener.getInstance(), this);

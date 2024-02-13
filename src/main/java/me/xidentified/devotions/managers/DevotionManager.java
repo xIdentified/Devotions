@@ -3,30 +3,28 @@ package me.xidentified.devotions.managers;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.model.DevotionData;
-import me.xidentified.devotions.storage.YamlStorage;
+import me.xidentified.devotions.storage.model.IStorage;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class DevotionManager {
     private final Devotions plugin;
-    private final YamlStorage YamlStorage;
+    private final IStorage storage;
     private final Map<UUID, FavorManager> playerDevotions = new ConcurrentHashMap<>();
     private final Map<String, Deity> deities;
 
     public DevotionManager(Devotions plugin, Map<String, Deity> loadedDeities) {
         this.plugin = plugin;
         this.deities = loadedDeities;
-        this.YamlStorage = plugin.getYamlStorage();
+        this.storage = plugin.getStorageManager().getStorage();
         loadPlayerDevotions();
     }
 
@@ -59,7 +57,7 @@ public class DevotionManager {
 
         if (player != null) {
             Deity deity = newDevotion.getDeity();
-            YamlStorage.savePlayerDevotion(playerUUID, newDevotion); // Save new devotion
+            storage.savePlayerDevotion(playerUUID, newDevotion); // Save new devotion
             plugin.playConfiguredSound(player, "deitySelected");
 
             plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
@@ -73,13 +71,13 @@ public class DevotionManager {
 
     public void removeDevotion(UUID playerUUID) {
         playerDevotions.remove(playerUUID);
-        YamlStorage.removePlayerDevotion(playerUUID);
+        storage.removePlayerDevotion(playerUUID);
     }
 
     public void loadPlayerDevotions() {
         Set<UUID> playerUUIDs = getAllStoredPlayerUUIDs();
         for (UUID uuid : playerUUIDs) {
-            DevotionData devotionData = YamlStorage.getPlayerDevotion(uuid);
+            DevotionData devotionData = storage.getPlayerDevotion(uuid);
             if (devotionData != null) {
                 Deity deity = getDeityByName(devotionData.getDeityName());
                 if (deity != null) {
@@ -95,13 +93,7 @@ public class DevotionManager {
     }
 
     private Set<UUID> getAllStoredPlayerUUIDs() {
-        ConfigurationSection section = YamlStorage.getYaml().getConfigurationSection("playerdata");
-        if (section != null) {
-            return section.getKeys(false).stream()
-                    .map(UUID::fromString)
-                    .collect(Collectors.toSet());
-        }
-        return Collections.emptySet();
+        return storage.getAllStoredPlayerUUIDs();
     }
 
     public List<Deity> getAllDeities() {
@@ -113,7 +105,7 @@ public class DevotionManager {
             UUID playerUUID = player.getUniqueId();
             FavorManager favorManager = playerDevotions.get(playerUUID);
             if (favorManager != null) {
-                YamlStorage.savePlayerDevotion(playerUUID, favorManager);
+                storage.savePlayerDevotion(playerUUID, favorManager);
             }
         }
     }

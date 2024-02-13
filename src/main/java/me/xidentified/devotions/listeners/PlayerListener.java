@@ -4,8 +4,9 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.storage.model.DevotionData;
-import me.xidentified.devotions.storage.YamlStorage;
+import me.xidentified.devotions.storage.model.IStorage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -15,22 +16,24 @@ import java.util.UUID;
 
 public class PlayerListener implements Listener {
     private final Devotions plugin;
+    private final StorageManager storageManager;
 
-    public PlayerListener(Devotions plugin) {
+    public PlayerListener(Devotions plugin, StorageManager storageManager) {
         this.plugin = plugin;
+        this.storageManager = storageManager;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         UUID playerUniqueId = event.getPlayer().getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
-        YamlStorage YamlStorage = plugin.getYamlStorage();
+        IStorage storage = storageManager.getStorage(); // Get the storage instance from the StorageManager
 
         // Check if player already has a FavorManager instance
         FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
 
         if (favorManager == null) {
-            DevotionData devotionData = YamlStorage.getPlayerDevotion(playerUniqueId);
+            DevotionData devotionData = storage.getPlayerDevotion(playerUniqueId); // Use the storage to get player devotion data
 
             if (devotionData != null) {
                 Deity deity = devotionManager.getDeityByName(devotionData.getDeityName());
@@ -51,8 +54,7 @@ public class PlayerListener implements Listener {
         UUID playerUniqueId = event.getPlayer().getUniqueId();
         FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(playerUniqueId);
         if (favorManager != null) {
-            plugin.getYamlStorage().savePlayerDevotion(playerUniqueId, favorManager);
+            storageManager.getStorage().savePlayerDevotion(playerUniqueId, favorManager);
         }
     }
-
 }

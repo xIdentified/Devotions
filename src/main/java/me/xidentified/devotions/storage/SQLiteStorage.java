@@ -1,12 +1,17 @@
 package me.xidentified.devotions.storage;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.Shrine;
+import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.storage.model.DevotionData;
+import me.xidentified.devotions.storage.model.IStorage;
+import org.bukkit.Location;
 
 import java.sql.*;
 import java.util.*;
 
-public class SQLiteStorage {
+public class SQLiteStorage implements IStorage {
     private Connection connection;
     private final Devotions plugin;
 
@@ -62,6 +67,11 @@ public class SQLiteStorage {
         }
     }
 
+    @Override
+    public void savePlayerDevotion(UUID playerUniqueId, DevotionData devotionData) {
+
+    }
+
     public FavorManager getPlayerDevotion(UUID playerUUID) {
         String query = "SELECT deity_name, favor FROM playerdata WHERE player_uuid = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -77,6 +87,26 @@ public class SQLiteStorage {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void removePlayerDevotion(UUID playerUUID) {
+
+    }
+
+    @Override
+    public List<Shrine> loadAllShrines(DevotionManager devotionManager) {
+        return null;
+    }
+
+    @Override
+    public void removeShrine(Location location, UUID playerId) {
+
+    }
+
+    @Override
+    public void saveShrine(Shrine newShrine) {
+
     }
 
     // Implement methods for saving and removing shrines
