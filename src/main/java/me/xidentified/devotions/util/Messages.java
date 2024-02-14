@@ -11,9 +11,15 @@ public class Messages {
 	public static final Message DEVOTION_RELOAD_SUCCESS = new MessageBuilder("devotion.reload_success")
 			.withDefault("<prefix>Devotions successfully reloaded!")
 			.build();
+	public static final Message NO_DEVOTION_SET = new MessageBuilder("devotion.none_set")
+			.withDefault("<prefix_negative>You don't have any devotion set.")
+			.build();
 	public static final Message DEVOTION_SET = new MessageBuilder("devotion.set")
 			.withDefault("<prefix>You are now devoted to {name}. Your favor is {favor}.")
 			.withPlaceholder("name", "favor")
+			.build();
+	public static final Message DEVOTION_ABANDONED = new MessageBuilder("devotion.abandoned")
+			.withDefault("<prefix>You have abandoned your devotion.")
 			.build();
 	public static final Message DEVOTION_ALREADY_SET = new MessageBuilder("devotion.already_set")
 			.withDefault("<prefix>You are already devoted to {name}.")
@@ -158,9 +164,6 @@ public class Messages {
 			.withPlaceholder("deity")
 			.withPlaceholder("favor")
 			.withPlaceholder("favor_col")
-			.build();
-	public static final Message FAVOR_NO_DEVOTION_SET = new MessageBuilder("favor.cmd.no_devotion_set")
-			.withDefault("<prefix_negative>You don't have any devotion set.")
 			.build();
 	public static final Message FAVOR_SET_TO = new MessageBuilder("favor.amount.set_to")
 			.withDefault("<offset>Your favor has been set to <favor_col>{favor}")

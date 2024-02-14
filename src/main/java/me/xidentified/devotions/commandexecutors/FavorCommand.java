@@ -5,7 +5,6 @@ import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -34,8 +33,12 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             // Get player's devotion
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            String deityName = favorManager.getDeity().getName();
+            if (favorManager == null) {
+                plugin.sendMessage(player, Messages.NO_DEVOTION_SET);
+                return true;
+            }
 
+            String deityName = favorManager.getDeity().getName();
             plugin.sendMessage(player, Messages.FAVOR_CURRENT.formatted(
                     Placeholder.unparsed("deity", deityName),
                     Placeholder.unparsed("favor", String.valueOf(favorManager.getFavor())),

@@ -64,6 +64,9 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             case "info" -> {
                 return handleInfo(player, args);
             }
+            case "abandon" -> {
+                return handleAbandon(player);
+            }
             default -> {
                 plugin.sendMessage(player,Messages.DEITY_CMD_USAGE);
                 return true;
@@ -156,6 +159,23 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean handleAbandon(Player player) {
+        UUID playerUniqueId = player.getUniqueId();
+        DevotionManager devotionManager = plugin.getDevotionManager();
+
+        // Check if the player has a devotion
+        FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
+        if (favorManager == null) {
+            plugin.sendMessage(player, Messages.NO_DEVOTION_SET);
+            return true;
+        }
+
+        // Remove the player's devotion
+        devotionManager.removeDevotion(playerUniqueId);
+        plugin.sendMessage(player, Messages.DEVOTION_ABANDONED);
+        return true;
+    }
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         List<String> completions = new ArrayList<>();
@@ -164,6 +184,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             completions.add("select");
             completions.add("info");
             completions.add("list");
+            completions.add("abandon");
         }
 
         if (args.length == 2 && (args[0].equalsIgnoreCase("select") || args[0].equalsIgnoreCase("info"))) {
