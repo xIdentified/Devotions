@@ -35,4 +35,13 @@ shrine-limit: 3
 # If false, players can only interact with a shrine dedicated to their deity
 all-players-can-interact-with-shrines: true
 
+storage:
+  type: 'sqlite' # Options: yaml, sqlite, mysql
+  mysql:
+    host: 'localhost'
+    port: 3306
+    database: 'devotions'
+    username: 'root'
+    password: 'password'
+
 debug_mode: false

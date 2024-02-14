@@ -6,6 +6,7 @@ import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.storage.model.DevotionData;
 import me.xidentified.devotions.storage.model.IStorage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.sql.*;
@@ -26,7 +27,7 @@ public class SQLiteStorage implements IStorage {
             Class.forName("org.sqlite.JDBC");
 
             // Connect to SQLite database
-            connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + "/data.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + plugin.getDataFolder() + "/storage/data.db");
 
             // Create tables if they don't exist
             createTables();
@@ -67,21 +68,15 @@ public class SQLiteStorage implements IStorage {
         }
     }
 
-    @Override
-    public void savePlayerDevotion(UUID playerUniqueId, DevotionData devotionData) {
-
-    }
-
-    public FavorManager getPlayerDevotion(UUID playerUUID) {
+    public DevotionData getPlayerDevotion(UUID playerUUID) {
         String query = "SELECT deity_name, favor FROM playerdata WHERE player_uuid = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    String deityName = resultSet.getString("deity_name");
-                    Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
-                    return new FavorManager(plugin, playerUUID, deity);
-                }
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String deityName = resultSet.getString("deity_name");
+                int favor = resultSet.getInt("favor");
+                return new DevotionData(deityName, favor);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,27 +84,76 @@ public class SQLiteStorage implements IStorage {
         return null;
     }
 
-    @Override
     public void removePlayerDevotion(UUID playerUUID) {
-
+        String query = "DELETE FROM playerdata WHERE player_uuid = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, playerUUID.toString());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
     public List<Shrine> loadAllShrines(DevotionManager devotionManager) {
-        return null;
+        List<Shrine> shrines = new ArrayList<>();
+        String query = "SELECT location, deity_name, owner_uuid FROM shrines";
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                String locationStr = resultSet.getString("location");
+                Location location = parseLocation(locationStr);
+                String deityName = resultSet.getString("deity_name");
+                UUID ownerUUID = UUID.fromString(resultSet.getString("owner_uuid"));
+                Deity deity = devotionManager.getDeityByName(deityName);
+                if (deity != null) {
+                    shrines.add(new Shrine(location, deity, ownerUUID));
+                } else {
+                    plugin.debugLog("Deity not found: " + deityName);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return shrines;
     }
 
-    @Override
     public void removeShrine(Location location, UUID playerId) {
+        String query = "DELETE FROM shrines WHERE location = ? AND owner_uuid = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, serializeLocation(location));
+            statement.setString(2, playerId.toString());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void saveShrine(Shrine newShrine) {
+        String query = "REPLACE INTO shrines (location, deity_name, owner_uuid) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, serializeLocation(newShrine.getLocation()));
+            statement.setString(2, newShrine.getDeity().getName());
+            statement.setString(3, newShrine.getOwner().toString());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void saveShrine(Shrine newShrine) {
-
+    public Set<UUID> getAllStoredPlayerUUIDs() {
+        Set<UUID> playerUUIDs = new HashSet<>();
+        try (PreparedStatement statement = connection.prepareStatement("SELECT player_uuid FROM playerdata")) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String playerUUIDString = resultSet.getString("player_uuid");
+                playerUUIDs.add(UUID.fromString(playerUUIDString));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return playerUUIDs;
     }
-
-    // Implement methods for saving and removing shrines
 
     public void closeConnection() {
         try {
@@ -120,5 +164,15 @@ public class SQLiteStorage implements IStorage {
             e.printStackTrace();
         }
     }
-}
 
+    private String serializeLocation(Location location) {
+        // Serialize location to a string, "world,x,y,z"
+        return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+    }
+
+    private Location parseLocation(String locationStr) {
+        // Parse location from string
+        String[] parts = locationStr.split(",");
+        return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+    }
+}

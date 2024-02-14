@@ -12,9 +12,7 @@ import me.xidentified.devotions.listeners.PlayerListener;
 import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.*;
-import me.xidentified.devotions.storage.YamlStorage;
 import me.xidentified.devotions.storage.StorageManager;
-import me.xidentified.devotions.storage.model.IStorage;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Metrics;
 import me.xidentified.devotions.util.Placeholders;
@@ -44,7 +42,6 @@ public class Devotions extends JavaPlugin {
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
     private StorageManager storageManager;
-    private IStorage storage;
     private Translator translations;
 
     @Override
@@ -160,8 +157,8 @@ public class Devotions extends JavaPlugin {
         instance = this;
         devotionsConfig.loadRitualConfig();
 
-        // Initiate manager classes
-        this.storageManager = new StorageManager(this, );
+        // Initialize storage
+        this.storageManager = new StorageManager(this);
 
         // Clear existing data before re-initializing
         if (devotionManager != null) {

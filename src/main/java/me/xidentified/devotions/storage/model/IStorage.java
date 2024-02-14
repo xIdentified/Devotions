@@ -15,15 +15,9 @@ public interface IStorage {
     void savePlayerDevotion(UUID playerUniqueId, FavorManager favorManager);
     DevotionData getPlayerDevotion(UUID playerUUID);
     void removePlayerDevotion(UUID playerUUID);
-
     List<Shrine> loadAllShrines(DevotionManager devotionManager);
-
     void removeShrine(Location location, UUID playerId);
-
     void saveShrine(Shrine newShrine);
-
     Set<UUID> getAllStoredPlayerUUIDs();
-
-
 }
 

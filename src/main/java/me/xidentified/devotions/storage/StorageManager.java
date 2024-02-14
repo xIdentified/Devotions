@@ -8,13 +8,12 @@ import java.io.File;
 
 @Getter
 public class StorageManager {
-    private File storageFolder;
+    @Getter private File storageFolder;
     private final Devotions plugin;
     private IStorage storage;
 
-    public StorageManager(Devotions plugin, IStorage storage) {
+    public StorageManager(Devotions plugin) {
         this.plugin = plugin;
-        this.storage = storage;
         init();
     }
 
