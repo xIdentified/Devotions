@@ -29,7 +29,7 @@ commands:
         usage: /devotions saveitem <itemName>
   deity:
     description: Manage and view information about deities.
-    usage: /<command> <select|info|list> [DeityName]
+    usage: /<command> <select|info|list|abandon> [DeityName]
     permission: devotions.select
     aliases: [god, gods]
     tab-completions: true
