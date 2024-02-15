@@ -10,6 +10,7 @@ max-favor: 250 # Max amount of favor players can have
 decay-rate: 5 # Rate at which favor decays over time
 decay-interval: 1200 # How often favor decays (in seconds) 1200 = 1 day
 decay-when-offline: false
+hide-favor-msgs: false # Optionally hide messages when favor is changed
 
 # Amount of favor player should have for certain actions to occur
 blessing-threshold: 150

@@ -31,6 +31,13 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
         // Display player's favor if they don't provide an argument
         Player player = (Player) sender;
         if (args.length == 0) {
+
+            // Check for permission
+            if (!player.hasPermission("devotions.favor")) {
+                plugin.sendMessage(player, GlobalMessages.NO_PERM_CMD);
+                return true;
+            }
+
             // Get player's devotion
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             if (favorManager == null) {
@@ -85,8 +92,7 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
         switch (action) {
             case "set" -> favorManager.setFavor(amount);
-            case "give" -> favorManager.increaseFavor(amount);
-            case "take" -> favorManager.decreaseFavor(amount);
+            case "give", "take" -> favorManager.adjustFavor(amount);
             default -> {
                 plugin.sendMessage(player,Messages.FAVOR_CMD_INVALID_ACTION);
                 return true;

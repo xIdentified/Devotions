@@ -159,15 +159,14 @@ public class Ritual {
                 plugin.playConfiguredSound(player, "ritualComplete");
                 plugin.spawnParticles(location, Particle.VILLAGER_HAPPY, 50, 2.0, 0.5);
                 plugin.sendMessage(player, Messages.RITUAL_SUCCESS.formatted(Placeholder.unparsed("ritual", displayName)));
-                favorManager.increaseFavor(favorAmount);
+                favorManager.adjustFavor(favorAmount);
             }
             case "FAILURE" -> {
                 plugin.playConfiguredSound(player, "ritualFailed");
                 plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
                 player.damage(5);
                 plugin.sendMessage(player, Messages.RITUAL_FAILURE.formatted(Placeholder.unparsed("ritual", displayName)));
-                favorManager.decreaseFavor(15); // TODO: Make this a certain percent of the favorAmount maybe??
-                // TODO: Also fix the messages so negative amounts don't say 'favor has increased to' a smaller number
+                favorManager.adjustFavor(15); // TODO: Make this a certain percent of the favorAmount maybe??
             }
         }
     }

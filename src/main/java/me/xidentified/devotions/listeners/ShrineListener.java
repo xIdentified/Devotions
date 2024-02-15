@@ -147,7 +147,7 @@ public class ShrineListener implements Listener {
             plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                favorManager.increaseFavor(offering.getValue());
+                favorManager.adjustFavor(offering.getValue());
                 if (droppedItem != null) droppedItem.remove();
                 plugin.playConfiguredSound(player, "offeringAccepted");
                 spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);

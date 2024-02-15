@@ -1,6 +1,7 @@
 package me.xidentified.devotions;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.managers.RitualManager;
@@ -27,6 +28,7 @@ public class DevotionsConfig {
     private YamlConfiguration deitiesConfig;
     private YamlConfiguration ritualConfig;
     private File savedItemsConfigFile;
+    @Setter private boolean hideFavorMessages;
 
     public int getShrineLimit() {
         return plugin.getConfig().getInt("shrine-limit", 3);

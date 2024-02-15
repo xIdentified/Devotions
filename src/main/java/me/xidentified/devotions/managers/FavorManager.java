@@ -6,6 +6,7 @@ import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -117,54 +118,50 @@ public class FavorManager {
         }
     }
 
-    public void increaseFavor(int amount) {
+    public void adjustFavor(int amount) {
+        int previousFavor = this.favor;
+
+        // Increase or decrease favor based on the amount
         this.favor += amount;
-        Player player = Bukkit.getPlayer(uuid);
 
-        if (this.favor > maxFavor) {
-            this.favor = maxFavor;
-        }
-        if (player != null && deity != null) {
-            plugin.sendMessage(player, Messages.FAVOR_INCREASED.formatted(
-                    Placeholder.unparsed("deity", deity.getName()),
-                    Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                    TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
-            ));
-
-            // Save the player's devotion data
-            plugin.getStorageManager().getStorage().savePlayerDevotion(player.getUniqueId(), this);
-        } else {
-            System.err.println("Error: Player or Deity is null in PlayerDevotion::increaseFavor");
-        }
-    }
-
-
-    public void decreaseFavor(int amount) {
-        // Ensure favor is 0 at the lowest
-        if (this.favor <= 0 ) {
-            this.favor = 0;
-            // Skip processing if player's favor is already 0
-            return;
-        }
-
-        this.favor -= amount;
+        // Ensure favor is within bounds
         if (this.favor < 0) {
             this.favor = 0;
+        } else if (this.favor > maxFavor) {
+            this.favor = maxFavor;
         }
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
-            plugin.sendMessage(player, Messages.FAVOR_DECREASED.formatted(
-                    Placeholder.unparsed("deity", deity.getName()),
-                    Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                    TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
-            ));
+            ComponentLike message;
+            if (amount > 0) {
+                message = Messages.FAVOR_INCREASED.formatted(
+                        Placeholder.unparsed("deity", deity.getName()),
+                        Placeholder.unparsed("favor", String.valueOf(this.favor)),
+                        TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
+                );
+            } else if (amount < 0) {
+                message = Messages.FAVOR_DECREASED.formatted(
+                        Placeholder.unparsed("deity", deity.getName()),
+                        Placeholder.unparsed("favor", String.valueOf(this.favor)),
+                        TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
+                );
+            } else {
+                // No change in favor
+                return;
+            }
+
+            if (!plugin.getDevotionsConfig().isHideFavorMessages()) {
+                plugin.sendMessage(player, message);
+            }
         }
 
         plugin.getStorageManager().getStorage().savePlayerDevotion(uuid, this);
     }
 
+
     private void decayFavor() {
+        // TODO: config option to hide decay messages
         Player player = Bukkit.getPlayer(uuid);
         boolean decayWhenOffline = plugin.getConfig().getBoolean("decay-when-offline", false);
 
@@ -182,7 +179,7 @@ public class FavorManager {
             lastDecayTime = currentTime;
 
             // Decay the favor without notifying the player
-            decreaseFavor(decayRate);
+            adjustFavor(decayRate);
         }
     }
 

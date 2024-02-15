@@ -34,12 +34,25 @@ public class MySQLStorage implements IStorage {
 
     private void initializeDatabase() {
         try {
-            // Establish connection to MySQL database
-            connection = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database, username, password);
+            // Load driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
-            // Create tables if they don't exist
-            createTables();
+            // Establish connection to database
+            connection = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database +
+                    "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", username, password);
+
+            // Check connection is valid
+            if (connection.isValid(5)) {
+                // Create tables if they don't exist
+                createTables();
+            } else {
+                plugin.getLogger().severe("Failed to establish a valid connection to the MySQL database.");
+            }
+        } catch (ClassNotFoundException e) {
+            plugin.getLogger().severe("MySQL JDBC Driver not found.");
+            e.printStackTrace();
         } catch (SQLException e) {
+            plugin.getLogger().severe("Error while connecting to MySQL database.");
             e.printStackTrace();
         }
     }
@@ -60,9 +73,11 @@ public class MySQLStorage implements IStorage {
                     + "owner_uuid VARCHAR(36)"
                     + ");");
         } catch (SQLException e) {
+            plugin.getLogger().severe("Error while creating database tables.");
             e.printStackTrace();
         }
     }
+
 
     public void savePlayerDevotion(UUID playerUniqueId, FavorManager favorManager) {
         String query = "REPLACE INTO playerdata (player_uuid, deity_name, favor) VALUES (?, ?, ?)";

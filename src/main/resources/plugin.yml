@@ -58,6 +58,9 @@ permissions:
   devotions.admin:
     description: Allows use of all admin commands.
     default: op
+  devotions.favor:
+    description: Allows use of /favor.
+    default: true
   devotions.shrine.set:
     description: Allows dedication of shrines to your deity.
     default: true
