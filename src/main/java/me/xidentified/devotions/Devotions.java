@@ -218,6 +218,9 @@ public class Devotions extends JavaPlugin {
         // Save all player devotions to ensure data is not lost on shutdown
         devotionManager.saveAllPlayerDevotions();
 
+        // Close the database connection
+        storageManager.getStorage().closeConnection();
+
         // Cancel tasks
         getServer().getScheduler().cancelTasks(this);
         ritualManager.ritualDroppedItems.clear();

@@ -162,4 +162,9 @@ public class YamlStorage implements IStorage {
         }
         return Collections.emptySet();
     }
+
+    @Override
+    public void closeConnection() {
+        // Not necessary for yaml :P
+    }
 }

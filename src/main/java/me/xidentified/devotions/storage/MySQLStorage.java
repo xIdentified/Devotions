@@ -23,7 +23,8 @@ public class MySQLStorage implements IStorage {
     private final String password;
     private Connection connection;
 
-    public MySQLStorage(Devotions plugin, String host, String database, String username, String password) {
+
+    public MySQLStorage(Devotions plugin, String host, String port, String database, String username, String password) {
         this.plugin = plugin;
         this.host = host;
         this.database = database;
@@ -43,6 +44,7 @@ public class MySQLStorage implements IStorage {
 
             // Check connection is valid
             if (connection.isValid(5)) {
+                plugin.getLogger().info("MySQL database connection established successfully.");
                 // Create tables if they don't exist
                 createTables();
             } else {

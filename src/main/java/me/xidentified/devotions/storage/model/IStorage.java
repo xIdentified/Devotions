@@ -19,5 +19,7 @@ public interface IStorage {
     void removeShrine(Location location, UUID playerId);
     void saveShrine(Shrine newShrine);
     Set<UUID> getAllStoredPlayerUUIDs();
+
+    void closeConnection();
 }
 
