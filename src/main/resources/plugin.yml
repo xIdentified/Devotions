@@ -50,6 +50,9 @@ commands:
     description: Execute miracles to ensure they work.
     usage: /<command> <number>
     tab-completions: true
+  migrate-storage:
+    description: Migrates data from YAML to database storage
+    usage: /migrate-storage
 
 permissions:
   devotions.shrine.list:

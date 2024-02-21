@@ -191,6 +191,7 @@ public class Devotions extends JavaPlugin {
         Objects.requireNonNull(getCommand("devotions")).setExecutor(new DevotionsCommandExecutor(this));
         Objects.requireNonNull(getCommand("ritual")).setExecutor(ritualCommand);
         Objects.requireNonNull(getCommand("ritual")).setTabCompleter(ritualCommand);
+        Objects.requireNonNull(getCommand("migrate-storage")).setExecutor(new MigrationCommand(this));
 
         // Register admin commands
         TestMiracleCommand testMiracleCmd = new TestMiracleCommand(devotionsConfig.getMiraclesMap());

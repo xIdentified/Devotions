@@ -73,9 +73,9 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 displayVersionInfo(sender);
+                return true;
 
                 default:
-                // You can handle unknown commands or provide a default message here
                 return false;
         }
     }

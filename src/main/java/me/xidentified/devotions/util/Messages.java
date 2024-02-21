@@ -8,6 +8,9 @@ public class Messages {
 	public static final Message GENERAL_PLAYER_NOT_FOUND = new MessageBuilder("general.player_not_found")
 			.withDefault("<prefix_negative>Player not found: {name}")
 			.build();
+	public static final Message MIGRATION_COMPLETE = new MessageBuilder("general.migration_complete")
+			.withDefault("<prefix>Storage successfully migrated!")
+			.build();
 	public static final Message DEVOTION_RELOAD_SUCCESS = new MessageBuilder("devotion.reload_success")
 			.withDefault("<prefix>Devotions successfully reloaded!")
 			.build();
@@ -68,9 +71,6 @@ public class Messages {
 
 	public static final Message MEDITATION_COMPLETE = new MessageBuilder("meditation.complete")
 			.withDefault("<prefix>Meditation complete! You can now move.")
-			.build();
-	public static final Message MEDIDATION_CANCELLED = new MessageBuilder("meditation.cancelled")
-			.withDefault("<prefix_negative>You moved during meditation! Restarting timer...")
 			.build();
 
 	public static final Message SHRINE_NO_PERM_LIST = new MessageBuilder("shrines.list.no_perm")
