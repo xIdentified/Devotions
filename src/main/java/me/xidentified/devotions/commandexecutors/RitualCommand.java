@@ -39,15 +39,14 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
         }
 
         String subCommand = args[0].toLowerCase();
-        switch (subCommand) {
-            case "info":
-                return handleInfo(player, args);
-            case "cancel":
-                return handleCancel(player);
-            default:
+        return switch (subCommand) {
+            case "info" -> handleInfo(player, args);
+            case "cancel" -> handleCancel(player);
+            default -> {
                 plugin.sendMessage(player, Messages.RITUAL_CMD_USAGE);
-                return true;
-        }
+                yield true;
+            }
+        };
     }
 
     private boolean handleInfo(Player player, String[] args) {

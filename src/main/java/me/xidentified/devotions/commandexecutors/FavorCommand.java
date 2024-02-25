@@ -92,7 +92,8 @@ public class FavorCommand implements CommandExecutor, TabCompleter {
 
         switch (action) {
             case "set" -> favorManager.setFavor(amount);
-            case "give", "take" -> favorManager.adjustFavor(amount);
+            case "give" -> favorManager.adjustFavor(amount);
+            case "take" -> favorManager.adjustFavor(-amount);
             default -> {
                 plugin.sendMessage(player,Messages.FAVOR_CMD_INVALID_ACTION);
                 return true;

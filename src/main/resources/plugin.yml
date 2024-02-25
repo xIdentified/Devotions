@@ -58,14 +58,14 @@ permissions:
   devotions.shrine.list:
     description: Allows listing of all shrines on server.
     default: op
+  devotions.shrine.set:
+    description: Allows dedication of shrines to your deity.
+    default: true
   devotions.admin:
     description: Allows use of all admin commands.
     default: op
   devotions.favor:
     description: Allows use of /favor.
-    default: true
-  devotions.shrine.set:
-    description: Allows dedication of shrines to your deity.
     default: true
   devotions.select:
     description: Allows selection of a chosen deity.

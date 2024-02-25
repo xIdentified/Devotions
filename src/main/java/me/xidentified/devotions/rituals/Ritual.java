@@ -166,7 +166,7 @@ public class Ritual {
                 plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
                 player.damage(5);
                 plugin.sendMessage(player, Messages.RITUAL_FAILURE.formatted(Placeholder.unparsed("ritual", displayName)));
-                favorManager.adjustFavor(15); // TODO: Make this a certain percent of the favorAmount maybe??
+                favorManager.adjustFavor(-15); // TODO: Make this a certain percent of the favorAmount maybe??
             }
         }
     }

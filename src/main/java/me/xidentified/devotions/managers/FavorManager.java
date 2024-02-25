@@ -179,7 +179,7 @@ public class FavorManager {
             lastDecayTime = currentTime;
 
             // Decay the favor without notifying the player
-            adjustFavor(decayRate);
+            adjustFavor(-decayRate);
         }
     }
 
