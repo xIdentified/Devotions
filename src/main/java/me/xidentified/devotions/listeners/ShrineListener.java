@@ -1,10 +1,7 @@
 package me.xidentified.devotions.listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.xidentified.devotions.Deity;
-import me.xidentified.devotions.Devotions;
-import me.xidentified.devotions.Offering;
-import me.xidentified.devotions.Shrine;
+import me.xidentified.devotions.*;
 import me.xidentified.devotions.managers.*;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
@@ -183,12 +180,15 @@ public class ShrineListener implements Listener {
     }
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
-        // Load saved items from configuration
-        FileConfiguration config = plugin.getDevotionsConfig().getSavedItemsConfig();
-        ConfigurationSection savedItemsSection = config.getConfigurationSection("items");
+        DevotionsConfig configHandler = plugin.getDevotionsConfig();
+        String itemId = configHandler.getItemId(item);
 
         // Get the favored offerings for the deity from the config
         List<String> validOfferings = plugin.getDevotionsConfig().getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
+
+        // Load saved items from configuration
+        FileConfiguration savedItemsConfig = plugin.getDevotionsConfig().getSavedItemsConfig();
+        ConfigurationSection savedItemsSection = savedItemsConfig.getConfigurationSection("items");
 
         for (String offering : validOfferings) {
             String[] parts = offering.split(":");
@@ -222,8 +222,7 @@ public class ShrineListener implements Listener {
                 }
             } else if ("VANILLA".equalsIgnoreCase(offeringType)) {
                 // Handle vanilla items
-                Material material = Material.matchMaterial(offeringItemId);
-                if (material != null && item.getType() == material) {
+                if (offeringItemId.equals(itemId)) {
                     return new Offering(item, favorValue, commands);
                 }
             }

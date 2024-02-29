@@ -11,6 +11,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
@@ -50,6 +52,22 @@ public class DevotionsConfig {
         }
 
         plugin.initializePlugin();
+    }
+
+    // Translates item ID for rituals and offerings
+    // TODO: Saved item support
+    public String getItemId(ItemStack item) {
+        plugin.debugLog("Checking for vanilla item key: VANILLA:" + item.getType().name());
+        // If the item is a potion, append the potion type to the ID
+        if (item.getType() == Material.POTION) {
+            PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+            if (potionMeta != null) {
+                PotionData potionData = potionMeta.getBasePotionData();
+                return "VANILLA:POTION_" + potionData.getType().name();
+            }
+        }
+        // constructs vanilla item IDs for non-potion items
+        return "VANILLA:" + item.getType().name();
     }
 
     public YamlConfiguration getDeitiesConfig() {
