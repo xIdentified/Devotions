@@ -91,6 +91,8 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
 
+        plugin.debugLog("Current devotion status for player " + player.getName() + ": " + devotionManager.getPlayerDevotion(playerUniqueId));
+
         // Check if the player already has a devotion
         FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
         if (currentFavorManager != null) {
@@ -112,6 +114,8 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
             devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
         }
+
+        plugin.debugLog("Updated devotion status for player " + player.getName() + ": " + devotionManager.getPlayerDevotion(playerUniqueId));
 
         return true;
     }

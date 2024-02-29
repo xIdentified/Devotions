@@ -161,7 +161,6 @@ public class FavorManager {
 
 
     private void decayFavor() {
-        // TODO: config option to hide decay messages
         Player player = Bukkit.getPlayer(uuid);
         boolean decayWhenOffline = plugin.getConfig().getBoolean("decay-when-offline", false);
 
