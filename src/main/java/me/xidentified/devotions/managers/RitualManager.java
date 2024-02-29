@@ -8,10 +8,13 @@ import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,9 +186,17 @@ public class RitualManager {
 
     // Translates item ID from config to match ritual ID in rituals table
     private String getItemId(ItemStack item) {
-            plugin.debugLog("Checking for vanilla item ritual key: VANILLA:" + item.getType().name());
-            // constructs vanilla item IDs
-            return "VANILLA:" + item.getType().name();
+        plugin.debugLog("Checking for vanilla item ritual key: VANILLA:" + item.getType().name());
+        // If the item is a potion, append the potion type to the ID
+        if (item.getType() == Material.POTION) {
+            PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+            if (potionMeta != null) {
+                PotionData potionData = potionMeta.getBasePotionData();
+                return "VANILLA:POTION_" + potionData.getType().name();
+            }
+        }
+        // constructs vanilla item IDs for non-potion items
+        return "VANILLA:" + item.getType().name();
     }
 
     /**
