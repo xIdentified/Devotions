@@ -83,7 +83,8 @@ public class RitualManager {
 
         // Validate the ritual and its conditions
         if (ritual.validateConditions(player)) {
-            plugin.getShrineListener().takeItemInHand(player, item);
+            try {
+                plugin.getShrineListener().takeItemInHand(player, item);
             ritual.provideFeedback(player, "START");
 
             List<RitualObjective> objectives = ritual.getObjectives(); // Directly fetch from the ritual object
@@ -106,13 +107,22 @@ public class RitualManager {
             // Set the ritual for the player, so we can track it
             RitualManager.getInstance(plugin).setRitualForPlayer(player, ritual);
             return true; // Ritual started successfully
-        } else if (droppedItem != null) {
-            droppedItem.remove();
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error while starting ritual: " + e.getMessage());
+            e.printStackTrace();
+            // Remove dropped item if an error occurs during ritual initiation
+            if (droppedItem != null) droppedItem.remove();
+            // Provide feedback to the player about the failure
             ritual.provideFeedback(player, "FAILURE");
-            return false; // Ritual did not start
+            return false;
         }
-        return false;
+    } else if (droppedItem != null) {
+        droppedItem.remove();
+        ritual.provideFeedback(player, "FAILURE");
+        return false; // Ritual did not start
     }
+    return false;
+}
 
     public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
         // Get rid of item on shrine

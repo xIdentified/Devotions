@@ -25,6 +25,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.util.Vector;
 
 import java.time.Instant;
@@ -79,17 +80,21 @@ public class ShrineListener implements Listener {
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
         if (ritual != null) {
             try {
+                // Only drop item on shrine if it's a valid ritual item
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleRitualInteraction(player, itemInHand, droppedItem, event);
             } catch (Exception e) {
                 plugin.getLogger().severe("Error while handling ritual interaction: " + e.getMessage());
                 e.printStackTrace();
             }
+            return; // Exit method to prevent further handling
         }
 
         // Check if the player is holding a valid offering
-        else if (!itemInHand.getType().equals(Material.AIR)) {
+        Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
+        if (offering != null) {
             try {
+                // Only drop item on shrine if it's a valid offering
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleOfferingInteraction(player, clickedBlock, itemInHand, droppedItem);
             } catch (Exception e) {
@@ -106,6 +111,7 @@ public class ShrineListener implements Listener {
                     Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
             ));
             event.setCancelled(true);
+            if (droppedItem != null) droppedItem.remove();
             return;
         }
 
@@ -116,7 +122,8 @@ public class ShrineListener implements Listener {
         } else if (droppedItem != null) {
             droppedItem.remove();  // Remove dropped item from shrine if ritual did not start
         }
-        event.setCancelled(true);
+        // Cancel the event only if the ritual started successfully
+        event.setCancelled(!ritualStarted);
     }
 
     private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem) {
@@ -180,15 +187,12 @@ public class ShrineListener implements Listener {
     }
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
-        DevotionsConfig configHandler = plugin.getDevotionsConfig();
-        String itemId = configHandler.getItemId(item);
+        // Load saved items from configuration
+        FileConfiguration config = plugin.getDevotionsConfig().getSavedItemsConfig();
+        ConfigurationSection savedItemsSection = config.getConfigurationSection("items");
 
         // Get the favored offerings for the deity from the config
         List<String> validOfferings = plugin.getDevotionsConfig().getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
-
-        // Load saved items from configuration
-        FileConfiguration savedItemsConfig = plugin.getDevotionsConfig().getSavedItemsConfig();
-        ConfigurationSection savedItemsSection = savedItemsConfig.getConfigurationSection("items");
 
         for (String offering : validOfferings) {
             String[] parts = offering.split(":");
@@ -222,8 +226,21 @@ public class ShrineListener implements Listener {
                 }
             } else if ("VANILLA".equalsIgnoreCase(offeringType)) {
                 // Handle vanilla items
-                if (offeringItemId.equals(itemId)) {
-                    return new Offering(item, favorValue, commands);
+                if (offeringItemId.startsWith("POTION_")) {
+                    // This is a potion offering
+                    String potionType = offeringItemId.substring("POTION_".length());
+                    if (item.getType() == Material.POTION) {
+                        PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                        if (potionMeta != null && potionMeta.getBasePotionData().getType().name().equalsIgnoreCase(potionType)) {
+                            return new Offering(item, favorValue, commands);
+                        }
+                    }
+                } else {
+                    // This is a regular item offering
+                    Material material = Material.matchMaterial(offeringItemId);
+                    if (material != null && item.getType() == material) {
+                        return new Offering(item, favorValue, commands);
+                    }
                 }
             }
         }
