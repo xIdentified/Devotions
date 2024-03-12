@@ -39,22 +39,25 @@ public class DevotionManager {
         return manager;
     }
 
-    public void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
+    public synchronized void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
         if (playerUUID == null || newDevotion == null) {
             plugin.getLogger().warning("Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = " + newDevotion);
             return;
         }
 
-        FavorManager currentDevotion = playerDevotions.get(playerUUID);
-        if (currentDevotion != null && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
-            // Player is switching to a new deity, reset their favor
-            newDevotion.resetFavor();
+        FavorManager currentDevotion;
+        synchronized (playerDevotions) {
+            currentDevotion = playerDevotions.get(playerUUID);
+            if (currentDevotion != null && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
+                // Player is switching to a new deity, reset their favor
+                newDevotion.resetFavor();
+            }
+
+            // Update the player's devotion with the new or reset FavorManager
+            playerDevotions.put(playerUUID, newDevotion);
         }
 
-        // Update the player's devotion with the new or reset FavorManager
-        playerDevotions.put(playerUUID, newDevotion);
         Player player = Bukkit.getPlayer(playerUUID);
-
         if (player != null) {
             Deity deity = newDevotion.getDeity();
             storage.getStorage().savePlayerDevotion(playerUUID, newDevotion);

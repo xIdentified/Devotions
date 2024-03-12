@@ -119,8 +119,6 @@ public class FavorManager {
     }
 
     public void adjustFavor(int amount) {
-        int previousFavor = this.favor;
-
         // Increase or decrease favor based on the amount
         this.favor += amount;
 
@@ -158,7 +156,6 @@ public class FavorManager {
 
         plugin.getStorageManager().getStorage().savePlayerDevotion(uuid, this);
     }
-
 
     private void decayFavor() {
         Player player = Bukkit.getPlayer(uuid);

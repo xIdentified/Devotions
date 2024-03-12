@@ -68,7 +68,6 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleSelect(Player player, String[] args) {
-
         if (args.length < 2) {
             return displayExistingDeityInfo(player);
         }
@@ -109,7 +108,6 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         }
 
         plugin.debugLog("Updated devotion status for player " + player.getName() + ": " + devotionManager.getPlayerDevotion(playerUniqueId));
-
         return true;
     }
 
