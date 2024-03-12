@@ -165,7 +165,7 @@ public class FavorManager {
         boolean decayWhenOffline = plugin.getConfig().getBoolean("decay-when-offline", false);
 
         // If the configuration is set to not decay when offline, and the player is offline, return
-        if (!decayWhenOffline && (player == null || !player.isOnline())) {
+        if (!decayWhenOffline && (player == null || !player.isOnline()) || this.favor == 0) {
             return;
         }
 
