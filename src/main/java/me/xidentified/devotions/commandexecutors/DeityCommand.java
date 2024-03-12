@@ -38,14 +38,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            UUID playerUUID = player.getUniqueId();
-            FavorManager playerDevotion = plugin.getDevotionManager().getPlayerDevotion(playerUUID);
-
-            if (playerDevotion != null) {
-                String deityName = playerDevotion.getDeity().name;
-                handleInfo(player, new String[]{"info", deityName});
-                return true;
-            }
+            if (displayExistingDeityInfo(player)) return true;
         }
 
         if (args.length < 1) {
@@ -75,9 +68,9 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleSelect(Player player, String[] args) {
+
         if (args.length < 2) {
-            plugin.sendMessage(player, Messages.DEITY_CMD_SPECIFY_DEITY);
-            return true;
+            return displayExistingDeityInfo(player);
         }
 
         String deityName = args[1];
@@ -122,9 +115,9 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            plugin.sendMessage(player,Messages.DEITY_SPECIFY_PLAYER);
-            return true;
+            if (displayExistingDeityInfo(player)) return true;
         }
+
 
         String deityName = args[1];
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
@@ -143,6 +136,20 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             Placeholder.unparsed("rituals", selectedDeity.getRituals()),
             Placeholder.unparsed("offerings", selectedDeity.getOfferings())
         ));
+        return true;
+    }
+
+    private boolean displayExistingDeityInfo(Player player) {
+        UUID playerUUID = player.getUniqueId();
+        FavorManager playerDevotion = plugin.getDevotionManager().getPlayerDevotion(playerUUID);
+
+        if (playerDevotion != null) {
+            String deityName = playerDevotion.getDeity().name;
+            handleInfo(player, new String[]{"info", deityName});
+            return true;
+        }
+
+        plugin.sendMessage(player, Messages.DEITY_CMD_SPECIFY_DEITY);
         return true;
     }
 
