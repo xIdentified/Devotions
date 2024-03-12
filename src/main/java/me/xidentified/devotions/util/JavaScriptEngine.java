@@ -1,19 +1,22 @@
 package me.xidentified.devotions.util;
 
-import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 
 public class JavaScriptEngine {
-    private static final ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
+
     public static boolean evaluateExpression(String expression) {
+        Context rhinoContext = Context.enter();
         try {
-            Object result = engine.eval(expression);
-            return (result instanceof Boolean) && (Boolean) result;
-        } catch (ScriptException e) {
+            rhinoContext.setOptimizationLevel(-1); // Interpretive mode
+            Scriptable scope = rhinoContext.initStandardObjects();
+            Object result = rhinoContext.evaluateString(scope, expression, "JavaScript", 1, null);
+            return Context.toBoolean(result);
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            Context.exit();
         }
     }
 }

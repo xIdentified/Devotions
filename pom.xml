@@ -42,6 +42,7 @@
                                 <includes>
                                     <include>de.cubbossa:TinyTranslations-bukkit</include>
                                     <include>de.cubbossa:TinyTranslations-common</include>
+                                    <include>org.mozilla:rhino</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -96,7 +97,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -112,9 +113,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.openjdk.nashorn</groupId>
-            <artifactId>nashorn-core</artifactId>
-            <version>15.4</version>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7.14</version>
         </dependency>
     </dependencies>
 </project>
