@@ -1,6 +1,7 @@
 package me.xidentified.devotions.commandexecutors;
 
 import de.cubbossa.tinytranslations.GlobalMessages;
+import de.cubbossa.tinytranslations.Message;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -47,13 +48,10 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
 
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("list")) {
-                if (player.hasPermission("devotions.shrine.list")) {
-                    displayShrineList(player);
-                } else {
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_LIST);
-                }
+                displayShrineList(player);
                 return true;
-            } else if (args[0].equalsIgnoreCase("remove")) {
+            }
+            else if (args[0].equalsIgnoreCase("remove")) {
                 if (player.hasPermission("devotions.shrine.remove")) {
                     pendingShrineRemovals.put(player.getUniqueId(), true);
                     Devotions.getInstance().sendMessage(player, Messages.SHRINE_RC_TO_REMOVE);
@@ -127,15 +125,23 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     public void onShrineRemoval(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
+
+        // Check if the player has initiated the shrine removal process
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
         if (pendingShrineRemovals.containsKey(playerId)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
                 Location location = clickedBlock.getLocation();
-                if (shrineManager.getShrineAtLocation(location) != null) {
-                    boolean removed = shrineManager.removeShrine(playerId, location);
-                    if (removed) {
-                        Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVED);
+                Shrine shrine = shrineManager.getShrineAtLocation(location);
+                if (shrine != null) {
+                    boolean canRemove = player.hasPermission("devotions.admin") || shrine.getOwner() == playerId;
+                    if (canRemove) {
+                        boolean removed = shrineManager.removeShrine(playerId, location);
+                        if (removed) {
+                            Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVED);
+                        } else {
+                            Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
+                        }
                     } else {
                         Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
                     }
@@ -164,7 +170,15 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     }
 
     private void displayShrineList(Player player) {
-        List<Shrine> shrines = shrineManager.getAllShrines();
+        List<Shrine> shrines;
+        boolean isAdmin = player.hasPermission("devotions.admin");
+
+        if (isAdmin) {
+            shrines = shrineManager.getAllShrines();
+        } else {
+            shrines = shrineManager.getShrinesByOwner(player.getUniqueId());
+        }
+
         if (shrines.isEmpty()) {
             Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_DESIGNATED_SHRINE);
             return;
@@ -173,12 +187,14 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
         Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIST);
         for (Shrine shrine : shrines) {
             Location loc = shrine.getLocation();
-            Devotions.getInstance().sendMessage(player, Messages.SHRINE_INFO.formatted(
-                Placeholder.unparsed("deity", shrine.getDeity().getName()),
-                Formatter.number("x", loc.getBlockX()),
-                Formatter.number("y", loc.getBlockY()),
-                Formatter.number("z", loc.getBlockZ())
+            Message message = isAdmin ? Messages.SHRINE_INFO_ADMIN : Messages.SHRINE_INFO_PLAYER;
+            Devotions.getInstance().sendMessage(player, message.formatted(
+                    Placeholder.unparsed("deity", shrine.getDeity().getName()),
+                    Formatter.number("x", loc.getBlockX()),
+                    Formatter.number("y", loc.getBlockY()),
+                    Formatter.number("z", loc.getBlockZ())
             ));
         }
     }
+
 }

@@ -29,7 +29,7 @@ public class PlayerListener implements Listener {
         DevotionManager devotionManager = plugin.getDevotionManager();
         IStorage storage = storageManager.getStorage(); // Get the storage instance from the StorageManager
 
-        // Check if player already has a FavorManager instance
+        // Check if the player already has a FavorManager instance
         FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
 
         if (favorManager == null) {
@@ -41,9 +41,16 @@ public class PlayerListener implements Listener {
                     favorManager = new FavorManager(plugin, playerUniqueId, deity);
                     favorManager.setFavor(devotionData.getFavor());
                     devotionManager.setPlayerDevotion(playerUniqueId, favorManager);
+                    plugin.getLogger().info("Devotion set for " + event.getPlayer().getName());
                 } else {
-                    plugin.debugLog("Player '" + event.getPlayer().getName() + " does not have devotion set: " + devotionData.getDeityName());
+                    plugin.getLogger().warning("Deity '" + devotionData.getDeityName() + "' not found for " + event.getPlayer().getName());
+                    // Optionally notify the player
+                    event.getPlayer().sendMessage("Your devotion deity could not be found. Please select a new one.");
                 }
+            } else {
+                plugin.getLogger().info("No devotion data found for " + event.getPlayer().getName());
+                // Optionally notify the player
+                event.getPlayer().sendMessage("You currently have no devotion. Use '/devotion select <deity>' to choose one.");
             }
         }
     }

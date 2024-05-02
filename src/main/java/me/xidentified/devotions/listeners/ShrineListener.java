@@ -13,8 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,15 +23,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.util.Vector;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
 // Begins rituals or player's offerings
 public class ShrineListener implements Listener {
@@ -78,27 +75,29 @@ public class ShrineListener implements Listener {
         // Check for ritual initiation
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
+        plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
         if (ritual != null) {
             try {
                 // Only drop item on shrine if it's a valid ritual item
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleRitualInteraction(player, itemInHand, droppedItem, event);
             } catch (Exception e) {
-                plugin.getLogger().severe("Error while handling ritual interaction: " + e.getMessage());
+                plugin.getLogger().severe("Error while handling ritual: " + e.getMessage());
                 e.printStackTrace();
             }
             return; // Exit method to prevent further handling
         }
 
         // Check if the player is holding a valid offering
-        Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
+        Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());        plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
+        plugin.debugLog("Checking for offering associated with item: " + itemInHand);
         if (offering != null) {
             try {
                 // Only drop item on shrine if it's a valid offering
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
                 handleOfferingInteraction(player, clickedBlock, itemInHand, droppedItem);
             } catch (Exception e) {
-                plugin.getLogger().severe("Error while handling offering interaction: " + e.getMessage());
+                plugin.getLogger().severe("Error while handling offering: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -187,65 +186,50 @@ public class ShrineListener implements Listener {
     }
 
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
-        // Load saved items from configuration
-        FileConfiguration config = plugin.getDevotionsConfig().getSavedItemsConfig();
-        ConfigurationSection savedItemsSection = config.getConfigurationSection("items");
+        for (Offering offering : deity.getOfferings()) {
+            if (matchesOffering(item, offering)) {
+                plugin.debugLog(String.format("Offering found for deity %s: %s", deity.getName(), offering.getItemStack().displayName()));
 
-        // Get the favored offerings for the deity from the config
-        List<String> validOfferings = plugin.getDevotionsConfig().getDeitiesConfig().getStringList("deities." + deity.getName().toLowerCase() + ".offerings");
-
-        for (String offering : validOfferings) {
-            String[] parts = offering.split(":");
-            if (parts.length < 3) { // Ensure offering is in the correct format
-                continue;
-            }
-
-            String offeringType = parts[0];
-            String offeringItemId = parts[1];
-            int favorValue;
-            try {
-                favorValue = Integer.parseInt(parts[2]);
-            } catch (NumberFormatException e) {
-                plugin.getLogger().warning("Invalid favor value for offering " + offering + " for deity " + deity.getName());
-                continue;
-            }
-
-            List<String> commands = new ArrayList<>();
-            if (parts.length > 3) {
-                // Parts[3] contains the commands separated by a semicolon
-                commands = Arrays.asList(parts[3].split(";"));
-            }
-
-            if ("SAVED".equalsIgnoreCase(offeringType)) {
-                // Handle saved items
-                if (savedItemsSection != null) {
-                    ItemStack savedItem = savedItemsSection.getItemStack(offeringItemId);
-                    if (savedItem != null && savedItem.isSimilar(item)) {
-                        return new Offering(item, favorValue, commands);
-                    }
-                }
-            } else if ("VANILLA".equalsIgnoreCase(offeringType)) {
-                // Handle vanilla items
-                if (offeringItemId.startsWith("POTION_")) {
-                    // This is a potion offering
-                    String potionType = offeringItemId.substring("POTION_".length());
-                    if (item.getType() == Material.POTION) {
-                        PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-                        if (potionMeta != null && potionMeta.getBasePotionData().getType().name().equalsIgnoreCase(potionType)) {
-                            return new Offering(item, favorValue, commands);
-                        }
-                    }
+                // Now consider the chance for offering acceptance
+                if (Math.random() <= offering.getChance()) {
+                    return offering;
                 } else {
-                    // This is a regular item offering
-                    Material material = Material.matchMaterial(offeringItemId);
-                    if (material != null && item.getType() == material) {
-                        return new Offering(item, favorValue, commands);
-                    }
+                    // Log that the offering was not accepted due to chance
+                    plugin.debugLog(String.format("Offering for deity %s was not accepted due to chance: %s", deity.getName(), offering));
+                    return null;
                 }
             }
         }
+        // No offering found
         return null;
     }
+
+    private boolean matchesOffering(ItemStack item, Offering offering) {
+        // Check for item type match
+        if (!item.getType().equals(offering.getItemStack().getType())) {
+            return false;
+        }
+
+        // If the offering is a potion, verify potion type
+        if (item.getType() == Material.POTION || item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION) {
+            PotionMeta itemMeta = (PotionMeta) item.getItemMeta();
+            PotionMeta offeringMeta = (PotionMeta) offering.getItemStack().getItemMeta();
+
+            if (itemMeta == null || offeringMeta == null) {
+                return false; // Either the item or the offering has no metadata, so they do not match
+            }
+
+            if (!itemMeta.getBasePotionData().getType().equals(offeringMeta.getBasePotionData().getType())) {
+                return false; // Potion types do not match
+            }
+        }
+
+        // TODO: Check for 'SAVED' items here, match metadata/lore/enchantments and stuff maybe?
+
+        // If no checks failed, the item matches the offering
+        return true;
+    }
+
 
     // Don't allow players to place blocks on top of shrines
     @EventHandler
@@ -287,7 +271,6 @@ public class ShrineListener implements Listener {
     }
 
     private Item dropItemOnShrine(Block clickedBlock, ItemStack itemInHand) {
-        plugin.debugLog("Attempting to place item on shrine.");
 
         if (!itemInHand.getType().equals(Material.AIR)) {
             Location dropLocation = clickedBlock.getLocation().add(0.5, 1, 0.5);
@@ -304,10 +287,10 @@ public class ShrineListener implements Listener {
             // Set velocity to zero to prevent it from shooting into the air
             droppedItem.setVelocity(new Vector(0, 0, 0));
 
-            plugin.debugLog("Dropped item spawned at: " + dropLocation + " with item " + singleItemStack.getType());
+            plugin.debugLog("Item on shrine spawned at: " + dropLocation + " with ID " + singleItemStack.getType());
             return droppedItem;
         }
-        plugin.debugLog("Dropped item not spawned.");
+        plugin.debugLog("Item on shrine not spawned.");
         return null;
     }
 

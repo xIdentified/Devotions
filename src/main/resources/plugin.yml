@@ -55,9 +55,6 @@ commands:
     usage: /migrate-storage
 
 permissions:
-  devotions.shrine.list:
-    description: Allows listing of all shrines on server.
-    default: op
   devotions.shrine.set:
     description: Allows dedication of shrines to your deity.
     default: true

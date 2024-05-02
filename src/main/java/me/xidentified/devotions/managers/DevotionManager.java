@@ -35,7 +35,11 @@ public class DevotionManager {
 
     public FavorManager getPlayerDevotion(UUID playerUUID) {
         FavorManager manager = playerDevotions.get(playerUUID);
-        plugin.debugLog("Retrieved FavorManager for UUID " + playerUUID + ": " + manager);
+        if (manager == null || manager.getDeity() == null) {
+            plugin.debugLog("No Devotion found for UUID " + playerUUID);
+            return null;
+        }
+        plugin.debugLog("Retrieved Devotion for UUID " + playerUUID + ": " + manager.getDeity().getName());
         return manager;
     }
 
@@ -80,8 +84,11 @@ public class DevotionManager {
     public void loadPlayerDevotions() {
         Set<UUID> playerUUIDs = getAllStoredPlayerUUIDs();
         for (UUID uuid : playerUUIDs) {
-            DevotionData devotionData = storage.getStorage().getPlayerDevotion(uuid);
-            if (devotionData != null) {
+            try {
+                DevotionData devotionData = storage.getStorage().getPlayerDevotion(uuid);
+                if (devotionData == null) {
+                    continue;
+                }
                 Deity deity = getDeityByName(devotionData.getDeityName());
                 if (deity != null) {
                     FavorManager favorManager = new FavorManager(plugin, uuid, deity);
@@ -90,6 +97,8 @@ public class DevotionManager {
                 } else {
                     plugin.getLogger().warning("Deity not found for UUID: " + uuid);
                 }
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error loading devotion for UUID " + uuid + ": " + e.getMessage());
             }
         }
         plugin.getLogger().info("Loaded devotions for " + playerDevotions.size() + " players.");

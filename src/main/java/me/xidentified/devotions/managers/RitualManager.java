@@ -179,7 +179,6 @@ public class RitualManager {
         if (item == null) return null;
 
         String itemId = plugin.getDevotionsConfig().getItemId(item);
-        plugin.debugLog("Looking for ritual associated with item ID " + itemId);
 
         for (Ritual ritual : rituals.values()) {
             RitualItem keyRitualItem = ritual.getItem();

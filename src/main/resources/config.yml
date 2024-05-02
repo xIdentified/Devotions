@@ -11,6 +11,7 @@ decay-rate: 5 # Rate at which favor decays over time
 decay-interval: 1200 # How often favor decays (in seconds) 1200 = 1 day
 decay-when-offline: false
 hide-favor-msgs: false # Optionally hide messages when favor is changed
+reset-favor-on-abandon: true # When player abandons a deity, should we set favor to 0 if they re-devote themselves?
 
 # Amount of favor player should have for certain actions to occur
 blessing-threshold: 150

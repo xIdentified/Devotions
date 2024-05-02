@@ -82,8 +82,15 @@ public class Messages {
 	public static final Message SHRINE_LIST = new MessageBuilder("shrines.list.header")
 			.withDefault("<offset>Shrines:")
 			.build();
-	public static final Message SHRINE_INFO = new MessageBuilder("shrines.list.shrine")
-			.withDefault("<hover:show_text:Click to teleport><click:run_command:'/teleport @p {x:'#.#'} {y:'#.#'} {z:'#.#'}'>{deity} at {x:#}, {y:#}, {z:#}")
+	// For admins with teleport action
+	public static final Message SHRINE_INFO_ADMIN = new MessageBuilder("shrines.list.shrine")
+			.withDefault("<hover:show_text:'Click to teleport'><click:run_command:'/teleport @p {x:'#.#'} {y:'#.#'} {z:'#.#'}'>{deity} at {x:#}, {y:#}, {z:#}")
+			.withPlaceholders("deity", "x", "y", "z")
+			.build();
+
+	// For regular players without teleport action
+	public static final Message SHRINE_INFO_PLAYER = new MessageBuilder("shrines.list.shrine")
+			.withDefault("{deity} at {x:#}, {y:#}, {z:#}")
 			.withPlaceholders("deity", "x", "y", "z")
 			.build();
 	public static final Message SHRINE_NO_PERM_REMOVE = new MessageBuilder("shrines.remove.no_perm")

@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,12 +73,14 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return displayExistingDeityInfo(player);
         }
 
-        String deityName = args[1];
+        String deityName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        plugin.debugLog("Value of deityName: " + deityName);
+
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
         if (selectedDeity == null) {
             plugin.sendMessage(player, Messages.DEITY_NOT_FOUND);
-            return false;
+            return true;
         }
 
         UUID playerUniqueId = player.getUniqueId();
@@ -116,7 +119,6 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             if (displayExistingDeityInfo(player)) return true;
         }
 
-
         String deityName = args[1];
         Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
 
@@ -132,7 +134,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             Placeholder.unparsed("domain", String.join(", ", selectedDeity.getDomain())),
             Placeholder.unparsed("alignment", selectedDeity.getAlignment()),
             Placeholder.unparsed("rituals", selectedDeity.getRituals()),
-            Placeholder.unparsed("offerings", selectedDeity.getOfferings())
+            Placeholder.unparsed("offerings", selectedDeity.getFormattedOfferings())
         ));
         return true;
     }
@@ -141,14 +143,15 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         UUID playerUUID = player.getUniqueId();
         FavorManager playerDevotion = plugin.getDevotionManager().getPlayerDevotion(playerUUID);
 
-        if (playerDevotion != null) {
-            String deityName = playerDevotion.getDeity().name;
-            handleInfo(player, new String[]{"info", deityName});
+        if (playerDevotion == null) {
+            plugin.sendMessage(player, Messages.NO_DEVOTION_SET);
             return true;
         }
 
-        plugin.sendMessage(player, Messages.DEITY_CMD_SPECIFY_DEITY);
+        Deity deity = playerDevotion.getDeity();
+        handleInfo(player, new String[]{"info", deity.name});
         return true;
+
     }
 
     private boolean handleList(Player player) {
@@ -174,9 +177,16 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         // Check if the player has a devotion
         FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
+
         if (favorManager == null) {
             plugin.sendMessage(player, Messages.NO_DEVOTION_SET);
-            return true;
+            return false;
+        }
+
+        // Check if reset-favor-on-abandon is true
+        boolean resetFavorOnAbandon = plugin.getDevotionsConfig().resetFavorOnAbandon();
+        if (resetFavorOnAbandon) {
+            favorManager.resetFavor();
         }
 
         // Remove the player's devotion

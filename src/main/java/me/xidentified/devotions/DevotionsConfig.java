@@ -36,6 +36,10 @@ public class DevotionsConfig {
         return plugin.getConfig().getInt("shrine-limit", 3);
     }
 
+    public boolean resetFavorOnAbandon() {
+        return plugin.getConfig().getBoolean("reset-favor-on-abandon", true);
+    }
+
     public DevotionsConfig(Devotions plugin) {
         this.plugin = plugin;
     }
@@ -68,14 +72,6 @@ public class DevotionsConfig {
         }
         // constructs vanilla item IDs for non-potion items
         return "VANILLA:" + item.getType().name();
-    }
-
-    public YamlConfiguration getDeitiesConfig() {
-        if (deitiesConfig == null) {
-            File deitiesFile = new File(plugin.getDataFolder(), "deities.yml");
-            deitiesConfig = YamlConfiguration.loadConfiguration(deitiesFile);
-        }
-        return deitiesConfig;
     }
 
     public void loadRitualConfig() {
@@ -221,70 +217,31 @@ public class DevotionsConfig {
         }
     }
 
-    public FileConfiguration getSavedItemsConfig() {
-        if (savedItemsConfig == null) {
-            reloadSavedItemsConfig();
-        }
-        return savedItemsConfig;
-    }
-
     public Map<String, Deity> loadDeities(YamlConfiguration deitiesConfig) {
         Map<String, Deity> deityMap = new HashMap<>();
         ConfigurationSection deitiesSection = deitiesConfig.getConfigurationSection("deities");
-        assert deitiesSection != null;
+        if (deitiesSection == null) {
+            plugin.getLogger().warning("No 'deities' section found in config.");
+            return deityMap;
+        }
+
         for (String deityKey : deitiesSection.getKeys(false)) {
             ConfigurationSection deityConfig = deitiesSection.getConfigurationSection(deityKey);
+            if (deityConfig == null) {
+                plugin.getLogger().warning("Deity configuration section is missing for: " + deityKey);
+                continue;
+            }
 
-            assert deityConfig != null;
-            String name = deityConfig.getString("name");
-            String lore = deityConfig.getString("lore");
-            String domain = deityConfig.getString("domain");
-            String alignment = deityConfig.getString("alignment");
+            String name = deityConfig.getString("name", deityKey); // Default to key if name is missing
+            String lore = deityConfig.getString("lore", "");
+            String domain = deityConfig.getString("domain", "");
+            String alignment = deityConfig.getString("alignment", "");
             List<String> favoredRituals = deityConfig.getStringList("rituals");
 
             // Load offerings
             List<String> offeringStrings = deityConfig.getStringList("offerings");
             List<Offering> favoredOfferings = offeringStrings.stream()
-                    .map(offeringString -> {
-                        String[] parts = offeringString.split(":");
-                        if (parts.length < 3) {
-                            plugin.getLogger().warning("Invalid offering format for deity " + deityKey + ": " + offeringString);
-                            return null;
-                        }
-
-                        String type = parts[0];
-                        String itemId = parts[1];
-                        int favorValue;
-                        try {
-                            favorValue = Integer.parseInt(parts[2]);
-                        } catch (NumberFormatException e) {
-                            plugin.getLogger().warning("Invalid favor value in offerings for deity " + deityKey + ": " + parts[2]);
-                            return null;
-                        }
-
-                        List<String> commands = new ArrayList<>();
-                        if (parts.length > 3) {
-                            commands = Arrays.asList(parts[3].split(";"));
-                            plugin.debugLog("Loaded commands for offering: " + commands);
-                        }
-
-                        ItemStack itemStack;
-                        if ("Saved".equalsIgnoreCase(type)) {
-                            itemStack = loadSavedItem(itemId);
-                            if (itemStack == null) {
-                                plugin.getLogger().warning("Saved item not found: " + itemId + " for deity: " + deityKey);
-                                return null;
-                            }
-                        } else {
-                            Material material = Material.matchMaterial(itemId);
-                            if (material == null) {
-                                plugin.getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + itemId);
-                                return null;
-                            }
-                            itemStack = new ItemStack(material);
-                        }
-                        return new Offering(itemStack, favorValue, commands);
-                    })
+                    .map(offeringString -> parseOffering(offeringString, deityKey)) // Use a separate method to parse each offering
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
@@ -316,6 +273,61 @@ public class DevotionsConfig {
         }
 
         return deityMap;
+    }
+
+    private Offering parseOffering(String offeringString, String deityKey) {
+        String[] parts = offeringString.split(":");
+        if (parts.length < 3) {
+            plugin.getLogger().warning("Invalid offering format for deity " + deityKey + ": " + offeringString);
+            return null;
+        }
+
+        String type = parts[0];
+        String itemId = parts[1];
+        String[] favorAndChance = parts[2].split("-");
+        int favorValue;
+        double chance = 1.0; // Default chance is 100%
+
+        try {
+            favorValue = Integer.parseInt(favorAndChance[0]);
+            if (favorAndChance.length > 1) {
+                chance = Double.parseDouble(favorAndChance[1]);
+            }
+        } catch (NumberFormatException e) {
+            plugin.getLogger().warning("Invalid favor value or chance in offerings for deity " + deityKey + ": " + parts[2]);
+            return null;
+        }
+
+        List<String> commands = new ArrayList<>();
+        if (parts.length > 3) {
+            commands = Arrays.asList(parts[3].split(";"));
+        }
+
+        ItemStack itemStack = resolveItemStack(type, itemId, deityKey);
+        if (itemStack == null) {
+            // resolveItemStack will log the error
+            return null;
+        }
+
+        return new Offering(itemStack, favorValue, commands, chance);
+    }
+
+    private ItemStack resolveItemStack(String type, String itemId, String deityKey) {
+        if ("Saved".equalsIgnoreCase(type)) {
+            ItemStack itemStack = loadSavedItem(itemId);
+            if (itemStack == null) {
+                plugin.getLogger().warning("Saved item not found: " + itemId + " for deity: " + deityKey);
+            }
+            return itemStack;
+        } else {
+            Material material = Material.matchMaterial(itemId);
+            if (material != null) {
+                return new ItemStack(material);
+            } else {
+                plugin.getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + itemId);
+                return null;
+            }
+        }
     }
 
     public Map<String, Deity> reloadDeitiesConfig() {

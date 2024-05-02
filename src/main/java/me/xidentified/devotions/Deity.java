@@ -23,7 +23,7 @@ public class Deity {
     @Getter private final String lore;
     @Getter private final String alignment;
     private final String domain;
-    private final List<Offering> offerings;
+    @Getter private final List<Offering> offerings;
     private final List<String> rituals;
     private final List<Blessing> blessings;
     private final List<Curse> curses;
@@ -142,7 +142,7 @@ public class Deity {
     }
 
     // Return offerings as a well formatted list
-    public String getOfferings() {
+    public String getFormattedOfferings() {
         return offerings.stream()
                 .map(offering -> {
                     ItemStack itemStack = offering.getItemStack();

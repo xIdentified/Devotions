@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ShrineManager {
     @Getter private final Devotions plugin;
@@ -72,6 +73,12 @@ public class ShrineManager {
             }
         }
         return null;
+    }
+
+    public List<Shrine> getShrinesByOwner(UUID playerUUID) {
+        return allShrinesList.stream()
+                .filter(shrine -> shrine.getOwner().equals(playerUUID))
+                .collect(Collectors.toList());
     }
 
     private boolean isSameBlockLocation(Location loc1, Location loc2) {
