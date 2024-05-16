@@ -3,6 +3,7 @@ package me.xidentified.devotions.rituals;
 import org.bukkit.inventory.ItemStack;
 
 public class RitualItem {
+
     public final String type;
     public String id;
     public ItemStack itemStack;
@@ -27,8 +28,12 @@ public class RitualItem {
     // Ensure uniqueness and equivalence checks are accurate
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         RitualItem that = (RitualItem) obj;
         return type.equals(that.type) && id.equals(that.id);
     }

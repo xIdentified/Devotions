@@ -1,9 +1,12 @@
 package me.xidentified.devotions.commandexecutors;
 
 import de.cubbossa.tinytranslations.GlobalMessages;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -16,11 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final Devotions plugin;
@@ -29,7 +27,8 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            String[] args) {
         if (args.length == 0) {
             return false;
         }
@@ -37,20 +36,20 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         switch (args[0].toLowerCase()) {
             case "reload":
                 if (!sender.hasPermission("devotions.reload")) {
-                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    Devotions.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                     return true;
                 }
                 plugin.getDevotionsConfig().reloadConfigs();
-                plugin.sendMessage(sender, Messages.DEVOTION_RELOAD_SUCCESS);
+                Devotions.sendMessage(sender, Messages.DEVOTION_RELOAD_SUCCESS);
                 return true;
 
             case "saveitem":
                 if (!sender.hasPermission("devotions.admin")) {
-                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    Devotions.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                     return true;
                 }
                 if (!(sender instanceof Player player)) {
-                    plugin.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
+                    Devotions.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
                     return true;
                 }
                 if (args.length < 2) {
@@ -69,13 +68,13 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
 
             case "version":
                 if (!sender.hasPermission("devotions.admin")) {
-                    plugin.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
+                    Devotions.sendMessage(sender, GlobalMessages.NO_PERM_CMD);
                     return true;
                 }
                 displayVersionInfo(sender);
                 return true;
 
-                default:
+            default:
                 return false;
         }
     }
@@ -103,15 +102,15 @@ public class DevotionsCommandExecutor implements CommandExecutor, TabCompleter {
         String javaVersion = System.getProperty("java.version");
 
         // Displaying info
-        plugin.sendMessage(sender, Messages.VERSION_INFO.formatted(
-                Placeholder.unparsed("server-ver", serverVersion),
-                Placeholder.unparsed("plugin-ver", pluginVersion),
-                Placeholder.unparsed("java-ver", javaVersion)
-        ));
+        Devotions.sendMessage(sender, Messages.VERSION_INFO
+                .insertString("server-ver", serverVersion)
+                .insertString("plugin-ver", pluginVersion)
+                .insertString("java-ver", javaVersion));
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label,
+            String[] args) {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {

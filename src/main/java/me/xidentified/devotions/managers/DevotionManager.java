@@ -1,21 +1,23 @@
 package me.xidentified.devotions.managers;
 
+import static org.bukkit.Bukkit.getServer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.storage.model.DevotionData;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.bukkit.Bukkit.getServer;
-
 public class DevotionManager {
+
     private final Devotions plugin;
     private final StorageManager storage;
     private final Map<UUID, FavorManager> playerDevotions = new ConcurrentHashMap<>();
@@ -29,7 +31,9 @@ public class DevotionManager {
     }
 
     public Deity getDeityByName(String name) {
-        if (name == null || deities == null) return null;
+        if (name == null || deities == null) {
+            return null;
+        }
         return deities.get(name.toLowerCase());
     }
 
@@ -45,7 +49,9 @@ public class DevotionManager {
 
     public synchronized void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
         if (playerUUID == null || newDevotion == null) {
-            plugin.getLogger().warning("Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = " + newDevotion);
+            plugin.getLogger().warning(
+                    "Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = "
+                            + newDevotion);
             return;
         }
 
@@ -67,10 +73,10 @@ public class DevotionManager {
             storage.getStorage().savePlayerDevotion(playerUUID, newDevotion);
             plugin.playConfiguredSound(player, "deitySelected");
 
-            plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
-                    Placeholder.unparsed("name", deity.getName()),
-                    Formatter.number("favor", newDevotion.getFavor())
-            ));
+            Devotions.sendMessage(player, Messages.DEVOTION_SET
+                    .insertParsed("name", deity.getName())
+                    .insertNumber("favor", newDevotion.getFavor())
+            );
         } else {
             plugin.getLogger().warning("Tried to set devotion for a player that is not online: " + playerUUID);
         }

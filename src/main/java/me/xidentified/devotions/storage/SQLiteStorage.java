@@ -1,4 +1,16 @@
 package me.xidentified.devotions.storage;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -9,10 +21,8 @@ import me.xidentified.devotions.storage.model.IStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.sql.*;
-import java.util.*;
-
 public class SQLiteStorage implements IStorage {
+
     private Connection connection;
     private final Devotions plugin;
 
@@ -167,12 +177,14 @@ public class SQLiteStorage implements IStorage {
 
     private String serializeLocation(Location location) {
         // Serialize location to a string, "world,x,y,z"
-        return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+        return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + ","
+                + location.getBlockZ();
     }
 
     private Location parseLocation(String locationStr) {
         // Parse location from string
         String[] parts = locationStr.split(",");
-        return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]),
+                Integer.parseInt(parts[3]));
     }
 }

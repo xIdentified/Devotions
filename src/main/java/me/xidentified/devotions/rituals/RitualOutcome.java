@@ -1,11 +1,11 @@
 package me.xidentified.devotions.rituals;
 
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
 public class RitualOutcome {
+
     private final String type;
     private final List<String> commands;
 

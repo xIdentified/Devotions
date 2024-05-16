@@ -1,12 +1,20 @@
 package me.xidentified.devotions.listeners;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.xidentified.devotions.*;
-import me.xidentified.devotions.managers.*;
+import me.xidentified.devotions.Deity;
+import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.Offering;
+import me.xidentified.devotions.Shrine;
+import me.xidentified.devotions.managers.CooldownManager;
+import me.xidentified.devotions.managers.DevotionManager;
+import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,17 +31,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.util.Vector;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Objects;
-
 // Begins rituals or player's offerings
 public class ShrineListener implements Listener {
+
     private final Devotions plugin;
     private final DevotionManager devotionManager;
     private final ShrineManager shrineManager;
@@ -52,11 +55,16 @@ public class ShrineListener implements Listener {
         Block clickedBlock = event.getClickedBlock();
 
         // Return if player isn't right-clicking the shrine or interacting with their hand.
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || clickedBlock == null) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND
+                || clickedBlock == null) {
+            return;
+        }
 
         // Make sure valid shrine is at location
         Shrine shrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
-        if (shrine == null) return;
+        if (shrine == null) {
+            return;
+        }
 
         // Check config setting for shrine interaction
         boolean allPlayersCanInteract = plugin.getConfig().getBoolean("all-players-can-interact-with-shrines", true);
@@ -65,9 +73,8 @@ public class ShrineListener implements Listener {
         if (!allPlayersCanInteract) {
             Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
             if (!shrine.getDeity().equals(playerDeity)) {
-                plugin.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.formatted(
-                        Placeholder.unparsed("deity", shrine.getDeity().getName())
-                ));
+                Devotions.sendMessage(player,
+                        Messages.SHRINE_NOT_FOLLOWING_DEITY.insertParsed("deity", shrine.getDeity().getName()));
                 return;
             }
         }
@@ -89,7 +96,9 @@ public class ShrineListener implements Listener {
         }
 
         // Check if the player is holding a valid offering
-        Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());        plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
+        Offering offering = getOfferingForItem(itemInHand,
+                devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
+        plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
         plugin.debugLog("Checking for offering associated with item: " + itemInHand);
         if (offering != null) {
             try {
@@ -103,14 +112,18 @@ public class ShrineListener implements Listener {
         }
     }
 
-    private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem, PlayerInteractEvent event) {
+    private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem,
+            PlayerInteractEvent event) {
         long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
         if (remainingCooldown > 0) {
-            plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-            ));
+            Devotions.sendMessage(player, Messages.SHRINE_COOLDOWN
+                    .insertTemporal("cooldown",
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
+            );
             event.setCancelled(true);
-            if (droppedItem != null) droppedItem.remove();
+            if (droppedItem != null) {
+                droppedItem.remove();
+            }
             return;
         }
 
@@ -128,10 +141,13 @@ public class ShrineListener implements Listener {
     private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem) {
         long remainingCooldown = cooldownManager.isActionAllowed(player, "offering");
         if (remainingCooldown > 0) {
-            plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-            ));
-            if (droppedItem != null) droppedItem.remove();
+            Devotions.sendMessage(player, Messages.SHRINE_COOLDOWN
+                    .insertTemporal("cooldown",
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
+            );
+            if (droppedItem != null) {
+                droppedItem.remove();
+            }
             return;
         }
 
@@ -147,11 +163,13 @@ public class ShrineListener implements Listener {
             cooldownManager.setCooldown(player, "offering", offeringCooldown);
 
             takeItemInHand(player, itemInHand);
-            plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
+            Devotions.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 favorManager.adjustFavor(offering.getValue());
-                if (droppedItem != null) droppedItem.remove();
+                if (droppedItem != null) {
+                    droppedItem.remove();
+                }
                 plugin.playConfiguredSound(player, "offeringAccepted");
                 spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);
 
@@ -167,10 +185,12 @@ public class ShrineListener implements Listener {
                 }
             }, 100L);
         } else {
-            plugin.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED.formatted(
-                    Placeholder.unparsed("subject", playerDeity.getName())
-            ));
-            if (droppedItem != null) droppedItem.remove();
+            Devotions.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED
+                    .insertParsed("subject", playerDeity.getName())
+            );
+            if (droppedItem != null) {
+                droppedItem.remove();
+            }
         }
     }
 
@@ -188,14 +208,17 @@ public class ShrineListener implements Listener {
     private Offering getOfferingForItem(ItemStack item, Deity deity) {
         for (Offering offering : deity.getOfferings()) {
             if (matchesOffering(item, offering)) {
-                plugin.debugLog(String.format("Offering found for deity %s: %s", deity.getName(), offering.getItemStack().displayName()));
+                plugin.debugLog(String.format("Offering found for deity %s: %s", deity.getName(),
+                        offering.getItemStack().displayName()));
 
                 // Now consider the chance for offering acceptance
                 if (Math.random() <= offering.getChance()) {
                     return offering;
                 } else {
                     // Log that the offering was not accepted due to chance
-                    plugin.debugLog(String.format("Offering for deity %s was not accepted due to chance: %s", deity.getName(), offering));
+                    plugin.debugLog(
+                            String.format("Offering for deity %s was not accepted due to chance: %s", deity.getName(),
+                                    offering));
                     return null;
                 }
             }
@@ -211,7 +234,8 @@ public class ShrineListener implements Listener {
         }
 
         // If the offering is a potion, verify potion type
-        if (item.getType() == Material.POTION || item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION) {
+        if (item.getType() == Material.POTION || item.getType() == Material.SPLASH_POTION
+                || item.getType() == Material.LINGERING_POTION) {
             PotionMeta itemMeta = (PotionMeta) item.getItemMeta();
             PotionMeta offeringMeta = (PotionMeta) offering.getItemStack().getItemMeta();
 
@@ -266,7 +290,7 @@ public class ShrineListener implements Listener {
         Shrine shrine = shrineManager.getShrineAtLocation(block.getLocation());
         if (shrine != null) {
             event.setCancelled(true);
-            plugin.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
+            Devotions.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
         }
     }
 
