@@ -1,14 +1,15 @@
 package me.xidentified.devotions.storage;
 
+import java.io.File;
 import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.model.IStorage;
 
-import java.io.File;
-
 @Getter
 public class StorageManager {
-    @Getter private File storageFolder;
+
+    @Getter
+    private File storageFolder;
     private final Devotions plugin;
     private IStorage storage;
 

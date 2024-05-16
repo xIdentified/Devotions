@@ -7,18 +7,38 @@ import de.cubbossa.tinytranslations.TinyTranslations;
 import de.cubbossa.tinytranslations.libs.kyori.adventure.text.ComponentLike;
 import de.cubbossa.tinytranslations.storage.yml.YamlMessageStorage;
 import de.cubbossa.tinytranslations.storage.yml.YamlStyleStorage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import lombok.Getter;
-import me.xidentified.devotions.commandexecutors.*;
+import me.xidentified.devotions.commandexecutors.DeityCommand;
+import me.xidentified.devotions.commandexecutors.DevotionsCommandExecutor;
+import me.xidentified.devotions.commandexecutors.FavorCommand;
+import me.xidentified.devotions.commandexecutors.RitualCommand;
+import me.xidentified.devotions.commandexecutors.ShrineCommandExecutor;
+import me.xidentified.devotions.commandexecutors.TestMiracleCommand;
 import me.xidentified.devotions.listeners.PlayerListener;
 import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
-import me.xidentified.devotions.managers.*;
+import me.xidentified.devotions.managers.CooldownManager;
+import me.xidentified.devotions.managers.DevotionManager;
+import me.xidentified.devotions.managers.MeditationManager;
+import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Metrics;
 import me.xidentified.devotions.util.Placeholders;
-import net.kyori.adventure.identity.Identity;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -29,12 +49,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-import java.io.File;
-import java.util.*;
-
 @Getter
 public class Devotions extends JavaPlugin {
-    @Getter private static Devotions instance;
+
+    @Getter
+    private static Devotions instance;
     private final DevotionsConfig devotionsConfig = new DevotionsConfig(this);
     private DevotionManager devotionManager;
     private RitualManager ritualManager;
@@ -58,13 +77,12 @@ public class Devotions extends JavaPlugin {
 
         loadLanguages();
 
-
         String fallbackLocaleCode = getConfig().getString("default-locale", "en");
         Locale fallbackLocale = Locale.forLanguageTag(fallbackLocaleCode);
         translations.defaultLocale(fallbackLocale);
 
         // If PAPI is installed we'll register placeholders
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new Placeholders(this).register();
             debugLog("PlaceholderAPI expansion enabled!");
         }
@@ -93,9 +111,11 @@ public class Devotions extends JavaPlugin {
             Vector direction = particleLocation.toVector().subtract(location.toVector()).normalize().multiply(velocity);
 
             if (dustOptions != null) {
-                world.spawnParticle(particle, particleLocation, 0, direction.getX(), direction.getY(), direction.getZ(), 0, dustOptions);
+                world.spawnParticle(particle, particleLocation, 0, direction.getX(), direction.getY(), direction.getZ(),
+                        0, dustOptions);
             } else {
-                world.spawnParticle(particle, particleLocation, 0, direction.getX(), direction.getY(), direction.getZ(), 0);
+                world.spawnParticle(particle, particleLocation, 0, direction.getX(), direction.getY(), direction.getZ(),
+                        0);
             }
         }
     }
@@ -111,7 +131,8 @@ public class Devotions extends JavaPlugin {
             double z = center.getZ() + radius * Math.cos(angle);
             Location potentialLocation = new Location(world, x, center.getY(), z);
             Block block = potentialLocation.getBlock();
-            if (block.getType() == Material.AIR && block.getRelative(BlockFace.DOWN).getType().isSolid() && block.getRelative(BlockFace.UP).getType() == Material.AIR) {
+            if (block.getType() == Material.AIR && block.getRelative(BlockFace.DOWN).getType().isSolid()
+                    && block.getRelative(BlockFace.UP).getType() == Material.AIR) {
                 validLocations.add(potentialLocation);
             }
         }

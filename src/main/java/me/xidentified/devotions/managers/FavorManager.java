@@ -2,6 +2,10 @@ package me.xidentified.devotions.managers;
 
 import de.cubbossa.tinytranslations.libs.kyori.adventure.text.ComponentLike;
 import de.cubbossa.tinytranslations.libs.kyori.adventure.text.minimessage.tag.Tag;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.Deity;
@@ -11,19 +15,22 @@ import me.xidentified.devotions.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 // Point system for tracking favor with each deity
 public class FavorManager {
+
     // Basic details
-    @Getter private final Devotions plugin;
-    @Getter private final UUID uuid;
-    @Getter @Setter private Deity deity;
-    @Getter @Setter private int favor;
-    @Getter private final int maxFavor;
+    @Getter
+    private final Devotions plugin;
+    @Getter
+    private final UUID uuid;
+    @Getter
+    @Setter
+    private Deity deity;
+    @Getter
+    @Setter
+    private int favor;
+    @Getter
+    private final int maxFavor;
 
     // Blessing, curse, miracle thresholds and chances etc
     private final int BLESSING_THRESHOLD;
@@ -55,12 +62,15 @@ public class FavorManager {
         this.CURSE_CHANCE = plugin.getConfig().getDouble("curse-chance");
         this.MIRACLE_THRESHOLD = plugin.getConfig().getInt("miracle-threshold", 90);
         this.MIRACLE_CHANCE = plugin.getConfig().getDouble("miracle-chance");
-        this.MIRACLE_DURATION = plugin.getConfig().getInt("miracleDuration", 3) * 24000L; // 3 in-game days, 24000 ticks per day
-        long effectCheckInterval = plugin.getConfig().getLong("effect-interval", 1800) * 20L; // Convert seconds to ticks
+        this.MIRACLE_DURATION =
+                plugin.getConfig().getInt("miracleDuration", 3) * 24000L; // 3 in-game days, 24000 ticks per day
+        long effectCheckInterval =
+                plugin.getConfig().getLong("effect-interval", 1800) * 20L; // Convert seconds to ticks
 
         // Decay system variables
         this.decayRate = plugin.getConfig().getInt("decay-rate", 5);
-        this.decayInterval = plugin.getConfig().getLong("decay-interval", 1200) * 20L; // Default 1200 seconds (20 minutes) converted to ticks
+        this.decayInterval = plugin.getConfig().getLong("decay-interval", 1200)
+                * 20L; // Default 1200 seconds (20 minutes) converted to ticks
         this.lastDecayTime = System.currentTimeMillis();
 
         // Check for effects (Blessings, Curses, Miracles)
@@ -135,13 +145,13 @@ public class FavorManager {
                         .insertParsed("deity", deity.getName())
                         .insertString("favor", String.valueOf(this.favor))
                         .insertTag("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor)))
-                );
+                        );
             } else if (amount < 0) {
                 message = Messages.FAVOR_DECREASED
                         .insertParsed("deity", deity.getName())
                         .insertParsed("favor", String.valueOf(this.favor))
                         .insertTag("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor)))
-                );
+                        );
             } else {
                 // No change in favor
                 return;

@@ -1,19 +1,18 @@
 package me.xidentified.devotions.managers;
 
+import java.util.HashMap;
+import java.util.Map;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.MeditationData;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MeditationManager {
+
     private final Devotions plugin;
     private final Map<Player, MeditationData> meditationStartData = new HashMap<>();
     private final Map<Player, BukkitRunnable> meditationTimers = new HashMap<>();

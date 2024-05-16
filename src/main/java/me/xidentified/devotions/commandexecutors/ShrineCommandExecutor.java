@@ -2,6 +2,11 @@ package me.xidentified.devotions.commandexecutors;
 
 import de.cubbossa.tinytranslations.GlobalMessages;
 import de.cubbossa.tinytranslations.Message;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -9,8 +14,6 @@ import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -26,9 +29,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
 public class ShrineCommandExecutor implements CommandExecutor, Listener, TabCompleter {
+
     private final Map<Player, Deity> pendingShrineDesignations = new HashMap<>();
     private final Map<UUID, Boolean> pendingShrineRemovals = new HashMap<>();
     private final DevotionManager devotionManager;
@@ -40,7 +42,8 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            String[] args) {
         if (!(sender instanceof Player player)) {
             Devotions.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
             return true;
@@ -50,8 +53,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             if (args[0].equalsIgnoreCase("list")) {
                 displayShrineList(player);
                 return true;
-            }
-            else if (args[0].equalsIgnoreCase("remove")) {
+            } else if (args[0].equalsIgnoreCase("remove")) {
                 if (player.hasPermission("devotions.shrine.remove")) {
                     pendingShrineRemovals.put(player.getUniqueId(), true);
                     Devotions.sendMessage(player, Messages.SHRINE_RC_TO_REMOVE);
@@ -81,7 +83,8 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             // Fetch the deity directly from the player's FavorManager
             Deity deity = favorManager.getDeity();
             pendingShrineDesignations.put(player, deity);
-            Devotions.sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.insertParsed("deity", deity.getName()));
+            Devotions.sendMessage(player,
+                    Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.insertParsed("deity", deity.getName()));
             return true;
         } else {
             Devotions.sendMessage(player, Messages.SHRINE_NO_PERM_SET);
@@ -93,7 +96,9 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     @EventHandler
     public void onShrineDesignation(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
         if (pendingShrineDesignations.containsKey(player)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
@@ -121,7 +126,9 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
         UUID playerId = player.getUniqueId();
 
         // Check if the player has initiated the shrine removal process
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
         if (pendingShrineRemovals.containsKey(playerId)) {
             Block clickedBlock = event.getClickedBlock();
             if (clickedBlock != null) {
@@ -149,14 +156,14 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label,
+            String[] args) {
         List<String> completions = new ArrayList<>();
 
-        if (args.length >0 && sender.hasPermission("devotions.shrine.list")) {
+        if (args.length > 0 && sender.hasPermission("devotions.shrine.list")) {
             completions.add("list");
             completions.add("remove");
-        }
-        else if (args.length >0) {
+        } else if (args.length > 0) {
             completions.add("remove");
         }
 

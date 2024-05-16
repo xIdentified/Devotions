@@ -1,6 +1,7 @@
 package me.xidentified.devotions.effects;
 
 public abstract class Effect {
+
     private final String type;
     protected int duration;
     protected int potency;

@@ -1,5 +1,6 @@
 package me.xidentified.devotions.listeners;
 
+import java.util.List;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.MeditationManager;
 import me.xidentified.devotions.managers.RitualManager;
@@ -18,9 +19,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class RitualListener implements Listener {
+
     private final Devotions plugin;
     private final RitualManager ritualManager;
     private final ShrineManager shrineManager;
@@ -40,7 +40,8 @@ public class RitualListener implements Listener {
 
     public static RitualListener getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("RitualObjectiveListener has not been initialized. Call initialize() first.");
+            throw new IllegalStateException(
+                    "RitualObjectiveListener has not been initialized. Call initialize() first.");
         }
         return instance;
     }
@@ -97,7 +98,8 @@ public class RitualListener implements Listener {
     private boolean hasPlayerMoved(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        return to != null && (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ());
+        return to != null && (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY()
+                || from.getBlockZ() != to.getBlockZ());
     }
 
     @EventHandler
@@ -112,7 +114,8 @@ public class RitualListener implements Listener {
 
             List<RitualObjective> objectives = ritual.getObjectives();
             for (RitualObjective objective : objectives) {
-                if (objective.getType() == RitualObjective.Type.PURIFICATION && objective.getTarget().equals(event.getEntityType().name())) {
+                if (objective.getType() == RitualObjective.Type.PURIFICATION && objective.getTarget()
+                        .equals(event.getEntityType().name())) {
                     objective.incrementCount();
                     if (objective.isComplete()) {
                         plugin.debugLog("Objective complete for ritual " + ritual.getDisplayName());
@@ -138,7 +141,7 @@ public class RitualListener implements Listener {
         return ritual.getObjectives().stream().allMatch(RitualObjective::isComplete);
     }
 
-    private MeditationManager meditationManager(){
+    private MeditationManager meditationManager() {
         return plugin.getMeditationManager();
     }
 }

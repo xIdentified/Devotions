@@ -1,5 +1,9 @@
 package me.xidentified.devotions.commandexecutors;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Miracle;
 import me.xidentified.devotions.util.Messages;
@@ -10,12 +14,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 public class TestMiracleCommand implements CommandExecutor, TabCompleter {
+
     private final List<Miracle> miraclesList;
     private final Map<String, Miracle> miraclesMap;
 
@@ -25,7 +25,8 @@ public class TestMiracleCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            String[] args) {
         if (!(sender instanceof Player player) || !player.hasPermission("devotions.admin")) {
             return false;
         }
@@ -56,7 +57,8 @@ public class TestMiracleCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
+            String[] args) {
         if (!(sender instanceof Player) || !sender.hasPermission("devotions.admin")) {
             return Collections.emptyList();
         }

@@ -1,5 +1,11 @@
 package me.xidentified.devotions.managers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -7,15 +13,10 @@ import me.xidentified.devotions.storage.model.IStorage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 public class ShrineManager {
-    @Getter private final Devotions plugin;
+
+    @Getter
+    private final Devotions plugin;
     private IStorage storage;
     private final List<Shrine> allShrinesList;
     private final Map<Location, Shrine> shrines = new ConcurrentHashMap<>();
@@ -36,7 +37,8 @@ public class ShrineManager {
             this.allShrinesList.add(newShrine);
             this.shrines.put(newShrine.getLocation(), newShrine);
             storage.saveShrine(newShrine);
-            plugin.debugLog("New shrine added for " + newShrine.getDeity().getName() + " at " + newShrine.getLocation());
+            plugin.debugLog(
+                    "New shrine added for " + newShrine.getDeity().getName() + " at " + newShrine.getLocation());
         }
     }
 
@@ -60,6 +62,7 @@ public class ShrineManager {
         plugin.debugLog("Shrine removed for " + shrine.getDeity().getName() + " at " + shrine.getLocation());
         return true;
     }
+
     public List<Shrine> getAllShrines() {
         return this.allShrinesList;
     }
@@ -90,7 +93,8 @@ public class ShrineManager {
 
     public Location getShrineLocationForPlayer(Player player) {
         for (Location shrineLoc : shrines.keySet()) {
-            if (shrineLoc.getWorld().equals(player.getWorld()) && shrineLoc.distance(player.getLocation()) <= 5) { // Assuming 5 blocks is the radius
+            if (shrineLoc.getWorld().equals(player.getWorld())
+                    && shrineLoc.distance(player.getLocation()) <= 5) { // Assuming 5 blocks is the radius
                 return shrineLoc;
             }
         }

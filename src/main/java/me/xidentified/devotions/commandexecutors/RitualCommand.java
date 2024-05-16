@@ -1,12 +1,14 @@
 package me.xidentified.devotions.commandexecutors;
 
 import de.cubbossa.tinytranslations.GlobalMessages;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,12 +16,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class RitualCommand implements CommandExecutor, TabCompleter {
+
     private final Devotions plugin;
 
     public RitualCommand(Devotions plugin) {
@@ -27,7 +25,8 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            String[] args) {
         if (!(sender instanceof Player player)) {
             Devotions.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
             return true;
@@ -71,10 +70,10 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
 
     private void displayRitualInfo(Player player, Ritual ritual) {
         Devotions.sendMessage(player, Messages.RITUAL_INFO
-            .insertParsed("display-name", ritual.getDisplayName())
-            .insertParsed("description", ritual.getDescription())
-            .insertString("item-name", ritual.getParsedItemName())
-            .insertNumber("favour-amount", ritual.getFavorAmount())
+                .insertParsed("display-name", ritual.getDisplayName())
+                .insertParsed("description", ritual.getDescription())
+                .insertString("item-name", ritual.getParsedItemName())
+                .insertNumber("favour-amount", ritual.getFavorAmount())
         );
     }
 
@@ -97,7 +96,8 @@ public class RitualCommand implements CommandExecutor, TabCompleter {
 
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
+            String[] args) {
         List<String> suggestions = new ArrayList<>();
 
         if (args.length == 1) {

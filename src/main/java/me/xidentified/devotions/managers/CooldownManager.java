@@ -1,16 +1,16 @@
 package me.xidentified.devotions.managers;
 
-import me.xidentified.devotions.Devotions;
-import org.bukkit.entity.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import me.xidentified.devotions.Devotions;
+import org.bukkit.entity.Player;
 
 public class CooldownManager {
+
     private final Devotions plugin;
     private final Map<UUID, Map<String, Long>> playerCooldowns = new HashMap<>();
     private final Map<String, Long> cooldowns = new HashMap<>();
@@ -39,7 +39,8 @@ public class CooldownManager {
             return 0; // No cooldown defined for this action
         }
 
-        Map<String, Long> playerTimestamps = playerActionTimestamps.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
+        Map<String, Long> playerTimestamps = playerActionTimestamps.computeIfAbsent(player.getUniqueId(),
+                k -> new HashMap<>());
         Long nextAllowedActionTime = playerTimestamps.get(action);
 
         if (nextAllowedActionTime != null && currentTime < nextAllowedActionTime) {

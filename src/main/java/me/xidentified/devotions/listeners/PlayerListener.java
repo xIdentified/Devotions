@@ -1,5 +1,6 @@
 package me.xidentified.devotions.listeners;
 
+import java.util.UUID;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
@@ -12,9 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.UUID;
-
 public class PlayerListener implements Listener {
+
     private final Devotions plugin;
     private final StorageManager storageManager;
 
@@ -33,7 +33,8 @@ public class PlayerListener implements Listener {
         FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
 
         if (favorManager == null) {
-            DevotionData devotionData = storage.getPlayerDevotion(playerUniqueId); // Use the storage to get player devotion data
+            DevotionData devotionData = storage.getPlayerDevotion(
+                    playerUniqueId); // Use the storage to get player devotion data
 
             if (devotionData != null) {
                 Deity deity = devotionManager.getDeityByName(devotionData.getDeityName());
@@ -43,14 +44,16 @@ public class PlayerListener implements Listener {
                     devotionManager.setPlayerDevotion(playerUniqueId, favorManager);
                     plugin.getLogger().info("Devotion set for " + event.getPlayer().getName());
                 } else {
-                    plugin.getLogger().warning("Deity '" + devotionData.getDeityName() + "' not found for " + event.getPlayer().getName());
+                    plugin.getLogger().warning(
+                            "Deity '" + devotionData.getDeityName() + "' not found for " + event.getPlayer().getName());
                     // Optionally notify the player
                     event.getPlayer().sendMessage("Your devotion deity could not be found. Please select a new one.");
                 }
             } else {
                 plugin.getLogger().info("No devotion data found for " + event.getPlayer().getName());
                 // Optionally notify the player
-                event.getPlayer().sendMessage("You currently have no devotion. Use '/devotion select <deity>' to choose one.");
+                event.getPlayer()
+                        .sendMessage("You currently have no devotion. Use '/devotion select <deity>' to choose one.");
             }
         }
     }

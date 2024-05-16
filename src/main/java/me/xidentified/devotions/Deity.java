@@ -1,5 +1,9 @@
 package me.xidentified.devotions;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
@@ -7,31 +11,30 @@ import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 public class Deity {
+
     private final Devotions plugin;
     // Getter methods below
-    @Getter public final String name;
-    @Getter private final String lore;
-    @Getter private final String alignment;
+    @Getter
+    public final String name;
+    @Getter
+    private final String lore;
+    @Getter
+    private final String alignment;
     private final String domain;
-    @Getter private final List<Offering> offerings;
+    @Getter
+    private final List<Offering> offerings;
     private final List<String> rituals;
     private final List<Blessing> blessings;
     private final List<Curse> curses;
     private final List<Miracle> miracles;
 
     public Deity(Devotions plugin, String name, String lore, String domain, String alignment,
-                 List<Offering> offerings, List<String> rituals, List<Blessing> blessings,
-                 List<Curse> curses, List<Miracle> miracles) {
+            List<Offering> offerings, List<String> rituals, List<Blessing> blessings,
+            List<Curse> curses, List<Miracle> miracles) {
         this.plugin = plugin;
         this.name = name;
         this.lore = lore;
@@ -44,10 +47,14 @@ public class Deity {
         this.miracles = miracles;
     }
 
-    private CooldownManager cooldownManager() {return plugin.getCooldownManager();}
+    private CooldownManager cooldownManager() {
+        return plugin.getCooldownManager();
+    }
 
     public void applyBlessing(Player player, Deity deity) {
-        if (blessings.isEmpty()) return;
+        if (blessings.isEmpty()) {
+            return;
+        }
 
         long remainingCooldown = cooldownManager().isActionAllowed(player, "blessing");
         if (remainingCooldown <= 0) {
@@ -66,14 +73,16 @@ public class Deity {
             // Provide feedback
             plugin.debugLog("Blessing applied to player " + player.getName());
             Devotions.sendMessage(player, Messages.DEITY_BLESSED
-                .insertString("deity", deity.getName())
-                .insertString("blessing", blessing.getName())
+                    .insertString("deity", deity.getName())
+                    .insertString("blessing", blessing.getName())
             );
         }
     }
 
     public void applyCurse(Player player, Deity deity) {
-        if (curses.isEmpty()) return;
+        if (curses.isEmpty()) {
+            return;
+        }
 
         long remainingCooldown = cooldownManager().isActionAllowed(player, "curse");
         if (remainingCooldown <= 0) {
@@ -92,14 +101,16 @@ public class Deity {
             // Provide feedback
             plugin.debugLog("Curse applied to player " + player.getName());
             Devotions.sendMessage(player, Messages.DEITY_CURSED
-                .insertParsed("deity", deity.getName())
-                .insertParsed("curse", curse.getName())
+                    .insertParsed("deity", deity.getName())
+                    .insertParsed("curse", curse.getName())
             );
         }
     }
 
     public void applyMiracle(Player player) {
-        if (miracles.isEmpty()) return;
+        if (miracles.isEmpty()) {
+            return;
+        }
 
         Miracle selectedMiracle = selectMiracleForPlayer(player);
         if (selectedMiracle != null) {
@@ -161,7 +172,9 @@ public class Deity {
                     // Retrieve the ritual using the configuration name (ritualKey)
                     Ritual ritual = RitualManager.getInstance(plugin).getRitualByKey(ritualKey);
                     // Debug log to check if ritual is not null and what getDisplayName returns
-                    plugin.debugLog("Ritual Key: " + ritualKey + ", Ritual Found: " + (ritual != null) + ", Display Name: " + (ritual != null ? ritual.getDisplayName() : "N/A"));
+                    plugin.debugLog(
+                            "Ritual Key: " + ritualKey + ", Ritual Found: " + (ritual != null) + ", Display Name: " + (
+                                    ritual != null ? ritual.getDisplayName() : "N/A"));
                     // Return the display name if the ritual is found, otherwise return the key itself
                     return ritual != null ? ritual.getDisplayName() : ritualKey;
                 })

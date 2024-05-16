@@ -1,5 +1,6 @@
 package me.xidentified.devotions.rituals;
 
+import java.util.List;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Devotions;
@@ -7,15 +8,13 @@ import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.JavaScriptEngine;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
 @Getter
 public class Ritual {
+
     public boolean isCompleted = false;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
@@ -28,8 +27,9 @@ public class Ritual {
     private final RitualOutcome outcome;
     private final List<RitualObjective> objectives;
 
-    public Ritual(Devotions plugin, String key, String displayName, String description, RitualItem item, int favorAmount,
-                  RitualConditions conditions, RitualOutcome outcome, List<RitualObjective> objectives) {
+    public Ritual(Devotions plugin, String key, String displayName, String description, RitualItem item,
+            int favorAmount,
+            RitualConditions conditions, RitualOutcome outcome, List<RitualObjective> objectives) {
         this.plugin = plugin;
         this.devotionManager = plugin.getDevotionManager();
         this.key = key;
@@ -74,7 +74,8 @@ public class Ritual {
         // Biome condition
         if (conditions.biome() != null) {
             String currentBiome = player.getLocation().getBlock().getBiome().toString();
-            plugin.debugLog("Checking biome condition. Current biome: " + currentBiome + ", Required: " + conditions.biome());
+            plugin.debugLog(
+                    "Checking biome condition. Current biome: " + currentBiome + ", Required: " + conditions.biome());
             if (!currentBiome.equalsIgnoreCase(conditions.biome())) {
                 plugin.debugLog("Biome condition failed.");
                 return false;
@@ -84,7 +85,8 @@ public class Ritual {
         // Weather condition
         if (conditions.weather() != null) {
             boolean isRaining = player.getWorld().hasStorm();
-            plugin.debugLog("Checking weather condition. Is raining: " + isRaining + ", Required: " + conditions.weather());
+            plugin.debugLog(
+                    "Checking weather condition. Is raining: " + isRaining + ", Required: " + conditions.weather());
             if (("RAIN".equalsIgnoreCase(conditions.weather()) && !isRaining) ||
                     ("CLEAR".equalsIgnoreCase(conditions.weather()) && isRaining)) {
                 plugin.debugLog("Weather condition failed.");
@@ -95,7 +97,8 @@ public class Ritual {
         // Moon phase condition
         if (conditions.moonPhase() != null) {
             long moonPhase = player.getWorld().getFullTime() / 24000L % 8;
-            plugin.debugLog("Checking moon phase condition. Current phase: " + moonPhase + ", Required: " + conditions.moonPhase());
+            plugin.debugLog("Checking moon phase condition. Current phase: " + moonPhase + ", Required: "
+                    + conditions.moonPhase());
             if (moonPhase != conditions.getMoonPhaseNumber(conditions.moonPhase())) {
                 plugin.debugLog("Moon phase condition failed.");
                 return false;
@@ -105,7 +108,8 @@ public class Ritual {
         // Altitude condition
         if (conditions.minAltitude() != 0.0) {
             double altitude = player.getLocation().getY();
-            plugin.debugLog("Checking altitude condition. Current altitude: " + altitude + ", Minimum required: " + conditions.minAltitude());
+            plugin.debugLog("Checking altitude condition. Current altitude: " + altitude + ", Minimum required: "
+                    + conditions.minAltitude());
             if (altitude < conditions.minAltitude()) {
                 plugin.debugLog("Altitude condition failed.");
                 return false;
@@ -115,7 +119,8 @@ public class Ritual {
         // Experience condition
         if (conditions.minExperience() != 0) {
             int experience = player.getTotalExperience();
-            plugin.debugLog("Checking experience condition. Current experience: " + experience + ", Minimum required: " + conditions.minExperience());
+            plugin.debugLog("Checking experience condition. Current experience: " + experience + ", Minimum required: "
+                    + conditions.minExperience());
             if (experience < conditions.minExperience()) {
                 plugin.debugLog("Experience condition failed.");
                 return false;
@@ -125,7 +130,8 @@ public class Ritual {
         // Health condition
         if (conditions.minHealth() != 0.0) {
             double health = player.getHealth();
-            plugin.debugLog("Checking health condition. Current health: " + health + ", Minimum required: " + conditions.minHealth());
+            plugin.debugLog("Checking health condition. Current health: " + health + ", Minimum required: "
+                    + conditions.minHealth());
             if (health < conditions.minHealth()) {
                 plugin.debugLog("Health condition failed.");
                 return false;
@@ -135,7 +141,8 @@ public class Ritual {
         // Hunger condition
         if (conditions.minHunger() != 0) {
             int hunger = player.getFoodLevel();
-            plugin.debugLog("Checking hunger condition. Current hunger: " + hunger + ", Minimum required: " + conditions.minHunger());
+            plugin.debugLog("Checking hunger condition. Current hunger: " + hunger + ", Minimum required: "
+                    + conditions.minHunger());
             if (hunger < conditions.minHunger()) {
                 plugin.debugLog("Hunger condition failed.");
                 return false;

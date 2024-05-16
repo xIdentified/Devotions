@@ -1,6 +1,7 @@
 package me.xidentified.devotions.rituals;
 
-public record RitualConditions(String expression, String time, String biome, String weather, String moonPhase, Double minAltitude,
+public record RitualConditions(String expression, String time, String biome, String weather, String moonPhase,
+                               Double minAltitude,
                                Integer minExperience, Double minHealth, Integer minHunger) {
 
     public long getMoonPhaseNumber(String moonPhase) {
