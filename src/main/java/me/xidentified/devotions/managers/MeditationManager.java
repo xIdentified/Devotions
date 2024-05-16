@@ -52,7 +52,7 @@ public class MeditationManager {
         objective.setCurrentCount(objective.getCount());
         if (objective.isComplete()) {
             plugin.debugLog("[DEBUG] Meditation objective complete for player: " + player.getName());
-            plugin.sendMessage(player, Messages.MEDITATION_COMPLETE);
+            Devotions.sendMessage(player, Messages.MEDITATION_COMPLETE);
             plugin.getRitualManager().completeRitual(player, ritual, this);
         }
         clearMeditationData(player);
@@ -65,7 +65,7 @@ public class MeditationManager {
             // Smite the player as a warning
             if (moveCount == 1) {
                 player.getWorld().strikeLightningEffect(player.getLocation());
-                plugin.sendMessage(player, Messages.MEDITATION_PENALTY);
+                Devotions.sendMessage(player, Messages.MEDITATION_PENALTY);
             }
 
             // Cancel the ritual if they keep moving
@@ -73,9 +73,7 @@ public class MeditationManager {
                 String ritualName = plugin.getRitualManager().getCurrentRitualForPlayer(player).getDisplayName();
                 cancelMeditationTimer(player);
                 clearMeditationData(player);
-                plugin.sendMessage(player, Messages.RITUAL_CANCELLED.formatted(
-                        Placeholder.unparsed("ritual", ritualName)
-                ));
+                Devotions.sendMessage(player, Messages.RITUAL_CANCELLED.insertParsed("ritual", ritualName));
                 plugin.getRitualManager().cancelRitualFor(player);
             }
         }

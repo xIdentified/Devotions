@@ -157,7 +157,7 @@ class ReviveOnDeath implements MiracleEffect {
         @Nullable AttributeInstance maxHealth = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH));
         if (maxHealth != null) {
             player.setHealth(maxHealth.getValue());
-            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
+            Devotions.sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
         }
     }
 }
@@ -166,7 +166,7 @@ class HeroEffectInVillage implements MiracleEffect {
     @Override
     public void execute(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 6000, 1)); // 5 minutes of Hero of the Village effect
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HERO_OF_VILLAGE);
+        Devotions.sendMessage(player, Messages.MIRACLE_HERO_OF_VILLAGE);
     }
 }
 
@@ -174,7 +174,7 @@ class SaveFromBurning implements MiracleEffect {
     @Override
     public void execute(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 300, 1));
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_FIRE_RESISTANCE);
+        Devotions.sendMessage(player, Messages.MIRACLE_FIRE_RESISTANCE);
     }
 }
 
@@ -193,7 +193,7 @@ class RepairAllItems implements MiracleEffect {
                 }
             }
         }
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_REPAIR);
+        Devotions.sendMessage(player, Messages.MIRACLE_REPAIR);
     }
 }
 
@@ -227,7 +227,7 @@ class SummonAidEffect implements MiracleEffect {
                 wolf.setTamed(true);
             }
         }
-        Devotions.getInstance().sendMessage(player, message);
+        Devotions.sendMessage(player, message);
     }
 }
 
@@ -241,7 +241,7 @@ class ExecuteCommandEffect implements MiracleEffect {
     @Override
     public void execute(Player player) {
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_BESTOWED);
+        Devotions.sendMessage(player, Messages.MIRACLE_BESTOWED);
     }
 }
 
@@ -260,7 +260,7 @@ class DoubleCropDropsEffect implements MiracleEffect, Listener {
     public void execute(Player player) {
         playersWithEffect.add(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(plugin, () -> playersWithEffect.remove(player.getUniqueId()), duration);
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HARVEST);
+        Devotions.sendMessage(player, Messages.MIRACLE_HARVEST);
     }
 
     @EventHandler

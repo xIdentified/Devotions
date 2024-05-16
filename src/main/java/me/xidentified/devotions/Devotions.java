@@ -1,11 +1,12 @@
 package me.xidentified.devotions;
 
+import de.cubbossa.tinytranslations.BukkitTinyTranslations;
 import de.cubbossa.tinytranslations.Message;
-import de.cubbossa.tinytranslations.TinyTranslationsBukkit;
-import de.cubbossa.tinytranslations.Translator;
+import de.cubbossa.tinytranslations.MessageTranslator;
 import de.cubbossa.tinytranslations.TinyTranslations;
-import de.cubbossa.tinytranslations.persistent.YamlMessageStorage;
-import de.cubbossa.tinytranslations.persistent.YamlStyleStorage;
+import de.cubbossa.tinytranslations.libs.kyori.adventure.text.ComponentLike;
+import de.cubbossa.tinytranslations.storage.yml.YamlMessageStorage;
+import de.cubbossa.tinytranslations.storage.yml.YamlStyleStorage;
 import lombok.Getter;
 import me.xidentified.devotions.commandexecutors.*;
 import me.xidentified.devotions.listeners.PlayerListener;
@@ -17,7 +18,6 @@ import me.xidentified.devotions.util.Messages;
 import me.xidentified.devotions.util.Metrics;
 import me.xidentified.devotions.util.Placeholders;
 import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -42,7 +42,7 @@ public class Devotions extends JavaPlugin {
     private MeditationManager meditationManager;
     private ShrineListener shrineListener;
     private StorageManager storageManager;
-    private Translator translations;
+    private MessageTranslator translations;
 
     @Override
     public void onEnable() {
@@ -51,27 +51,17 @@ public class Devotions extends JavaPlugin {
         devotionsConfig.loadSoundsConfig();
         devotionsConfig.reloadSavedItemsConfig();
 
-        TinyTranslationsBukkit.enable(this);
-        translations = TinyTranslationsBukkit.application(this);
+        translations = BukkitTinyTranslations.application(this);
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
         translations.setStyleStorage(new YamlStyleStorage(new File(getDataFolder(), "/lang/styles.yml")));
         translations.addMessages(TinyTranslations.messageFieldsFromClass(Messages.class));
 
         loadLanguages();
 
-        // Set the LocaleProvider
-        translations.setLocaleProvider(audience -> {
-            // Read settings from config
-            boolean usePlayerClientLocale = getConfig().getBoolean("use-player-client-locale", true);
-            String fallbackLocaleCode = getConfig().getString("default-locale", "en");
-            Locale fallbackLocale = Locale.forLanguageTag(fallbackLocaleCode);
 
-            if (audience == null || !usePlayerClientLocale) {
-                return fallbackLocale;
-            }
-
-            return audience.getOrDefault(Identity.LOCALE, fallbackLocale);
-        });
+        String fallbackLocaleCode = getConfig().getString("default-locale", "en");
+        Locale fallbackLocale = Locale.forLanguageTag(fallbackLocaleCode);
+        translations.defaultLocale(fallbackLocale);
 
         // If PAPI is installed we'll register placeholders
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -255,12 +245,11 @@ public class Devotions extends JavaPlugin {
         }
     }
 
-    public void sendMessage(CommandSender sender, ComponentLike componentLike) {
+    public static void sendMessage(CommandSender sender, ComponentLike componentLike) {
         if (componentLike instanceof Message msg) {
-            // Translate the message into the locale of the command sender
-            componentLike = translations.process(msg, TinyTranslationsBukkit.getLocale(sender));
+            componentLike = Devotions.instance.translations.translate(msg);
         }
-        TinyTranslationsBukkit.sendMessage(sender, componentLike);
+        BukkitTinyTranslations.sendMessageIfNotEmpty(sender, componentLike);
     }
 
 }

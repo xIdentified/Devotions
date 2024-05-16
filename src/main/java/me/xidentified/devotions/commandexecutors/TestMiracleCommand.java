@@ -31,12 +31,12 @@ public class TestMiracleCommand implements CommandExecutor, TabCompleter {
         }
 
         if (miraclesList.isEmpty()) {
-            Devotions.getInstance().sendMessage(sender, Messages.MIRACLE_CMD_NO_MIRACLES);
+            Devotions.sendMessage(sender, Messages.MIRACLE_CMD_NO_MIRACLES);
             return true;
         }
 
         if (args.length != 1) {
-            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_CMD_USAGE);
+            Devotions.sendMessage(player, Messages.MIRACLE_CMD_USAGE);
             return true;
         }
 
@@ -50,7 +50,7 @@ public class TestMiracleCommand implements CommandExecutor, TabCompleter {
             miracle.apply(player);
 
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_CMD_UNKNOWN_MIRACLE);
+            Devotions.sendMessage(player, Messages.MIRACLE_CMD_UNKNOWN_MIRACLE);
         }
         return true;
     }

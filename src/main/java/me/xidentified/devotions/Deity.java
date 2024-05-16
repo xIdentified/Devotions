@@ -65,10 +65,10 @@ public class Deity {
 
             // Provide feedback
             plugin.debugLog("Blessing applied to player " + player.getName());
-            plugin.sendMessage(player, Messages.DEITY_BLESSED.formatted(
-                Placeholder.unparsed("deity", deity.getName()),
-                Placeholder.unparsed("blessing", blessing.getName())
-            ));
+            Devotions.sendMessage(player, Messages.DEITY_BLESSED
+                .insertString("deity", deity.getName())
+                .insertString("blessing", blessing.getName())
+            );
         }
     }
 
@@ -91,10 +91,10 @@ public class Deity {
 
             // Provide feedback
             plugin.debugLog("Curse applied to player " + player.getName());
-            plugin.sendMessage(player, Messages.DEITY_CURSED.formatted(
-                Placeholder.unparsed("deity", deity.getName()),
-                Placeholder.unparsed("curse", curse.getName())
-            ));
+            Devotions.sendMessage(player, Messages.DEITY_CURSED
+                .insertParsed("deity", deity.getName())
+                .insertParsed("curse", curse.getName())
+            );
         }
     }
 

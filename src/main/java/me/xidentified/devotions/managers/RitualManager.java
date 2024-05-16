@@ -72,9 +72,7 @@ public class RitualManager {
         Deity playerDeity = favorManager != null ? favorManager.getDeity() : null;
         if (playerDeity == null || !playerDeity.getRitualKeys().contains(ritual.getKey())) {
             plugin.debugLog("Ritual not allowed by chosen deity");
-            plugin.sendMessage(player, Messages.RITUAL_WRONG_DEITY.formatted(
-                    Placeholder.unparsed("ritual", ritual.getDisplayName())
-            ));
+            Devotions.sendMessage(player, Messages.RITUAL_WRONG_DEITY.insertParsed("ritual", ritual.getDisplayName()));
             return false;
         }
 
@@ -100,7 +98,7 @@ public class RitualManager {
                     if (objective.getType() == RitualObjective.Type.MEDITATION) {
                         plugin.getMeditationManager().startMeditation(player, ritual, objective);
                     }
-                    plugin.sendMessage(player, plugin.getTranslations().process(objective.getDescription()));
+                    Devotions.sendMessage(player, plugin.getTranslations().translate(objective.getDescription()));
                 }
             }
 

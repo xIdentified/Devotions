@@ -1,15 +1,13 @@
 package me.xidentified.devotions.managers;
 
+import de.cubbossa.tinytranslations.libs.kyori.adventure.text.ComponentLike;
+import de.cubbossa.tinytranslations.libs.kyori.adventure.text.minimessage.tag.Tag;
 import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.util.FavorUtils;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -133,16 +131,16 @@ public class FavorManager {
         if (player != null && player.isOnline() && deity != null) {
             ComponentLike message;
             if (amount > 0) {
-                message = Messages.FAVOR_INCREASED.formatted(
-                        Placeholder.unparsed("deity", deity.getName()),
-                        Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                        TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
+                message = Messages.FAVOR_INCREASED
+                        .insertParsed("deity", deity.getName())
+                        .insertString("favor", String.valueOf(this.favor))
+                        .insertTag("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor)))
                 );
             } else if (amount < 0) {
-                message = Messages.FAVOR_DECREASED.formatted(
-                        Placeholder.unparsed("deity", deity.getName()),
-                        Placeholder.unparsed("favor", String.valueOf(this.favor)),
-                        TagResolver.resolver("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))))
+                message = Messages.FAVOR_DECREASED
+                        .insertParsed("deity", deity.getName())
+                        .insertParsed("favor", String.valueOf(this.favor))
+                        .insertTag("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor)))
                 );
             } else {
                 // No change in favor
@@ -150,7 +148,7 @@ public class FavorManager {
             }
 
             if (!plugin.getDevotionsConfig().isHideFavorMessages()) {
-                plugin.sendMessage(player, message);
+                Devotions.sendMessage(player, message);
             }
         }
 

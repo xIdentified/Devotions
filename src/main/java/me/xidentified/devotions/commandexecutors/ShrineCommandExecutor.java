@@ -42,7 +42,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            Devotions.getInstance().sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
+            Devotions.sendMessage(sender, GlobalMessages.CMD_PLAYER_ONLY);
             return true;
         }
 
@@ -54,10 +54,10 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             else if (args[0].equalsIgnoreCase("remove")) {
                 if (player.hasPermission("devotions.shrine.remove")) {
                     pendingShrineRemovals.put(player.getUniqueId(), true);
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_RC_TO_REMOVE);
+                    Devotions.sendMessage(player, Messages.SHRINE_RC_TO_REMOVE);
                     //Bukkit.getLogger().log(Level.WARNING, "Current pendingShrineRemovals map: " + pendingShrineRemovals);
                 } else {
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_REMOVE);
+                    Devotions.sendMessage(player, Messages.SHRINE_NO_PERM_REMOVE);
                 }
                 return true;
             }
@@ -66,9 +66,7 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             int shrineLimit = shrineManager.getPlugin().getDevotionsConfig().getShrineLimit();
 
             if (currentShrineCount >= shrineLimit) {
-                Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIMIT_REACHED.formatted(
-                    Formatter.number("limit", shrineLimit)
-                ));
+                Devotions.sendMessage(player, Messages.SHRINE_LIMIT_REACHED.insertNumber("limit", shrineLimit));
                 return true;
             }
 
@@ -76,19 +74,17 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
             FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
 
             if (favorManager == null || favorManager.getDeity() == null) {
-                Devotions.getInstance().sendMessage(player, Messages.SHRINE_FOLLOW_DEITY_TO_DESIGNATE);
+                Devotions.sendMessage(player, Messages.SHRINE_FOLLOW_DEITY_TO_DESIGNATE);
                 return true;
             }
 
             // Fetch the deity directly from the player's FavorManager
             Deity deity = favorManager.getDeity();
             pendingShrineDesignations.put(player, deity);
-            Devotions.getInstance().sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.formatted(
-                Placeholder.unparsed("deity", deity.getName())
-            ));
+            Devotions.sendMessage(player, Messages.SHRINE_CLICK_BLOCK_TO_DESIGNATE.insertParsed("deity", deity.getName()));
             return true;
         } else {
-            Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_PERM_SET);
+            Devotions.sendMessage(player, Messages.SHRINE_NO_PERM_SET);
             return false;
         }
         return false;
@@ -104,18 +100,16 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                 Shrine existingShrine = shrineManager.getShrineAtLocation(clickedBlock.getLocation());
                 if (existingShrine != null) {
                     // Inform the player that a shrine already exists at this location
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_ALREADY_EXISTS.formatted(
-                            Placeholder.unparsed("deity", existingShrine.getDeity().getName()),
-                            Placeholder.unparsed("location", clickedBlock.getLocation().toString())
-                    ));
+                    Devotions.sendMessage(player, Messages.SHRINE_ALREADY_EXISTS
+                            .insertParsed("deity", existingShrine.getDeity().getName())
+                            .insertString("location", clickedBlock.getLocation().toString())
+                    );
                 } else {
                     Deity deity = pendingShrineDesignations.remove(player);
                     // Store the clickedBlock location, deity, and player as a designated shrine
                     Shrine newShrine = new Shrine(clickedBlock.getLocation(), deity, player.getUniqueId());
                     shrineManager.addShrine(newShrine);
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_SUCCESS.formatted(
-                            Placeholder.unparsed("deity", deity.getName())
-                    ));
+                    Devotions.sendMessage(player, Messages.SHRINE_SUCCESS.insertParsed("deity", deity.getName()));
                 }
             }
         }
@@ -138,15 +132,15 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
                     if (canRemove) {
                         boolean removed = shrineManager.removeShrine(playerId, location);
                         if (removed) {
-                            Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVED);
+                            Devotions.sendMessage(player, Messages.SHRINE_REMOVED);
                         } else {
-                            Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
+                            Devotions.sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
                         }
                     } else {
-                        Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
+                        Devotions.sendMessage(player, Messages.SHRINE_REMOVE_FAIL);
                     }
                 } else {
-                    Devotions.getInstance().sendMessage(player, Messages.SHRINE_REMOVE_NOT_FOUND);
+                    Devotions.sendMessage(player, Messages.SHRINE_REMOVE_NOT_FOUND);
                 }
                 pendingShrineRemovals.remove(playerId);
                 event.setCancelled(true);
@@ -180,20 +174,20 @@ public class ShrineCommandExecutor implements CommandExecutor, Listener, TabComp
         }
 
         if (shrines.isEmpty()) {
-            Devotions.getInstance().sendMessage(player, Messages.SHRINE_NO_DESIGNATED_SHRINE);
+            Devotions.sendMessage(player, Messages.SHRINE_NO_DESIGNATED_SHRINE);
             return;
         }
 
-        Devotions.getInstance().sendMessage(player, Messages.SHRINE_LIST);
+        Devotions.sendMessage(player, Messages.SHRINE_LIST);
         for (Shrine shrine : shrines) {
             Location loc = shrine.getLocation();
             Message message = isAdmin ? Messages.SHRINE_INFO_ADMIN : Messages.SHRINE_INFO_PLAYER;
-            Devotions.getInstance().sendMessage(player, message.formatted(
-                    Placeholder.unparsed("deity", shrine.getDeity().getName()),
-                    Formatter.number("x", loc.getBlockX()),
-                    Formatter.number("y", loc.getBlockY()),
-                    Formatter.number("z", loc.getBlockZ())
-            ));
+            Devotions.sendMessage(player, message
+                    .insertParsed("deity", shrine.getDeity().getName())
+                    .insertNumber("x", loc.getBlockX())
+                    .insertNumber("y", loc.getBlockY())
+                    .insertNumber("z", loc.getBlockZ())
+            );
         }
     }
 

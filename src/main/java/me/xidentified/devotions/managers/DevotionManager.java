@@ -67,10 +67,10 @@ public class DevotionManager {
             storage.getStorage().savePlayerDevotion(playerUUID, newDevotion);
             plugin.playConfiguredSound(player, "deitySelected");
 
-            plugin.sendMessage(player, Messages.DEVOTION_SET.formatted(
-                    Placeholder.unparsed("name", deity.getName()),
-                    Formatter.number("favor", newDevotion.getFavor())
-            ));
+            Devotions.sendMessage(player, Messages.DEVOTION_SET
+                    .insertParsed("name", deity.getName())
+                    .insertNumber("favor", newDevotion.getFavor())
+            );
         } else {
             plugin.getLogger().warning("Tried to set devotion for a player that is not online: " + playerUUID);
         }

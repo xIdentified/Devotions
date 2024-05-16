@@ -153,19 +153,19 @@ public class Ritual {
             case "START" -> {
                 plugin.playConfiguredSound(player, "ritualStarted");
                 plugin.spawnParticles(location, Particle.ENCHANTMENT_TABLE, 50, 2.0, 0.5);
-                plugin.sendMessage(player, Messages.RITUAL_START.formatted(Placeholder.unparsed("ritual", displayName)));
+                Devotions.sendMessage(player, Messages.RITUAL_START.insertParsed("ritual", displayName));
             }
             case "SUCCESS" -> {
                 plugin.playConfiguredSound(player, "ritualComplete");
                 plugin.spawnParticles(location, Particle.VILLAGER_HAPPY, 50, 2.0, 0.5);
-                plugin.sendMessage(player, Messages.RITUAL_SUCCESS.formatted(Placeholder.unparsed("ritual", displayName)));
+                Devotions.sendMessage(player, Messages.RITUAL_SUCCESS.insertParsed("ritual", displayName));
                 favorManager.adjustFavor(favorAmount);
             }
             case "FAILURE" -> {
                 plugin.playConfiguredSound(player, "ritualFailed");
                 plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
                 player.damage(5);
-                plugin.sendMessage(player, Messages.RITUAL_FAILURE.formatted(Placeholder.unparsed("ritual", displayName)));
+                Devotions.sendMessage(player, Messages.RITUAL_FAILURE.insertParsed("ritual", displayName));
                 favorManager.adjustFavor(-15); // TODO: Make this a certain percent of the favorAmount maybe??
             }
         }

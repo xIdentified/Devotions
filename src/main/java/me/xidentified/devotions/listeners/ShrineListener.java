@@ -65,9 +65,7 @@ public class ShrineListener implements Listener {
         if (!allPlayersCanInteract) {
             Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
             if (!shrine.getDeity().equals(playerDeity)) {
-                plugin.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.formatted(
-                        Placeholder.unparsed("deity", shrine.getDeity().getName())
-                ));
+                Devotions.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.insertParsed("deity", shrine.getDeity().getName()));
                 return;
             }
         }
@@ -106,9 +104,9 @@ public class ShrineListener implements Listener {
     private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem, PlayerInteractEvent event) {
         long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
         if (remainingCooldown > 0) {
-            plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-            ));
+            Devotions.sendMessage(player, Messages.SHRINE_COOLDOWN
+                    .insertTemporal("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
+            );
             event.setCancelled(true);
             if (droppedItem != null) droppedItem.remove();
             return;
@@ -128,9 +126,9 @@ public class ShrineListener implements Listener {
     private void handleOfferingInteraction(Player player, Block clickedBlock, ItemStack itemInHand, Item droppedItem) {
         long remainingCooldown = cooldownManager.isActionAllowed(player, "offering");
         if (remainingCooldown > 0) {
-            plugin.sendMessage(player, Messages.SHRINE_COOLDOWN.formatted(
-                    Formatter.date("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
-            ));
+            Devotions.sendMessage(player, Messages.SHRINE_COOLDOWN
+                    .insertTemporal("cooldown", LocalDateTime.ofInstant(Instant.ofEpochMilli(remainingCooldown), ZoneId.systemDefault()))
+            );
             if (droppedItem != null) droppedItem.remove();
             return;
         }
@@ -147,7 +145,7 @@ public class ShrineListener implements Listener {
             cooldownManager.setCooldown(player, "offering", offeringCooldown);
 
             takeItemInHand(player, itemInHand);
-            plugin.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
+            Devotions.sendMessage(player, Messages.SHRINE_OFFERING_ACCEPTED);
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 favorManager.adjustFavor(offering.getValue());
@@ -167,9 +165,9 @@ public class ShrineListener implements Listener {
                 }
             }, 100L);
         } else {
-            plugin.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED.formatted(
-                    Placeholder.unparsed("subject", playerDeity.getName())
-            ));
+            Devotions.sendMessage(player, Messages.SHRINE_OFFERING_DECLINED
+                    .insertParsed("subject", playerDeity.getName())
+            );
             if (droppedItem != null) droppedItem.remove();
         }
     }
@@ -266,7 +264,7 @@ public class ShrineListener implements Listener {
         Shrine shrine = shrineManager.getShrineAtLocation(block.getLocation());
         if (shrine != null) {
             event.setCancelled(true);
-            plugin.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
+            Devotions.sendMessage(event.getPlayer(), Messages.SHRINE_CANNOT_BREAK);
         }
     }
 
