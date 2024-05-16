@@ -87,12 +87,12 @@
         <dependency>
             <groupId>de.cubbossa</groupId>
             <artifactId>TinyTranslations-bukkit</artifactId>
-            <version>4.3.2</version>
+            <version>4.5.0</version>
         </dependency>
         <dependency>
             <groupId>de.cubbossa</groupId>
             <artifactId>TinyTranslations-common</artifactId>
-            <version>4.3.2</version>
+            <version>4.5.0</version>
         </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
