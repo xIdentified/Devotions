@@ -44,13 +44,9 @@ public class PlayerListener implements Listener {
                     plugin.getLogger().info("Devotion set for " + event.getPlayer().getName());
                 } else {
                     plugin.getLogger().warning("Deity '" + devotionData.getDeityName() + "' not found for " + event.getPlayer().getName());
-                    // Optionally notify the player
-                    event.getPlayer().sendMessage("Your devotion deity could not be found. Please select a new one.");
                 }
             } else {
                 plugin.getLogger().info("No devotion data found for " + event.getPlayer().getName());
-                // Optionally notify the player
-                event.getPlayer().sendMessage("You currently have no devotion. Use '/devotion select <deity>' to choose one.");
             }
         }
     }
