@@ -17,7 +17,8 @@ public class RitualObjective {
     private final String description;
     private final String target;  // Can be an item or a mob type
     private final int count;
-    @Setter private int currentCount;  // To track objective progress
+    @Setter
+    private int currentCount;  // To track objective progress
 
     public RitualObjective(Devotions plugin, Type type, String description, String target, int count) {
         this.plugin = plugin;

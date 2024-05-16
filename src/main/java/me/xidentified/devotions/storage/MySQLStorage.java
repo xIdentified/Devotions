@@ -1,5 +1,16 @@
 package me.xidentified.devotions.storage;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -10,12 +21,8 @@ import me.xidentified.devotions.storage.model.IStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.sql.Connection;
-import java.util.*;
-
-import java.sql.*;
-
 public class MySQLStorage implements IStorage {
+
     private final Devotions plugin;
     private final String host;
     private final String database;
@@ -40,7 +47,8 @@ public class MySQLStorage implements IStorage {
 
             // Establish connection to database
             connection = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database +
-                    "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", username, password);
+                            "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+                    username, password);
 
             // Check connection is valid
             if (connection.isValid(5)) {
@@ -169,7 +177,7 @@ public class MySQLStorage implements IStorage {
     public Set<UUID> getAllStoredPlayerUUIDs() {
         Set<UUID> playerUUIDs = new HashSet<>();
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT player_uuid FROM playerdata")) {
+                ResultSet resultSet = statement.executeQuery("SELECT player_uuid FROM playerdata")) {
             while (resultSet.next()) {
                 String playerUUIDString = resultSet.getString("player_uuid");
                 playerUUIDs.add(UUID.fromString(playerUUIDString));
@@ -192,12 +200,14 @@ public class MySQLStorage implements IStorage {
 
     private String serializeLocation(Location location) {
         // Serialize location to a string, e.g., "world,x,y,z"
-        return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+        return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + ","
+                + location.getBlockZ();
     }
 
     private Location parseLocation(String locationStr) {
         // Parse location from the serialized string
         String[] parts = locationStr.split(",");
-        return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]),
+                Integer.parseInt(parts[3]));
     }
 }

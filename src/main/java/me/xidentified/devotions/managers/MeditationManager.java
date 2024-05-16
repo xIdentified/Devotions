@@ -1,19 +1,18 @@
 package me.xidentified.devotions.managers;
 
+import java.util.HashMap;
+import java.util.Map;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.MeditationData;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MeditationManager {
+
     private final Devotions plugin;
     private final Map<Player, MeditationData> meditationStartData = new HashMap<>();
     private final Map<Player, BukkitRunnable> meditationTimers = new HashMap<>();
@@ -52,7 +51,7 @@ public class MeditationManager {
         objective.setCurrentCount(objective.getCount());
         if (objective.isComplete()) {
             plugin.debugLog("[DEBUG] Meditation objective complete for player: " + player.getName());
-            plugin.sendMessage(player, Messages.MEDITATION_COMPLETE);
+            Devotions.sendMessage(player, Messages.MEDITATION_COMPLETE);
             plugin.getRitualManager().completeRitual(player, ritual, this);
         }
         clearMeditationData(player);
@@ -65,7 +64,7 @@ public class MeditationManager {
             // Smite the player as a warning
             if (moveCount == 1) {
                 player.getWorld().strikeLightningEffect(player.getLocation());
-                plugin.sendMessage(player, Messages.MEDITATION_PENALTY);
+                Devotions.sendMessage(player, Messages.MEDITATION_PENALTY);
             }
 
             // Cancel the ritual if they keep moving
@@ -73,9 +72,7 @@ public class MeditationManager {
                 String ritualName = plugin.getRitualManager().getCurrentRitualForPlayer(player).getDisplayName();
                 cancelMeditationTimer(player);
                 clearMeditationData(player);
-                plugin.sendMessage(player, Messages.RITUAL_CANCELLED.formatted(
-                        Placeholder.unparsed("ritual", ritualName)
-                ));
+                Devotions.sendMessage(player, Messages.RITUAL_CANCELLED.insertParsed("ritual", ritualName));
                 plugin.getRitualManager().cancelRitualFor(player);
             }
         }

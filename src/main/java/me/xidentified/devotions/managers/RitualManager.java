@@ -1,24 +1,23 @@
 package me.xidentified.devotions.managers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualItem;
 import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class RitualManager {
+
     private final Devotions plugin;
     private static volatile RitualManager instance; // Use this instance throughout plugin
     public final Map<String, Ritual> rituals; // Defined rituals
@@ -61,20 +60,22 @@ public class RitualManager {
 
     public boolean startRitual(Player player, ItemStack item, Item droppedItem) {
         // Make sure player isn't already in a ritual before starting another one
-        if (RitualManager.getInstance(plugin).getCurrentRitualForPlayer(player) != null) return false;
+        if (RitualManager.getInstance(plugin).getCurrentRitualForPlayer(player) != null) {
+            return false;
+        }
 
         // Retrieve the ritual associated with the item
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(item);
-        plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
+        plugin.debugLog(
+                "Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount()
+                        + ritual.getObjectives());
 
         // Retrieve the player's current deity
         FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
         Deity playerDeity = favorManager != null ? favorManager.getDeity() : null;
         if (playerDeity == null || !playerDeity.getRitualKeys().contains(ritual.getKey())) {
             plugin.debugLog("Ritual not allowed by chosen deity");
-            plugin.sendMessage(player, Messages.RITUAL_WRONG_DEITY.formatted(
-                    Placeholder.unparsed("ritual", ritual.getDisplayName())
-            ));
+            Devotions.sendMessage(player, Messages.RITUAL_WRONG_DEITY.insertParsed("ritual", ritual.getDisplayName()));
             return false;
         }
 
@@ -85,49 +86,53 @@ public class RitualManager {
         if (ritual.validateConditions(player)) {
             try {
                 plugin.getShrineListener().takeItemInHand(player, item);
-            ritual.provideFeedback(player, "START");
+                ritual.provideFeedback(player, "START");
 
-            List<RitualObjective> objectives = ritual.getObjectives(); // Directly fetch from the ritual object
+                List<RitualObjective> objectives = ritual.getObjectives(); // Directly fetch from the ritual object
 
-            if (objectives != null) {
-                for (RitualObjective objective : objectives) {
-                    // If it's a purification ritual, we'll spawn the desired mobs around the player
-                    if (objective.getType() == RitualObjective.Type.PURIFICATION) {
-                        EntityType entityType = EntityType.valueOf(objective.getTarget());
-                        Location playerLocation = player.getLocation();
-                        plugin.spawnRitualMobs(playerLocation, entityType, objective.getCount(), 2);
+                if (objectives != null) {
+                    for (RitualObjective objective : objectives) {
+                        // If it's a purification ritual, we'll spawn the desired mobs around the player
+                        if (objective.getType() == RitualObjective.Type.PURIFICATION) {
+                            EntityType entityType = EntityType.valueOf(objective.getTarget());
+                            Location playerLocation = player.getLocation();
+                            plugin.spawnRitualMobs(playerLocation, entityType, objective.getCount(), 2);
+                        }
+                        if (objective.getType() == RitualObjective.Type.MEDITATION) {
+                            plugin.getMeditationManager().startMeditation(player, ritual, objective);
+                        }
+                        Devotions.sendMessage(player, plugin.getTranslations().translate(objective.getDescription()));
                     }
-                    if (objective.getType() == RitualObjective.Type.MEDITATION) {
-                        plugin.getMeditationManager().startMeditation(player, ritual, objective);
-                    }
-                    plugin.sendMessage(player, plugin.getTranslations().process(objective.getDescription()));
                 }
-            }
 
-            // Set the ritual for the player, so we can track it
-            RitualManager.getInstance(plugin).setRitualForPlayer(player, ritual);
-            return true; // Ritual started successfully
-        } catch (Exception e) {
-            plugin.getLogger().severe("Error while starting ritual: " + e.getMessage());
-            e.printStackTrace();
-            // Remove dropped item if an error occurs during ritual initiation
-            if (droppedItem != null) droppedItem.remove();
-            // Provide feedback to the player about the failure
+                // Set the ritual for the player, so we can track it
+                RitualManager.getInstance(plugin).setRitualForPlayer(player, ritual);
+                return true; // Ritual started successfully
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error while starting ritual: " + e.getMessage());
+                e.printStackTrace();
+                // Remove dropped item if an error occurs during ritual initiation
+                if (droppedItem != null) {
+                    droppedItem.remove();
+                }
+                // Provide feedback to the player about the failure
+                ritual.provideFeedback(player, "FAILURE");
+                return false;
+            }
+        } else if (droppedItem != null) {
+            droppedItem.remove();
             ritual.provideFeedback(player, "FAILURE");
-            return false;
+            return false; // Ritual did not start
         }
-    } else if (droppedItem != null) {
-        droppedItem.remove();
-        ritual.provideFeedback(player, "FAILURE");
-        return false; // Ritual did not start
+        return false;
     }
-    return false;
-}
 
     public void completeRitual(Player player, Ritual ritual, MeditationManager meditationManager) {
         // Get rid of item on shrine
         Item ritualDroppedItem = getAssociatedDroppedItem(player);
-        if (ritualDroppedItem != null) ritualDroppedItem.remove();
+        if (ritualDroppedItem != null) {
+            ritualDroppedItem.remove();
+        }
         removeDroppedItemAssociation(player);
 
         // Execute outcome and provide feedback
@@ -176,7 +181,9 @@ public class RitualManager {
 
     public Ritual getRitualByItem(ItemStack item) {
         plugin.debugLog("Itemstack in getRitualbyItem returns: " + item);
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
         String itemId = plugin.getDevotionsConfig().getItemId(item);
 
@@ -193,7 +200,7 @@ public class RitualManager {
     /**
      * Associates an item frame with the player's current ritual
      *
-     * @param player The player performing the ritual.
+     * @param player      The player performing the ritual.
      * @param droppedItem The associated item frame.
      */
     public void associateDroppedItem(Player player, Item droppedItem) {

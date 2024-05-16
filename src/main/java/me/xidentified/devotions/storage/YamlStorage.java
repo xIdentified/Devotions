@@ -1,5 +1,13 @@
 package me.xidentified.devotions.storage;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.Shrine;
@@ -13,13 +21,9 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
 // Store player devotions (what god they're following) and their favor amounts
 public class YamlStorage implements IStorage {
+
     private final Devotions plugin;
     private final File devotionFile;
     private final YamlConfiguration yaml;
@@ -87,11 +91,15 @@ public class YamlStorage implements IStorage {
 
     private String findKeyByLocationAndOwner(Location location, UUID ownerUUID) {
         ConfigurationSection shrinesSection = yaml.getConfigurationSection("shrines");
-        if (shrinesSection == null) return null;
+        if (shrinesSection == null) {
+            return null;
+        }
 
         for (String key : shrinesSection.getKeys(false)) {
             String[] parts = key.split(",");
-            if (parts.length < 5) continue; // Skip if the format is incorrect
+            if (parts.length < 5) {
+                continue; // Skip if the format is incorrect
+            }
 
             World world = Bukkit.getWorld(parts[0]);
             int x = Integer.parseInt(parts[1]);

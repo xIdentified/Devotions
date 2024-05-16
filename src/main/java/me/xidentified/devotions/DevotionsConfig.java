@@ -1,11 +1,28 @@
 package me.xidentified.devotions;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
 import me.xidentified.devotions.managers.RitualManager;
-import me.xidentified.devotions.rituals.*;
+import me.xidentified.devotions.rituals.Ritual;
+import me.xidentified.devotions.rituals.RitualConditions;
+import me.xidentified.devotions.rituals.RitualItem;
+import me.xidentified.devotions.rituals.RitualObjective;
+import me.xidentified.devotions.rituals.RitualOutcome;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,14 +32,9 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Getter
 public class DevotionsConfig {
+
     private final Devotions plugin;
     private final Map<String, Miracle> miraclesMap = new HashMap<>();
     private YamlConfiguration soundsConfig;
@@ -30,7 +42,8 @@ public class DevotionsConfig {
     private YamlConfiguration deitiesConfig;
     private YamlConfiguration ritualConfig;
     private File savedItemsConfigFile;
-    @Setter private boolean hideFavorMessages;
+    @Setter
+    private boolean hideFavorMessages;
 
     public int getShrineLimit() {
         return plugin.getConfig().getInt("shrine-limit", 3);
@@ -106,7 +119,8 @@ public class DevotionsConfig {
                 // Check for duplicate items and warn
                 String itemString = ritualConfig.getString(path + "item");
                 if (itemString != null && !usedItems.add(itemString.toLowerCase())) {
-                    plugin.getLogger().warning("Duplicate item detected for ritual: " + key + ". Use unique items for each ritual.");
+                    plugin.getLogger().warning(
+                            "Duplicate item detected for ritual: " + key + ". Use unique items for each ritual.");
                 }
 
                 // Parse general info
@@ -184,9 +198,9 @@ public class DevotionsConfig {
                     e.printStackTrace();
                 }
 
-
                 // Create and store the ritual
-                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, favorReward, ritualConditions, ritualOutcome, objectives);
+                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, favorReward,
+                        ritualConditions, ritualOutcome, objectives);
                 RitualManager.getInstance(plugin).addRitual(key, ritual);  // Store the ritual and key
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to load ritual with key: " + key);
@@ -241,7 +255,8 @@ public class DevotionsConfig {
             // Load offerings
             List<String> offeringStrings = deityConfig.getStringList("offerings");
             List<Offering> favoredOfferings = offeringStrings.stream()
-                    .map(offeringString -> parseOffering(offeringString, deityKey)) // Use a separate method to parse each offering
+                    .map(offeringString -> parseOffering(offeringString,
+                            deityKey)) // Use a separate method to parse each offering
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
@@ -267,9 +282,11 @@ public class DevotionsConfig {
                 }
             }
 
-            Deity deity = new Deity(plugin, name, lore, domain, alignment, favoredOfferings, favoredRituals, deityBlessings, deityCurses, deityMiracles);
+            Deity deity = new Deity(plugin, name, lore, domain, alignment, favoredOfferings, favoredRituals,
+                    deityBlessings, deityCurses, deityMiracles);
             deityMap.put(deityKey.toLowerCase(), deity);
-            plugin.getLogger().info("Loaded deity " + deity.getName() + " with " + favoredOfferings.size() + " offerings.");
+            plugin.getLogger()
+                    .info("Loaded deity " + deity.getName() + " with " + favoredOfferings.size() + " offerings.");
         }
 
         return deityMap;
@@ -294,7 +311,8 @@ public class DevotionsConfig {
                 chance = Double.parseDouble(favorAndChance[1]);
             }
         } catch (NumberFormatException e) {
-            plugin.getLogger().warning("Invalid favor value or chance in offerings for deity " + deityKey + ": " + parts[2]);
+            plugin.getLogger()
+                    .warning("Invalid favor value or chance in offerings for deity " + deityKey + ": " + parts[2]);
             return null;
         }
 

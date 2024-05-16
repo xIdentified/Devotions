@@ -1,8 +1,8 @@
 package me.xidentified.devotions.util;
 
+import de.cubbossa.tinytranslations.libs.kyori.adventure.text.format.NamedTextColor;
+import de.cubbossa.tinytranslations.libs.kyori.adventure.text.format.TextColor;
 import me.xidentified.devotions.Devotions;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 
 public class FavorUtils {
 

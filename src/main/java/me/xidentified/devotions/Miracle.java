@@ -1,6 +1,13 @@
 package me.xidentified.devotions;
 
 import de.cubbossa.tinytranslations.Message;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,7 +16,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -21,9 +32,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
 public class Miracle {
+
     private final String name;
     private final List<Condition> conditions;
     private final MiracleEffect effect;
@@ -58,6 +68,7 @@ public class Miracle {
 }
 
 interface Condition {
+
     boolean check(Player player);
 }
 
@@ -78,6 +89,7 @@ class NearVillagersCondition implements Condition {
 }
 
 class IsDeadCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         return player.isDead();
@@ -85,6 +97,7 @@ class IsDeadCondition implements Condition {
 }
 
 class IsOnFireCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         return player.getFireTicks() > 0;
@@ -92,6 +105,7 @@ class IsOnFireCondition implements Condition {
 }
 
 class LowHealthCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         Bukkit.getLogger().info("Player's health: " + player.getHealth());
@@ -100,6 +114,7 @@ class LowHealthCondition implements Condition {
 }
 
 class NearHostileMobsCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         for (Entity entity : player.getNearbyEntities(4, 4, 4)) {
@@ -116,6 +131,7 @@ class NearHostileMobsCondition implements Condition {
 }
 
 class HasRepairableItemsCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         // Check main inventory
@@ -146,35 +162,40 @@ class HasRepairableItemsCondition implements Condition {
 
 
 interface MiracleEffect {
+
     void execute(Player player);
 }
 
 
 // Existing miracles listed below
 class ReviveOnDeath implements MiracleEffect {
+
     @Override
     public void execute(Player player) {
         @Nullable AttributeInstance maxHealth = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH));
         if (maxHealth != null) {
             player.setHealth(maxHealth.getValue());
-            Devotions.getInstance().sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
+            Devotions.sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
         }
     }
 }
 
 class HeroEffectInVillage implements MiracleEffect {
+
     @Override
     public void execute(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 6000, 1)); // 5 minutes of Hero of the Village effect
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HERO_OF_VILLAGE);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 6000,
+                1)); // 5 minutes of Hero of the Village effect
+        Devotions.sendMessage(player, Messages.MIRACLE_HERO_OF_VILLAGE);
     }
 }
 
 class SaveFromBurning implements MiracleEffect {
+
     @Override
     public void execute(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 300, 1));
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_FIRE_RESISTANCE);
+        Devotions.sendMessage(player, Messages.MIRACLE_FIRE_RESISTANCE);
     }
 }
 
@@ -193,11 +214,12 @@ class RepairAllItems implements MiracleEffect {
                 }
             }
         }
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_REPAIR);
+        Devotions.sendMessage(player, Messages.MIRACLE_REPAIR);
     }
 }
 
 class SummonAidEffect implements MiracleEffect {
+
     private final int entityCount;
 
     public SummonAidEffect(int entityCount) {
@@ -227,11 +249,12 @@ class SummonAidEffect implements MiracleEffect {
                 wolf.setTamed(true);
             }
         }
-        Devotions.getInstance().sendMessage(player, message);
+        Devotions.sendMessage(player, message);
     }
 }
 
 class ExecuteCommandEffect implements MiracleEffect {
+
     private final String command;
 
     public ExecuteCommandEffect(String command) {
@@ -241,11 +264,12 @@ class ExecuteCommandEffect implements MiracleEffect {
     @Override
     public void execute(Player player) {
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_BESTOWED);
+        Devotions.sendMessage(player, Messages.MIRACLE_BESTOWED);
     }
 }
 
 class DoubleCropDropsEffect implements MiracleEffect, Listener {
+
     private final int duration;  // in ticks
     private static final Set<UUID> playersWithEffect = new HashSet<>();
     private final Plugin plugin;
@@ -260,7 +284,7 @@ class DoubleCropDropsEffect implements MiracleEffect, Listener {
     public void execute(Player player) {
         playersWithEffect.add(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(plugin, () -> playersWithEffect.remove(player.getUniqueId()), duration);
-        Devotions.getInstance().sendMessage(player, Messages.MIRACLE_HARVEST);
+        Devotions.sendMessage(player, Messages.MIRACLE_HARVEST);
     }
 
     @EventHandler
@@ -293,11 +317,13 @@ class DoubleCropDropsEffect implements MiracleEffect, Listener {
 
 // Check if player is near any crops
 class NearCropsCondition implements Condition {
+
     @Override
     public boolean check(Player player) {
         for (Block block : getNearbyBlocks(player.getLocation())) {  // Check in a 5 block radius
             Material type = block.getType();
-            if (type == Material.WHEAT || type == Material.CARROTS || type == Material.POTATOES || type == Material.BEETROOTS) {
+            if (type == Material.WHEAT || type == Material.CARROTS || type == Material.POTATOES
+                    || type == Material.BEETROOTS) {
                 return true;
             }
         }

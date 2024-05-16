@@ -1,5 +1,6 @@
 package me.xidentified.devotions.util;
 
+import java.util.List;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
@@ -7,8 +8,6 @@ import me.xidentified.devotions.managers.FavorManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class Placeholders extends PlaceholderExpansion {
 

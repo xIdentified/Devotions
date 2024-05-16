@@ -8,14 +8,6 @@ description: Create and worship deities on your server
 softdepend:
   - PlaceholderAPI
 
-libraries:
-  - net.kyori:adventure-api:4.14.0
-  - net.kyori:adventure-platform-bukkit:4.3.1
-  - net.kyori:adventure-text-minimessage:4.14.0
-  - net.kyori:adventure-text-serializer-legacy:4.14.0
-  - net.kyori:adventure-text-serializer-gson:4.14.0
-  - net.kyori:adventure-text-serializer-plain:4.14.0
-
 commands:
   devotions:
     description: Manage the Devotions plugin
