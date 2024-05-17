@@ -3,7 +3,7 @@ package me.xidentified.devotions.listeners;
 import java.util.List;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.MeditationManager;
-import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.rituals.RitualManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.rituals.MeditationData;
 import me.xidentified.devotions.rituals.Ritual;

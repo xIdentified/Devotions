@@ -7,6 +7,7 @@ rituals:
     description: "Celebrate the bounties of the earth and create prime farming conditions"
     favor: 30
     item: "VANILLA:GOLDEN_HOE"
+    consume-item: true
     conditions:
       expression: "%vault_eco_balance% >= 100"
     objectives:

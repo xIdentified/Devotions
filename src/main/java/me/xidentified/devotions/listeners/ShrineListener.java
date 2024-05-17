@@ -11,7 +11,7 @@ import me.xidentified.devotions.Shrine;
 import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
-import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.rituals.RitualManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
@@ -83,16 +83,20 @@ public class ShrineListener implements Listener {
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
         plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
+
         if (ritual != null) {
             try {
-                // Only drop item on shrine if it's a valid ritual item
-                Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
-                handleRitualInteraction(player, itemInHand, droppedItem, event);
+                Item droppedItem = null;
+                if (ritual.isConsumeItem()) {
+                    droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
+                }
+
+                handleRitualInteraction(player, itemInHand, droppedItem, event, ritual.isConsumeItem());
             } catch (Exception e) {
                 plugin.getLogger().severe("Error while handling ritual: " + e.getMessage());
                 e.printStackTrace();
             }
-            return; // Exit method to prevent further handling
+            return;
         }
 
         // Check if the player is holding a valid offering
@@ -113,7 +117,8 @@ public class ShrineListener implements Listener {
     }
 
     private void handleRitualInteraction(Player player, ItemStack itemInHand, Item droppedItem,
-            PlayerInteractEvent event) {
+            PlayerInteractEvent event, boolean consumeItem) {
+
         long remainingCooldown = cooldownManager.isActionAllowed(player, "ritual");
         if (remainingCooldown > 0) {
             Devotions.sendMessage(player, Messages.SHRINE_COOLDOWN
@@ -131,6 +136,10 @@ public class ShrineListener implements Listener {
         if (ritualStarted) {
             long ritualCooldown = cooldownManager.getCooldownFromConfig("ritual-cooldown", "5s");
             cooldownManager.setCooldown(player, "ritual", ritualCooldown);
+
+            if (consumeItem) {
+                player.getInventory().removeItem(new ItemStack(itemInHand.getType(), 1));
+            }
         } else if (droppedItem != null) {
             droppedItem.remove();  // Remove dropped item from shrine if ritual did not start
         }

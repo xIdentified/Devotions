@@ -26,7 +26,7 @@ import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.MeditationManager;
-import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.rituals.RitualManager;
 import me.xidentified.devotions.managers.ShrineManager;
 import me.xidentified.devotions.storage.StorageManager;
 import me.xidentified.devotions.util.Messages;

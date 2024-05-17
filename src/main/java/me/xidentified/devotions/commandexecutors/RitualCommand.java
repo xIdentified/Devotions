@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import me.xidentified.devotions.Devotions;
-import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.rituals.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.command.Command;

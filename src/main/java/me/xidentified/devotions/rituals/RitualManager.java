@@ -1,4 +1,4 @@
-package me.xidentified.devotions.managers;
+package me.xidentified.devotions.rituals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
-import me.xidentified.devotions.rituals.Ritual;
-import me.xidentified.devotions.rituals.RitualItem;
-import me.xidentified.devotions.rituals.RitualObjective;
+import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.managers.MeditationManager;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -85,7 +84,9 @@ public class RitualManager {
         // Validate the ritual and its conditions
         if (ritual.validateConditions(player)) {
             try {
-                plugin.getShrineListener().takeItemInHand(player, item);
+                if (ritual.isConsumeItem()) {
+                    plugin.getShrineListener().takeItemInHand(player, item); // Remove the item only if consume-item is true
+                }
                 ritual.provideFeedback(player, "START");
 
                 List<RitualObjective> objectives = ritual.getObjectives(); // Directly fetch from the ritual object
@@ -111,10 +112,6 @@ public class RitualManager {
             } catch (Exception e) {
                 plugin.getLogger().severe("Error while starting ritual: " + e.getMessage());
                 e.printStackTrace();
-                // Remove dropped item if an error occurs during ritual initiation
-                if (droppedItem != null) {
-                    droppedItem.remove();
-                }
                 // Provide feedback to the player about the failure
                 ritual.provideFeedback(player, "FAILURE");
                 return false;

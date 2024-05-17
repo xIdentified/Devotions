@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 public class Ritual {
 
     public boolean isCompleted = false;
+    public boolean consumeItem;
     private final Devotions plugin;
     private final DevotionManager devotionManager;
     private final String key;
@@ -27,7 +28,7 @@ public class Ritual {
     private final RitualOutcome outcome;
     private final List<RitualObjective> objectives;
 
-    public Ritual(Devotions plugin, String key, String displayName, String description, RitualItem item,
+    public Ritual(Devotions plugin, String key, String displayName, String description, RitualItem item, Boolean consumeItem,
             int favorAmount,
             RitualConditions conditions, RitualOutcome outcome, List<RitualObjective> objectives) {
         this.plugin = plugin;
@@ -40,6 +41,7 @@ public class Ritual {
         this.conditions = conditions;
         this.outcome = outcome;
         this.objectives = objectives;
+        this.consumeItem = consumeItem;
     }
 
     // Validate ritual conditions against a player and environment.

@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.xidentified.devotions.effects.Blessing;
 import me.xidentified.devotions.effects.Curse;
-import me.xidentified.devotions.managers.RitualManager;
+import me.xidentified.devotions.rituals.RitualManager;
 import me.xidentified.devotions.rituals.Ritual;
 import me.xidentified.devotions.rituals.RitualConditions;
 import me.xidentified.devotions.rituals.RitualItem;
@@ -126,6 +126,7 @@ public class DevotionsConfig {
                 // Parse general info
                 String displayName = ritualConfig.getString(path + "display_name");
                 String description = ritualConfig.getString(path + "description");
+                Boolean consumeItem = ritualConfig.getBoolean(path + "consume-item", true);
                 int favorReward = ritualConfig.getInt(path + "favor");
 
                 RitualItem ritualItem = null;
@@ -199,7 +200,7 @@ public class DevotionsConfig {
                 }
 
                 // Create and store the ritual
-                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, favorReward,
+                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, consumeItem, favorReward,
                         ritualConditions, ritualOutcome, objectives);
                 RitualManager.getInstance(plugin).addRitual(key, ritual);  // Store the ritual and key
             } catch (Exception e) {
