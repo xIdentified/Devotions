@@ -39,16 +39,19 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
+        // Placeholder for the player's current deity
         if (params.equalsIgnoreCase("deity")) {
             Deity deity = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()).getDeity();
             return deity != null ? "§e" + deity.getName() : "\u00A0"; // Non-breaking space
         }
 
+        // Placeholder for the player's favor value
         if (params.equalsIgnoreCase("favor")) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
             return favorManager.getFavor() + "";
         }
 
+        // Placeholder for the top players in favor
         if (params.equalsIgnoreCase("favor_top")) {
             List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorData();
             StringBuilder topPlayers = new StringBuilder();
@@ -61,8 +64,31 @@ public class Placeholders extends PlaceholderExpansion {
             return topPlayers.toString().trim();
         }
 
+        // Placeholder for the top players in favor for a specific deity
+        if (params.startsWith("favor_top_")) {
+            String[] parts = params.split("_");
+            if (parts.length == 4) {
+                String deityName = parts[2];
+                int rank = Integer.parseInt(parts[3]);
+
+                Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
+                if (deity == null) {
+                    return "Unknown Deity";
+                }
+
+                List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorDataByDeity(deity);
+
+                if (rank <= 0 || rank > sortedFavorData.size()) {
+                    return "No Data";
+                }
+
+                FavorManager favorManager = sortedFavorData.get(rank - 1);
+                String playerName = Bukkit.getOfflinePlayer(favorManager.getUuid()).getName();
+                return "§a" + playerName + " §7- " + favorManager.getFavor();
+            }
+        }
+
         return null; // Placeholder is unknown
     }
-
 
 }

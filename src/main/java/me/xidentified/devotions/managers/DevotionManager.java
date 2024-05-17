@@ -3,11 +3,13 @@ package me.xidentified.devotions.managers;
 import static org.bukkit.Bukkit.getServer;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.StorageManager;
@@ -28,6 +30,13 @@ public class DevotionManager {
         this.deities = loadedDeities;
         this.storage = plugin.getStorageManager();
         loadPlayerDevotions();
+    }
+
+    public List<FavorManager> getSortedFavorDataByDeity(Deity deity) {
+        return playerDevotions.values().stream()
+                .filter(favorManager -> favorManager.getDeity().equals(deity))
+                .sorted(Comparator.comparingInt(FavorManager::getFavor).reversed())
+                .collect(Collectors.toList());
     }
 
     public Deity getDeityByName(String name) {
