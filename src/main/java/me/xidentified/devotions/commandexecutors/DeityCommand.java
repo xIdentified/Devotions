@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
+import me.xidentified.devotions.util.JavaScriptEngine;
 import me.xidentified.devotions.util.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -166,7 +168,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         List<Deity> deities = plugin.getDevotionManager().getAllDeities();
         if (deities.isEmpty()) {
             Devotions.sendMessage(player, Messages.DEITY_NO_DEITY_FOUND);
-            return false;
+            return true;
         }
 
         Devotions.sendMessage(player, Messages.DEITY_LIST_HEADER);
@@ -188,7 +190,20 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         if (favorManager == null) {
             Devotions.sendMessage(player, Messages.NO_DEVOTION_SET);
-            return false;
+            return true;
+        }
+
+        Deity deity = favorManager.getDeity();
+        if (deity != null && deity.getAbandonCondition() != null) {
+            String condition = PlaceholderAPI.setPlaceholders(player, deity.getAbandonCondition());
+            boolean conditionMet = JavaScriptEngine.evaluateExpression(condition);
+
+            if (!conditionMet) {
+                Devotions.sendMessage(player, Messages.ABANDON_CONDITION_NOT_MET
+                        .insertParsed("deity", deity.getName())
+                );
+                return true;
+            }
         }
 
         // Check if reset-favor-on-abandon is true

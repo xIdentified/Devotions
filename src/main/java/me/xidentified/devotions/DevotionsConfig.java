@@ -252,6 +252,7 @@ public class DevotionsConfig {
             String domain = deityConfig.getString("domain", "");
             String alignment = deityConfig.getString("alignment", "");
             List<String> favoredRituals = deityConfig.getStringList("rituals");
+            String abandonCondition = deityConfig.getString("abandon-condition", null);
 
             // Load offerings
             List<String> offeringStrings = deityConfig.getStringList("offerings");
@@ -284,7 +285,7 @@ public class DevotionsConfig {
             }
 
             Deity deity = new Deity(plugin, name, lore, domain, alignment, favoredOfferings, favoredRituals,
-                    deityBlessings, deityCurses, deityMiracles);
+                    deityBlessings, deityCurses, deityMiracles, abandonCondition);
             deityMap.put(deityKey.toLowerCase(), deity);
             plugin.getLogger()
                     .info("Loaded deity " + deity.getName() + " with " + favoredOfferings.size() + " offerings.");
