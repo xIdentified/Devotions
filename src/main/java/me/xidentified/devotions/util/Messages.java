@@ -89,7 +89,7 @@ public class Messages {
     // For admins with teleport action
     public static final Message SHRINE_INFO_ADMIN = new MessageBuilder("shrines.list.shrine")
             .withDefault(
-                    "<hover:show_text:'Click to teleport'><click:run_command:'/teleport @p {x:'#.#'} {y:'#.#'} {z:'#.#'}'>{deity} at {x:#}, {y:#}, {z:#}")
+                    "<hover:show_text:'Click to teleport'><click:run_command:'/minecraft:teleport @p {x:'#.#'} {y:'#.#'} {z:'#.#'}'>{deity} at {x:#}, {y:#}, {z:#}")
             .withPlaceholders("deity", "x", "y", "z")
             .build();
 
@@ -231,8 +231,12 @@ public class Messages {
             .withDefault("<prefix>{ritual} was a success! Blessings upon ye!")
             .withPlaceholder("ritual")
             .build();
+    public static final Message RITUAL_PROGRESS = new MessageBuilder("ritual.progress")
+            .withDefault("<accent>Objective {objective}: {current}/{total} complete.")
+            .withPlaceholders("objective", "current", "total")
+            .build();
     public static final Message RITUAL_NOT_IN_PROGRESS = new MessageBuilder("ritual.failure")
-            .withDefault("<prefix_negative>There is no ritual in progress.")
+            .withDefault("<prefix_negative>The ritual has failed. Conditions were not met!")
             .build();
     public static final Message RITUAL_RETURN_TO_RESUME = new MessageBuilder("ritual.return_to_resume")
             .withDefault("<accent>Return to the shrine to complete the ritual.")

@@ -7,15 +7,20 @@ import me.xidentified.devotions.Devotions;
 @Getter
 public class RitualObjective {
 
-    // Other ritual objectives should be added later, but I'm going to keep it simple for right now
     public enum Type {
-        GATHERING, PURIFICATION, MEDITATION
+        GATHERING,
+        PURIFICATION,
+        MEDITATION,
+        CRAFTING,
+        BREEDING,
+        SACRIFICE,
+        PILGRIMAGE
     }
 
     private final Devotions plugin;
     private final Type type;
     private final String description;
-    private final String target;  // Can be an item or a mob type
+    private final String target;  // Can be an item, a mob type, or a location
     private final int count;
     @Setter
     private int currentCount;  // To track objective progress

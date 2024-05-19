@@ -92,18 +92,20 @@ public class DevotionManager {
     }
 
     public void removeDevotion(UUID playerUUID) {
-        playerDevotions.remove(playerUUID);
+        FavorManager favorManager = playerDevotions.remove(playerUUID);
+        if (favorManager != null) {
+            int abandonedFavor = plugin.getConfig().getInt("abandoned-favor", 0);
+            favorManager.setFavor(abandonedFavor);
+            storage.getStorage().savePlayerDevotion(playerUUID, favorManager);
+        }
         storage.getStorage().removePlayerDevotion(playerUUID);
     }
 
     public void loadPlayerDevotions() {
         Set<UUID> playerUUIDs = getAllStoredPlayerUUIDs();
         for (UUID uuid : playerUUIDs) {
-            try {
-                DevotionData devotionData = storage.getStorage().getPlayerDevotion(uuid);
-                if (devotionData == null) {
-                    continue;
-                }
+            DevotionData devotionData = storage.getStorage().getPlayerDevotion(uuid);
+            if (devotionData != null) {
                 Deity deity = getDeityByName(devotionData.getDeityName());
                 if (deity != null) {
                     FavorManager favorManager = new FavorManager(plugin, uuid, deity);
@@ -112,8 +114,6 @@ public class DevotionManager {
                 } else {
                     plugin.getLogger().warning("Deity not found for UUID: " + uuid);
                 }
-            } catch (Exception e) {
-                plugin.getLogger().severe("Error loading devotion for UUID " + uuid + ": " + e.getMessage());
             }
         }
         plugin.getLogger().info("Loaded devotions for " + playerDevotions.size() + " players.");

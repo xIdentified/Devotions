@@ -55,8 +55,7 @@ public class ShrineListener implements Listener {
         Block clickedBlock = event.getClickedBlock();
 
         // Return if player isn't right-clicking the shrine or interacting with their hand.
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND
-                || clickedBlock == null) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || clickedBlock == null) {
             return;
         }
 
@@ -73,8 +72,7 @@ public class ShrineListener implements Listener {
         if (!allPlayersCanInteract) {
             Deity playerDeity = devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity();
             if (!shrine.getDeity().equals(playerDeity)) {
-                Devotions.sendMessage(player,
-                        Messages.SHRINE_NOT_FOLLOWING_DEITY.insertParsed("deity", shrine.getDeity().getName()));
+                Devotions.sendMessage(player, Messages.SHRINE_NOT_FOLLOWING_DEITY.insertParsed("deity", shrine.getDeity().getName()));
                 return;
             }
         }
@@ -85,6 +83,7 @@ public class ShrineListener implements Listener {
         plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
 
         if (ritual != null) {
+            event.setCancelled(true); // Prevent the default action (block placement)
             try {
                 Item droppedItem = null;
                 if (ritual.isConsumeItem()) {
@@ -100,11 +99,11 @@ public class ShrineListener implements Listener {
         }
 
         // Check if the player is holding a valid offering
-        Offering offering = getOfferingForItem(itemInHand,
-                devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
+        Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
         plugin.debugLog("Checking for ritual associated with item: " + itemInHand);
         plugin.debugLog("Checking for offering associated with item: " + itemInHand);
         if (offering != null) {
+            event.setCancelled(true); // Prevent the default action (block placement)
             try {
                 // Only drop item on shrine if it's a valid offering
                 Item droppedItem = dropItemOnShrine(clickedBlock, itemInHand);
@@ -271,12 +270,16 @@ public class ShrineListener implements Listener {
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
-        if (isBlockAdjacentToShrine(block)) {
-            FavorManager favorManager = devotionManager.getPlayerDevotion(player.getUniqueId());
-            Deity playerDeity = favorManager.getDeity();
-            Offering offering = getOfferingForItem(itemInHand, playerDeity);
-            if (offering != null) {
-                event.setCancelled(true); // Prevent block from being placed if it's being used for an offering
+        // Check if the block is being placed on or adjacent to a shrine
+        if (isBlockAdjacentToShrine(block) || shrineManager.getShrineAtLocation(block.getLocation()) != null) {
+            Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(itemInHand);
+            Offering offering = getOfferingForItem(itemInHand, devotionManager.getPlayerDevotion(player.getUniqueId()).getDeity());
+
+            event.setCancelled(true);
+            if (ritual != null || offering != null) {
+            } else {
+                // Prevent block placement if it's not part of a ritual or offering
+                Devotions.sendMessage(player, Messages.SHRINE_PLACE_ON_TOP);
             }
         }
     }

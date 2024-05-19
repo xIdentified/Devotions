@@ -65,9 +65,7 @@ public class RitualManager {
 
         // Retrieve the ritual associated with the item
         Ritual ritual = RitualManager.getInstance(plugin).getRitualByItem(item);
-        plugin.debugLog(
-                "Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount()
-                        + ritual.getObjectives());
+        plugin.debugLog("Ritual retrieved: " + ritual.getDisplayName() + ritual.getDescription() + ritual.getFavorAmount() + ritual.getObjectives());
 
         // Retrieve the player's current deity
         FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
@@ -85,7 +83,7 @@ public class RitualManager {
         if (ritual.validateConditions(player)) {
             try {
                 if (ritual.isConsumeItem()) {
-                    plugin.getShrineListener().takeItemInHand(player, item); // Remove the item only if consume-item is true
+                    plugin.getShrineListener().takeItemInHand(player, item);
                 }
                 ritual.provideFeedback(player, "START");
 
@@ -93,14 +91,17 @@ public class RitualManager {
 
                 if (objectives != null) {
                     for (RitualObjective objective : objectives) {
-                        // If it's a purification ritual, we'll spawn the desired mobs around the player
-                        if (objective.getType() == RitualObjective.Type.PURIFICATION) {
-                            EntityType entityType = EntityType.valueOf(objective.getTarget());
-                            Location playerLocation = player.getLocation();
-                            plugin.spawnRitualMobs(playerLocation, entityType, objective.getCount(), 2);
-                        }
-                        if (objective.getType() == RitualObjective.Type.MEDITATION) {
-                            plugin.getMeditationManager().startMeditation(player, ritual, objective);
+                        switch (objective.getType()) {
+                            case PURIFICATION:
+                                EntityType entityType = EntityType.valueOf(objective.getTarget());
+                                Location playerLocation = player.getLocation();
+                                plugin.spawnRitualMobs(playerLocation, entityType, objective.getCount(), 2);
+                                break;
+                            case MEDITATION:
+                                plugin.getMeditationManager().startMeditation(player, ritual, objective);
+                                break;
+                            default:
+                                break;
                         }
                         Devotions.sendMessage(player, plugin.getTranslations().translate(objective.getDescription()));
                     }
@@ -112,6 +113,10 @@ public class RitualManager {
             } catch (Exception e) {
                 plugin.getLogger().severe("Error while starting ritual: " + e.getMessage());
                 e.printStackTrace();
+                // Remove dropped item if an error occurs during ritual initiation
+                if (droppedItem != null) {
+                    droppedItem.remove();
+                }
                 // Provide feedback to the player about the failure
                 ritual.provideFeedback(player, "FAILURE");
                 return false;
