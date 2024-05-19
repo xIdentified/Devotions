@@ -113,7 +113,7 @@ public class RitualListener implements Listener {
         Ritual currentRitual = ritualManager.getCurrentRitualForPlayer(player);
         if (currentRitual != null) {
             for (RitualObjective objective : currentRitual.getObjectives()) {
-                if (objective.getType() == RitualObjective.Type.PILGRIMAGE) {
+                if (objective.getType() == RitualObjective.Type.PILGRIMAGE && !objective.isComplete()) {
                     String[] coords = objective.getTarget().split(",");
                     int targetX = Integer.parseInt(coords[0]);
                     int targetY = Integer.parseInt(coords[1]);
@@ -125,13 +125,13 @@ public class RitualListener implements Listener {
                         objective.incrementCount();
                         if (objective.isComplete()) {
                             Devotions.sendMessage(player, Messages.RITUAL_RETURN_TO_RESUME);
-                            break;
                         } else {
                             Devotions.sendMessage(player, Messages.RITUAL_PROGRESS
                                     .insertParsed("current", String.valueOf(objective.getCurrentCount()))
                                     .insertParsed("total", String.valueOf(objective.getCount()))
                                     .insertParsed("objective", objective.getDescription()));
                         }
+                        break; // Exit loop once the objective is processed
                     }
                 }
             }
@@ -144,7 +144,7 @@ public class RitualListener implements Listener {
         }
 
         for (RitualObjective objective : ritual.getObjectives()) {
-            if (objective.getType() == type && objective.getTarget().equalsIgnoreCase(target)) {
+            if (objective.getType() == type && objective.getTarget().equalsIgnoreCase(target) && !objective.isComplete()) {
                 objective.incrementCount();
                 if (objective.isComplete()) {
                     if (allObjectivesCompleted(ritual)) {

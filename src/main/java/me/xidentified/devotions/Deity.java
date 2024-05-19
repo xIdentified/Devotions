@@ -32,10 +32,11 @@ public class Deity {
     private final List<Curse> curses;
     private final List<Miracle> miracles;
     @Getter final String abandonCondition;
+    @Getter private final String selectionCondition;
 
     public Deity(Devotions plugin, String name, String lore, String domain, String alignment,
             List<Offering> offerings, List<String> rituals, List<Blessing> blessings,
-            List<Curse> curses, List<Miracle> miracles, String abandonCondition) {
+            List<Curse> curses, List<Miracle> miracles, String abandonCondition, String selectionCondition) {
         this.plugin = plugin;
         this.name = name;
         this.lore = lore;
@@ -47,6 +48,7 @@ public class Deity {
         this.curses = curses;
         this.miracles = miracles;
         this.abandonCondition = abandonCondition;
+        this.selectionCondition = selectionCondition;
     }
 
     private CooldownManager cooldownManager() {

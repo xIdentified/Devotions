@@ -72,7 +72,10 @@ public class Messages {
                     <offset>Favored Offerings: <text>{offerings}""")
             .withPlaceholders("name", "lore", "domain", "alignment", "rituals", "offerings")
             .build();
-
+    public static final Message SELECTION_CONDITION_NOT_MET = new MessageBuilder("selection.condition.not.met")
+            .withDefault("You do not meet the requirements to follow {deity}.")
+            .withPlaceholders("deity")
+            .build();
     public static final Message MEDITATION_COMPLETE = new MessageBuilder("meditation.complete")
             .withDefault("<prefix>Meditation complete! You can now move.")
             .build();

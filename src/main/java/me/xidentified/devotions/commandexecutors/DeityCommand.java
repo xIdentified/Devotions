@@ -90,9 +90,20 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
 
-        plugin.debugLog(
-                "Current devotion status for player " + player.getName() + ": " + devotionManager.getPlayerDevotion(
-                        playerUniqueId));
+        // Check the selection condition
+        if (selectedDeity.getSelectionCondition() != null) {
+            String condition = PlaceholderAPI.setPlaceholders(player, selectedDeity.getSelectionCondition());
+            boolean conditionMet = JavaScriptEngine.evaluateExpression(condition);
+
+            if (!conditionMet) {
+                Devotions.sendMessage(player, Messages.SELECTION_CONDITION_NOT_MET
+                        .insertParsed("deity", selectedDeity.getName()));
+                return true;
+            }
+        }
+
+        plugin.debugLog("Current devotion status for player " + player.getName() + ": " +
+                devotionManager.getPlayerDevotion(playerUniqueId));
 
         // Check if the player already has a devotion
         FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
@@ -107,8 +118,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             } else {
                 // Player selected the same deity they're already devoted to
                 Devotions.sendMessage(player, Messages.DEVOTION_ALREADY_SET
-                        .insertParsed("deity", selectedDeity.getName())
-                );
+                        .insertParsed("deity", selectedDeity.getName()));
             }
         } else {
             // Player does not have an existing devotion, create a new FavorManager
@@ -116,9 +126,8 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
         }
 
-        plugin.debugLog(
-                "Updated devotion status for player " + player.getName() + ": " + devotionManager.getPlayerDevotion(
-                        playerUniqueId));
+        plugin.debugLog("Updated devotion status for player " + player.getName() + ": " +
+                devotionManager.getPlayerDevotion(playerUniqueId));
         return true;
     }
 
