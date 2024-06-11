@@ -37,6 +37,8 @@ miracle-cooldown: "5m"
 shrine-limit: 3
 # If false, players can only interact with a shrine dedicated to their deity
 all-players-can-interact-with-shrines: true
+# If true, only staff can designate shrines on the server
+staff-designated-shrines: false
 
 storage:
   type: 'sqlite' # Options: yaml, sqlite, mysql

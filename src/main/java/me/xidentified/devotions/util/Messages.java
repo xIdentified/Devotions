@@ -43,7 +43,7 @@ public class Messages {
             .withPlaceholders("deity", "blessing")
             .build();
     public static final Message DEITY_CURSED = new MessageBuilder("deity.cursed")
-            .withDefault("<prefix>{deity} has cursed you with {curse}!")
+            .withDefault("<prefix_negative>{deity} has cursed you with {curse}!")
             .withPlaceholders("deity", "curse")
             .build();
     public static final Message DEITY_CMD_USAGE = new MessageBuilder("deity.cmd.usage")
@@ -158,6 +158,9 @@ public class Messages {
     public static final Message SHRINE_CANNOT_BREAK = new MessageBuilder("shrines.cannot_break_shrines")
             .withDefault(
                     "<prefix_negative>You cannot destroy shrines! Remove with <cmd_syntax>/shrine remove</cmd_syntax>.")
+            .build();
+    public static final Message SHRINE_PROTECTED_AREA = new MessageBuilder("shrines.protected_area")
+            .withDefault("<prefix_negative>You cannot create a shrine in a protected area.")
             .build();
     public static final Message SHRINE_OFFERING_DECLINED = new MessageBuilder("shrines.offering_declined")
             .withDefault("<prefix_negative>Your offering was not accepted by {subject}.")

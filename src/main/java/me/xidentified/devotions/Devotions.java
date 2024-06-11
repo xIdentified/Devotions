@@ -188,7 +188,7 @@ public class Devotions extends JavaPlugin {
         this.cooldownManager = new CooldownManager(this);
         this.meditationManager = new MeditationManager(this);
         FavorCommand favorCmd = new FavorCommand(this);
-        ShrineCommandExecutor shrineCmd = new ShrineCommandExecutor(devotionManager, shrineManager);
+        ShrineCommandExecutor shrineCmd = new ShrineCommandExecutor(devotionManager, shrineManager, this);
         DeityCommand deityCmd = new DeityCommand(this);
         RitualCommand ritualCommand = new RitualCommand(this);
 
