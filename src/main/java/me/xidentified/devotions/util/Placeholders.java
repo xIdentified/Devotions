@@ -41,7 +41,11 @@ public class Placeholders extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, String params) {
         // Placeholder for the player's current deity
         if (params.equalsIgnoreCase("deity")) {
-            Deity deity = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId()).getDeity();
+            FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
+            if (favorManager == null) {
+                return "None";
+            }
+            Deity deity = favorManager.getDeity();
             return deity != null ? "§e" + deity.getName() : "\u00A0"; // Non-breaking space
         }
 
@@ -73,7 +77,7 @@ public class Placeholders extends PlaceholderExpansion {
 
                 Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
                 if (deity == null) {
-                    return "Unknown Deity";
+                    return "None";
                 }
 
                 List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorDataByDeity(deity);
