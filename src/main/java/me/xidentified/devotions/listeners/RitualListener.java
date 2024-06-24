@@ -1,9 +1,14 @@
-package me.xidentified.devotions.rituals;
+package me.xidentified.devotions.listeners;
 
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.managers.MeditationManager;
 import me.xidentified.devotions.managers.ShrineManager;
+import me.xidentified.devotions.rituals.MeditationData;
+import me.xidentified.devotions.rituals.Ritual;
+import me.xidentified.devotions.rituals.RitualManager;
+import me.xidentified.devotions.rituals.RitualObjective;
 import me.xidentified.devotions.util.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -23,6 +28,7 @@ public class RitualListener implements Listener {
     private final RitualManager ritualManager;
     private final ShrineManager shrineManager;
     private static RitualListener instance;
+    private static final double PILGRIMAGE_RADIUS_SQUARED = 9;
 
     public RitualListener(Devotions plugin, ShrineManager shrineManager) {
         this.plugin = plugin;
@@ -114,27 +120,34 @@ public class RitualListener implements Listener {
         if (currentRitual != null) {
             for (RitualObjective objective : currentRitual.getObjectives()) {
                 if (objective.getType() == RitualObjective.Type.PILGRIMAGE && !objective.isComplete()) {
+                    // Handle coordinate-based pilgrimage
                     String[] coords = objective.getTarget().split(",");
-                    int targetX = Integer.parseInt(coords[0]);
-                    int targetY = Integer.parseInt(coords[1]);
-                    int targetZ = Integer.parseInt(coords[2]);
-                    Location targetLocation = new Location(player.getWorld(), targetX, targetY, targetZ);
+                    if (coords.length == 3) {
+                        int targetX = Integer.parseInt(coords[0]);
+                        int targetY = Integer.parseInt(coords[1]);
+                        int targetZ = Integer.parseInt(coords[2]);
+                        Location targetLocation = new Location(player.getWorld(), targetX, targetY, targetZ);
 
-                    if (to.getBlockX() == targetLocation.getBlockX() && to.getBlockY() == targetLocation.getBlockY()
-                            && to.getBlockZ() == targetLocation.getBlockZ()) {
-                        objective.incrementCount();
-                        if (objective.isComplete()) {
-                            Devotions.sendMessage(player, Messages.RITUAL_RETURN_TO_RESUME);
-                        } else {
-                            Devotions.sendMessage(player, Messages.RITUAL_PROGRESS
-                                    .insertParsed("current", String.valueOf(objective.getCurrentCount()))
-                                    .insertParsed("total", String.valueOf(objective.getCount()))
-                                    .insertParsed("objective", objective.getDescription()));
+                        if (to.distanceSquared(targetLocation) <= PILGRIMAGE_RADIUS_SQUARED) {
+                            handlePilgrimageCompletion(player, objective);
                         }
-                        break; // Exit loop once the objective is processed
+                    } else if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
+                        plugin.getLogger().warning("Invalid coordinates format for pilgrimage objective: " + objective.getTarget());
                     }
                 }
             }
+        }
+    }
+
+    private void handlePilgrimageCompletion(Player player, RitualObjective objective) {
+        objective.incrementCount();
+        if (objective.isComplete()) {
+            Devotions.sendMessage(player, Messages.RITUAL_RETURN_TO_RESUME);
+        } else {
+            Devotions.sendMessage(player, Messages.RITUAL_PROGRESS
+                    .insertParsed("current", String.valueOf(objective.getCurrentCount()))
+                    .insertParsed("total", String.valueOf(objective.getCount()))
+                    .insertParsed("objective", objective.getDescription()));
         }
     }
 
@@ -160,6 +173,7 @@ public class RitualListener implements Listener {
             }
         }
     }
+
 
     private int countItemsInInventory(Inventory inventory, Material material) {
         int count = 0;

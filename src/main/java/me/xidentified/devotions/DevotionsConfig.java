@@ -190,7 +190,9 @@ public class DevotionsConfig {
                         String target = (String) objectiveMap.get("target");
                         int count = (Integer) objectiveMap.get("count");
 
-                        RitualObjective objective = new RitualObjective(plugin, type, objDescription, target, count);
+                        boolean isRegionTarget = !target.matches("-?\\d+,-?\\d+,-?\\d+"); // Check if target is not coordinates
+
+                        RitualObjective objective = new RitualObjective(plugin, type, objDescription, target, count, isRegionTarget);
                         objectives.add(objective);
                         plugin.debugLog("Loaded objective " + objDescription + " for ritual " + key);
                     }

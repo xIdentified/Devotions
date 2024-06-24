@@ -24,14 +24,16 @@ public class RitualObjective {
     private final int count;
     @Setter
     private int currentCount;  // To track objective progress
+    private final boolean isRegionTarget; // Added boolean to differentiate between coordinates and region
 
-    public RitualObjective(Devotions plugin, Type type, String description, String target, int count) {
+    public RitualObjective(Devotions plugin, Type type, String description, String target, int count, boolean isRegionTarget) {
         this.plugin = plugin;
         this.type = type;
         this.description = description;
         this.target = target;
         this.count = count;
         this.currentCount = 0;
+        this.isRegionTarget = isRegionTarget;
     }
 
     public void incrementCount() {

@@ -21,7 +21,8 @@ import me.xidentified.devotions.commandexecutors.RitualCommand;
 import me.xidentified.devotions.commandexecutors.ShrineCommandExecutor;
 import me.xidentified.devotions.commandexecutors.TestMiracleCommand;
 import me.xidentified.devotions.listeners.PlayerListener;
-import me.xidentified.devotions.rituals.RitualListener;
+import me.xidentified.devotions.listeners.WorldGuardListener;
+import me.xidentified.devotions.listeners.RitualListener;
 import me.xidentified.devotions.listeners.ShrineListener;
 import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.DevotionManager;
@@ -85,6 +86,11 @@ public class Devotions extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new Placeholders(this).register();
             debugLog("PlaceholderAPI expansion enabled!");
+        }
+
+        // Check for WorldGuard compat
+        if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+            getServer().getPluginManager().registerEvents(new WorldGuardListener(this), this);
         }
 
         // Register bStats
