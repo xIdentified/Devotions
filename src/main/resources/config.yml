@@ -40,6 +40,12 @@ all-players-can-interact-with-shrines: true
 # If true, only staff can designate shrines on the server
 staff-designated-shrines: false
 
+# Configuration for deity chat symbols
+deity-symbols:
+  Anubis: ⚡
+  Baphomet: 🔥
+  Default: ✝ # Emoji for unknown or default cases
+
 storage:
   type: 'sqlite' # Options: yaml, sqlite, mysql
   mysql:

@@ -42,8 +42,7 @@ public class DevotionsConfig {
     private YamlConfiguration deitiesConfig;
     private YamlConfiguration ritualConfig;
     private File savedItemsConfigFile;
-    @Setter
-    private boolean hideFavorMessages;
+    @Setter private boolean hideFavorMessages;
 
     public int getShrineLimit() {
         return plugin.getConfig().getInt("shrine-limit", 3);
@@ -59,6 +58,7 @@ public class DevotionsConfig {
 
     public void reloadConfigs() {
         plugin.reloadConfig();
+
         reloadRitualConfig();
         reloadSoundsConfig();
         plugin.loadLanguages();
@@ -473,6 +473,5 @@ public class DevotionsConfig {
         }
         return null;
     }
-
 
 }
