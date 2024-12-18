@@ -40,6 +40,12 @@ all-players-can-interact-with-shrines: true
 # If true, only staff can designate shrines on the server
 staff-designated-shrines: false
 
+# Using a chat plugin, you can use %devotions_icon% to display a corresponding deity's symbol before the player name
+chat-icons:
+  Baphomet: "⚡"
+  Anubis: "💀"
+  None: ""
+
 storage:
   type: 'sqlite' # Options: yaml, sqlite, mysql
   mysql:

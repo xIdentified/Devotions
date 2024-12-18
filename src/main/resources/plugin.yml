@@ -1,7 +1,7 @@
 name: Devotions
 version: '${project.version}'
 main: me.xidentified.devotions.Devotions
-api-version: '1.20'
+api-version: '1.19'
 author: xIdentified
 description: Create and worship deities on your server
 

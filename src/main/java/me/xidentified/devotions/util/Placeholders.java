@@ -49,19 +49,35 @@ public class Placeholders extends PlaceholderExpansion {
             return deity != null ? "§e" + deity.getName() : "\u00A0"; // Non-breaking space
         }
 
+        // Placeholder for deity's configured chat icon
+        if (params.equalsIgnoreCase("icon")) {
+            FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
+            if (favorManager == null) {
+                return plugin.getDevotionsConfig().getDeityIcon("None");
+            }
+            Deity deity = favorManager.getDeity();
+            String deityName = (deity != null) ? deity.getName() : "None";
+            return plugin.getDevotionsConfig().getDeityIcon(deityName);
+        }
+
         // Placeholder for the player's favor value
         if (params.equalsIgnoreCase("favor")) {
             FavorManager favorManager = plugin.getDevotionManager().getPlayerDevotion(player.getUniqueId());
-            return favorManager.getFavor() + "";
+            if (favorManager == null) {
+                return "0";
+            }
+            return String.valueOf(favorManager.getFavor());
         }
 
         // Placeholder for the top players in favor
         if (params.equalsIgnoreCase("favor_top")) {
             List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorData();
             StringBuilder topPlayers = new StringBuilder();
+
             for (int i = 0; i < Math.min(3, sortedFavorData.size()); i++) {
                 FavorManager data = sortedFavorData.get(i);
                 String playerName = Bukkit.getOfflinePlayer(data.getUuid()).getName();
+                playerName = (playerName != null) ? playerName : "Unknown";
                 topPlayers.append("§6").append(i + 1).append(". §a").append(playerName).append(" §7- ")
                         .append(data.getFavor()).append("\n");
             }
@@ -70,25 +86,39 @@ public class Placeholders extends PlaceholderExpansion {
 
         // Placeholder for the top players in favor for a specific deity
         if (params.startsWith("favor_top_")) {
-            String[] parts = params.split("_");
-            if (parts.length == 4) {
-                String deityName = parts[2];
-                int rank = Integer.parseInt(parts[3]);
+            try {
+                String[] parts = params.split("_");
+                if (parts.length == 4) {
+                    String deityName = parts[2];
+                    int rank;
 
-                Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
-                if (deity == null) {
-                    return "None";
+                    // Parse rank
+                    try {
+                        rank = Integer.parseInt(parts[3]);
+                    } catch (NumberFormatException e) {
+                        return "Invalid Integer";
+                    }
+
+                    // Validate deity
+                    Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
+                    if (deity == null) {
+                        return "Unknown Deity";
+                    }
+
+                    // Retrieve sorted data
+                    List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorDataByDeity(deity);
+                    if (rank <= 0 || rank > sortedFavorData.size()) {
+                        return "No Data";
+                    }
+
+                    // Show player info
+                    FavorManager favorManager = sortedFavorData.get(rank - 1);
+                    String playerName = Bukkit.getOfflinePlayer(favorManager.getUuid()).getName();
+                    playerName = (playerName != null) ? playerName : "Unknown";
+                    return "§a" + playerName + " §7- " + favorManager.getFavor();
                 }
-
-                List<FavorManager> sortedFavorData = plugin.getDevotionManager().getSortedFavorDataByDeity(deity);
-
-                if (rank <= 0 || rank > sortedFavorData.size()) {
-                    return "No Data";
-                }
-
-                FavorManager favorManager = sortedFavorData.get(rank - 1);
-                String playerName = Bukkit.getOfflinePlayer(favorManager.getUuid()).getName();
-                return "§a" + playerName + " §7- " + favorManager.getFavor();
+            } catch (Exception e) {
+                return "Error Processing Placeholder";
             }
         }
 

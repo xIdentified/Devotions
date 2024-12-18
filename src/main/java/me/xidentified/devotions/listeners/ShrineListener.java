@@ -217,7 +217,7 @@ public class ShrineListener implements Listener {
         for (Offering offering : deity.getOfferings()) {
             if (matchesOffering(item, offering)) {
                 plugin.debugLog(String.format("Offering found for deity %s: %s", deity.getName(),
-                        offering.getItemStack().displayName()));
+                        offering.getItemStack().getItemMeta().getDisplayName()));
 
                 // Now consider the chance for offering acceptance
                 if (Math.random() <= offering.getChance()) {

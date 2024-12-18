@@ -42,8 +42,8 @@ public class DevotionsConfig {
     private YamlConfiguration deitiesConfig;
     private YamlConfiguration ritualConfig;
     private File savedItemsConfigFile;
-    @Setter
-    private boolean hideFavorMessages;
+    @Setter private boolean hideFavorMessages;
+    private final Map<String, String> deityChatIcons = new HashMap<>();
 
     public int getShrineLimit() {
         return plugin.getConfig().getInt("shrine-limit", 3);
@@ -59,6 +59,16 @@ public class DevotionsConfig {
 
     public void reloadConfigs() {
         plugin.reloadConfig();
+
+        ConfigurationSection iconsSection = plugin.getConfig().getConfigurationSection("chat-icons");
+        if (iconsSection != null) {
+            deityChatIcons.clear();
+            for (String deityName : iconsSection.getKeys(false)) {
+                String icon = iconsSection.getString(deityName, "");
+                deityChatIcons.put(deityName, icon);
+            }
+        }
+
         reloadRitualConfig();
         reloadSoundsConfig();
         plugin.loadLanguages();
@@ -474,5 +484,8 @@ public class DevotionsConfig {
         return null;
     }
 
+    public String getDeityIcon(String deityName) {
+        return deityChatIcons.getOrDefault(deityName, "");
+    }
 
 }
