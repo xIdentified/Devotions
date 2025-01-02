@@ -21,6 +21,9 @@ public class Messages {
             .withDefault("<prefix>You are now devoted to {name}. Your favor is {favor}.")
             .withPlaceholder("name", "favor")
             .build();
+    public static final Message DEVOTION_MUST_ABANDON = new MessageBuilder("devotion.must_abandon")
+            .withDefault("<prefix_negative>Use '/deity abandon' to remove your current devotion before making another.")
+            .build();
     public static final Message ABANDON_CONDITION_NOT_MET = new MessageBuilder("devotion.abandoned-not-met")
             .withDefault("<prefix_negative>You haven't met the required conditions to abandon {deity}.")
             .withPlaceholders("deity")

@@ -137,7 +137,7 @@ public class YamlStorage implements IStorage {
             UUID ownerUUID = UUID.fromString(parts[4]);
 
             String deityName = shrineSection.getString(shrineKey);
-            Deity deity = devotionManager.getDeityByName(deityName);
+            Deity deity = devotionManager.getDeityByInput(deityName);
             if (deity == null) {
                 plugin.debugLog("Deity not found: " + deityName);
                 continue;

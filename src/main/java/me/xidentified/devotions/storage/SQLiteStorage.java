@@ -114,7 +114,7 @@ public class SQLiteStorage implements IStorage {
                 Location location = parseLocation(locationStr);
                 String deityName = resultSet.getString("deity_name");
                 UUID ownerUUID = UUID.fromString(resultSet.getString("owner_uuid"));
-                Deity deity = devotionManager.getDeityByName(deityName);
+                Deity deity = devotionManager.getDeityByInput(deityName);
                 if (deity != null) {
                     shrines.add(new Shrine(location, deity, ownerUUID));
                 } else {

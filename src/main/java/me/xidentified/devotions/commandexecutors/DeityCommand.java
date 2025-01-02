@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
@@ -79,83 +80,56 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return displayExistingDeityInfo(player);
         }
 
-        String deityName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        plugin.debugLog("Value of deityName: " + deityName);
+        String deityInput = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        plugin.debugLog("Value of deityInput: " + deityInput);
 
-        Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
+        Deity selectedDeity = plugin.getDevotionManager().getDeityByInput(deityInput);
 
         if (selectedDeity == null) {
-            Devotions.sendMessage(player, Messages.DEITY_NOT_FOUND);
+            String availableDeities = plugin.getDevotionManager().getAllDeities().stream()
+                    .map(Deity::getName)
+                    .collect(Collectors.joining(", "));
+            Devotions.sendMessage(player, Messages.DEITY_NOT_FOUND
+                    .insertParsed("input", deityInput)
+                    .insertParsed("deity_list", availableDeities));
             return true;
         }
 
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
 
-        // Check the selection condition
-        if (selectedDeity.getSelectionCondition() != null) {
-            String condition = PlaceholderAPI.setPlaceholders(player, selectedDeity.getSelectionCondition());
-            boolean conditionMet = JavaScriptEngine.evaluateExpression(condition);
-
-            if (!conditionMet) {
-                Devotions.sendMessage(player, Messages.SELECTION_CONDITION_NOT_MET
-                        .insertParsed("deity", selectedDeity.getName()));
-                return true;
-            }
-        }
-
-        plugin.debugLog("Current devotion status for player " + player.getName() + ": " +
-                devotionManager.getPlayerDevotion(playerUniqueId));
-
-        // Check if the player has abandoned this deity before
-        boolean hasAbandoned = devotionManager.getHasAbandonedDeity().getOrDefault(playerUniqueId, false);
-
         // Check if the player already has a devotion
         FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
         if (currentFavorManager != null) {
-            // Player has an existing devotion
-            if (!currentFavorManager.getDeity().equals(selectedDeity)) {
-                // Player is switching to a new deity
-                currentFavorManager.resetFavor();
-                currentFavorManager.setDeity(selectedDeity);
-
-                // Apply repeat-favor logic if they abandoned the deity before
-                int favor = hasAbandoned && currentFavorManager.getDeity().equals(selectedDeity)
-                        ? plugin.getConfig().getInt("repeat-favor", 20) // Use repeat-favor if abandoned
-                        : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise
-                currentFavorManager.setFavor(favor);
-
-                // Mark that the player is no longer abandoning the deity
-                devotionManager.getHasAbandonedDeity().put(playerUniqueId, false);
-
-                // Save the updated devotion
-                devotionManager.setPlayerDevotion(playerUniqueId, currentFavorManager);
-            } else {
-                // Player selected the same deity they're already devoted to
-                Devotions.sendMessage(player, Messages.DEVOTION_ALREADY_SET
-                        .insertParsed("deity", selectedDeity.getName()));
-            }
-        } else {
-            // Player does not have an existing devotion
-            FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
-
-            // Apply repeat-favor logic if they abandoned the deity before
-            int favor = hasAbandoned
-                    ? plugin.getConfig().getInt("repeat-favor", 20) // Use repeat-favor if abandoned
-                    : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise
-            newFavorManager.setFavor(favor);
-
-            // Mark that the player is no longer abandoning the deity
-            devotionManager.getHasAbandonedDeity().put(playerUniqueId, false);
-
-            devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
+            // Player already has a devotion
+            Deity currentDeity = currentFavorManager.getDeity();
+            Devotions.sendMessage(player, Messages.DEVOTION_MUST_ABANDON
+                    .insertParsed("current_deity", currentDeity.getName())
+            );
+            return true;
         }
+
+        // Player does not have an existing devotion
+        FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
+
+        // Apply repeat-favor logic if the deity was previously abandoned
+        int favor = devotionManager.hasAbandonedDeity(playerUniqueId, selectedDeity.getName())
+                ? plugin.getConfig().getInt("reselect-favor", 0) // Use reselect-favor for abandoned deities
+                : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise
+        newFavorManager.setFavor(favor);
+
+        // If penalized, clear the abandoned status for this deity
+        if (favor == plugin.getConfig().getInt("reselect-favor", 0)) {
+            devotionManager.clearAbandonedDeity(playerUniqueId, selectedDeity.getName());
+        }
+
+        // Update devotion
+        devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
 
         plugin.debugLog("Updated devotion status for player " + player.getName() + ": " +
                 devotionManager.getPlayerDevotion(playerUniqueId));
         return true;
     }
-
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
@@ -164,11 +138,16 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        String deityName = args[1];
-        Deity selectedDeity = plugin.getDevotionManager().getDeityByName(deityName);
+        String deityInput = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        Deity selectedDeity = plugin.getDevotionManager().getDeityByInput(deityInput);
 
         if (selectedDeity == null) {
-            Devotions.sendMessage(player, Messages.DEITY_NOT_FOUND);
+            String availableDeities = plugin.getDevotionManager().getAllDeities().stream()
+                    .map(Deity::getName)
+                    .collect(Collectors.joining(", "));
+            Devotions.sendMessage(player, Messages.DEITY_NOT_FOUND
+                    .insertParsed("input", deityInput)
+                    .insertParsed("deity_list", availableDeities));
             return false;
         }
 
@@ -178,7 +157,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
                 .insertString("lore", selectedDeity.getLore())
                 .insertString("domain", String.join(", ", selectedDeity.getDomain()))
                 .insertString("alignment", selectedDeity.getAlignment())
-                .insertString("rituals", selectedDeity.getRituals())
+                .insertString("rituals", String.join(", ", selectedDeity.getRituals()))
                 .insertString("offerings", selectedDeity.getFormattedOfferings())
         );
         return true;
@@ -240,15 +219,19 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         Deity deity = favorManager.getDeity();
 
+        // Handle null deity
+        if (deity == null) {
+            return true;
+        }
+
         // Check deity-specific abandonment conditions (if configured)
-        if (deity != null && deity.getAbandonCondition() != null) {
+        if (deity.getAbandonCondition() != null) {
             String condition = PlaceholderAPI.setPlaceholders(player, deity.getAbandonCondition());
             boolean conditionMet = JavaScriptEngine.evaluateExpression(condition);
 
             if (!conditionMet) {
                 Devotions.sendMessage(player, Messages.ABANDON_CONDITION_NOT_MET
-                        .insertParsed("deity", deity.getName())
-                );
+                        .insertParsed("deity", deity.getName()));
                 return true;
             }
         }
@@ -257,8 +240,8 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         int repeatFavor = plugin.getConfig().getInt("reselect-favor", 0);
         favorManager.setFavor(repeatFavor);
 
-        // Mark the player as having abandoned the deity
-        devotionManager.getHasAbandonedDeity().put(playerUniqueId, true);
+        // Mark the deity as abandoned
+        devotionManager.markDeityAsAbandoned(playerUniqueId, deity.getName());
 
         // Set the abandon cooldown
         long abandonCooldown = plugin.getCooldownManager().getCooldownFromConfig("abandon-cooldown", "20m");
@@ -269,7 +252,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
 
         // Send abandonment message
         Devotions.sendMessage(player, Messages.DEVOTION_ABANDONED
-                .insertParsed("deity", deity != null ? deity.getName() : "None")
+                .insertParsed("deity", deity.getName())
         );
 
         return true;

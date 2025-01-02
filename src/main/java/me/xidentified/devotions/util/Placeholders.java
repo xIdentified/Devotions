@@ -103,7 +103,7 @@ public class Placeholders extends PlaceholderExpansion {
                     }
 
                     // Validate deity
-                    Deity deity = plugin.getDevotionManager().getDeityByName(deityName);
+                    Deity deity = plugin.getDevotionManager().getDeityByInput(deityName);
                     if (deity == null) {
                         return "Unknown Deity";
                     }

@@ -37,7 +37,7 @@ public class PlayerListener implements Listener {
                     playerUniqueId); // Use the storage to get player devotion data
 
             if (devotionData != null) {
-                Deity deity = devotionManager.getDeityByName(devotionData.getDeityName());
+                Deity deity = devotionManager.getDeityByInput(devotionData.getDeityName());
                 if (deity != null) {
                     favorManager = new FavorManager(plugin, playerUniqueId, deity);
                     favorManager.setFavor(devotionData.getFavor());
