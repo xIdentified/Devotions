@@ -1,0 +1,60 @@
+# Devotions - Deities and Blessings
+# Made by xIdentified - https://discord.gg/yRrbBjfbXp
+# https://github:com/xIdentified/Devotions/wiki
+
+# Used whenever a player locale could not be read.
+default-locale: "en"
+
+initial-favor: 50 # Favor players start out with
+reselect-favor: 0 # If a player is unfaithful and abandons their deity, how much favor will they have upon return?
+abandon-cooldown: 20m # When a player selects a deity, how long until they can abandon?
+max-favor: 250 # Max amount of favor players can have
+decay-rate: 5 # Rate at which favor decays over time
+decay-interval: 1200 # How often favor decays (in seconds) 1200 = 1 day
+decay-when-offline: false
+hide-favor-msgs: false # Optionally hide messages when favor is changed
+reset-favor-on-abandon: true # When player abandons a deity, should we set favor to 0 if they re-devote themselves?
+
+# Amount of favor player should have for certain actions to occur
+blessing-threshold: 150
+curse-threshold: 35
+miracle-threshold: 210
+
+# Chances for certain events to occur once a player is above threshold
+blessing-chance: 0.4 #0.5 = 50%, 0.05 = 5% chance of occurring once per effect-interval
+curse-chance: 0.1
+miracle-chance: 0.03
+days-until-miracles-start: 3 # How many days should a player maintain their high favor before miracles start occurring?
+effect-interval: 1800 # How often to check if player has blessing/curse/miracle available (in seconds)
+
+# Cooldowns (format can be 5s / 5m / 5h)
+offering-cooldown: "5m"
+ritual-cooldown: "5m"
+blessing-cooldown: "5m"
+curse-cooldown: "5m"
+miracle-cooldown: "5m"
+
+# How many shrines can a player have at once?
+shrine-limit: 3
+# If false, players can only interact with a shrine dedicated to their deity
+all-players-can-interact-with-shrines: true
+# If true, only staff can designate shrines on the server
+staff-designated-shrines: false
+
+# Configuration for deity chat symbols
+deity-symbols:
+  Anubis: ⚡
+  Baphomet: 🔥
+  Default: ✝ # Emoji for unknown or default cases
+
+storage:
+  type: 'sqlite' # Options: yaml, sqlite, mysql
+  mysql:
+    host: 'localhost'
+    port: 3306
+    database: 'devotions'
+    username: 'root'
+    password: 'password'
+    url: "jdbc:mysql://your_mysql_host:your_mysql_port/your_database?autoReconnect=true"
+
+debug_mode: false

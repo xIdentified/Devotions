@@ -1,0 +1,62 @@
+name: Devotions
+version: '1.0'
+main: me.xidentified.devotions.Devotions
+api-version: '1.19'
+author: xIdentified
+description: Create and worship deities on your server
+
+softdepend:
+  - PlaceholderAPI
+  - WorldGuard
+
+commands:
+  devotions:
+    description: Manage the Devotions plugin
+    usage: /<command> <reload|saveitem|version>
+    aliases: [dvo]
+    permission: devotions.admin
+    permission-message: You do not have permission to use this command.
+    subcommands:
+      saveitem:
+        description: Save an item
+        usage: /devotions saveitem <itemName>
+  deity:
+    description: Manage and view information about deities.
+    usage: /<command> <select|info|list|abandon> [DeityName]
+    permission: devotions.select
+    aliases: [god, gods]
+    tab-completions: true
+  shrine:
+    description: Manage and view information about deities.
+    usage: /<command> <set|delete> [DeityName]
+    aliases: [altar]
+    tab-completions: true
+  favor:
+    description: Manages and adjusts player's favor.
+    usage: /<command> <set|give|take> <playername> <amount>
+    tab-completions: true
+  ritual:
+    description: View ritual information
+    usage: /<command> <info> [ritualName]
+    aliases: [rituals]
+  testmiracle:
+    description: Execute miracles to ensure they work.
+    usage: /<command> <number>
+    tab-completions: true
+  migrate-storage:
+    description: Migrates data from YAML to database storage
+    usage: /migrate-storage
+
+permissions:
+  devotions.shrine.set:
+    description: Allows dedication of shrines to your deity.
+    default: true
+  devotions.admin:
+    description: Allows use of all admin commands.
+    default: op
+  devotions.favor:
+    description: Allows use of /favor.
+    default: true
+  devotions.select:
+    description: Allows selection of a chosen deity.
+    default: true

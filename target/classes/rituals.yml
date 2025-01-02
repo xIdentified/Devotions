@@ -1,0 +1,109 @@
+# Here is where you'll set up rituals for players to participate in with their chosen Deity.
+# For potion effects, use https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
+
+rituals:
+  harvest_festival:
+    display_name: "Ritual of the Harvest Festival"
+    description: "Celebrate the bounties of the earth and create prime farming conditions"
+    favor: 30
+    item: "VANILLA:GOLDEN_HOE"
+    consume-item: true
+    conditions:
+      expression: "%vault_eco_balance% >= 100"
+    objectives:
+      - type: "GATHERING"
+        description: "Bring 20 wheat to the shrine"
+        target: "WHEAT"
+        count: 20
+    outcome-command:
+      - "weather set clear"
+
+  purification_ritual:
+    display_name: "Ritual of Purification"
+    description: "Purify the lands by vanquishing dark entities"
+    favor: 40
+    item: "VANILLA:IRON_SWORD"
+    conditions:
+      time: "NIGHT"
+    objectives:
+      - type: "PURIFICATION"
+        description: "Defeat 6 zombies around the shrine"
+        target: "ZOMBIE"
+        count: 6
+    outcome-command:
+      - "effect give @p minecraft:regeneration 30 1"
+      - "effect give @p minecraft:strength 60 1"
+
+  meditation_ritual:
+    display_name: "Ritual of Deep Meditation"
+    description: "Attain inner peace and spiritual enlightenment"
+    favor: 25
+    item: "VANILLA:BOOK"
+    conditions:
+      time: "DAY"
+    objectives:
+      - type: "MEDITATION"
+        description: "Meditate at the shrine for 10 seconds"
+        target: PLAYER
+        count: 10
+    outcome-command:
+      - "give {player} minecraft:totem_of_undying 1"
+      - "minecraft:say @p has achieved enlightenment!"
+
+  crafting_ritual:
+    display_name: "Ritual of Crafting"
+    description: "Craft a special item as an offering"
+    favor: 35
+    item: "VANILLA:CRAFTING_TABLE"
+    consume-item: true
+    objectives:
+      - type: "CRAFTING"
+        description: "Craft a diamond sword at the shrine"
+        target: "DIAMOND_SWORD"
+        count: 1
+    outcome-command:
+      - "give {player} minecraft:diamond_sword 1"
+
+  breeding_ritual:
+    display_name: "Ritual of Fertility"
+    description: "Promote the fertility of your livestock"
+    favor: 20
+    item: "VANILLA:WHEAT"
+    consume-item: true
+    objectives:
+      - type: "BREEDING"
+        description: "Breed 5 cows"
+        target: "COW"
+        count: 5
+    outcome-command:
+      - "give {player} minecraft:cow_spawn_egg 2"
+
+  sacrifice_ritual:
+    display_name: "Sacrificial Ritual"
+    description: "Sacrifice a passive mob to appease your deity."
+    favor: 50
+    item: "VANILLA:IRON_SWORD"
+    consume-item: true
+    objectives:
+      - type: "SACRIFICE"
+        description: "Kill 3 sheep at the shrine"
+        target: "SHEEP"
+        count: 3
+    outcome-command:
+      - "give {player} minecraft:wool 10"
+
+  pilgrimage_ritual:
+    display_name: "Ritual of Pilgrimage"
+    description: "Travel to the sacred site to complete the ritual"
+    favor: 45
+    item: "VANILLA:MAP"
+    consume-item: false
+    objectives:
+      - type: "PILGRIMAGE"
+        description: "Travel to coordinates (100, 64, -200)"
+        target: "100,64,-200"
+        count: 1
+    outcome-command:
+      - "give {player} minecraft:emerald 5"
+
+  # You can make more rituals in the same format, or update the existing ones.

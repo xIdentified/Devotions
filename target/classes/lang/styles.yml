@@ -1,0 +1,10 @@
+# Remove devotion styling rules to apply global styles instead.
+primary: <gold>{slot}</gold>
+offset: <yellow>{slot}</yellow>
+accent: <light_purple>{slot}</light_purple>
+
+prefix: <positive>{slot}</positive>
+prefix_negative: <negative>{slot}</negative>
+prefix_warning: <warning>{slot}</warning>
+text: <gray>{slot}</gray>
+cmd_syntax: <warning>{slot}</warning>
