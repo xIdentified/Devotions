@@ -6,7 +6,8 @@
 default-locale: "en"
 
 initial-favor: 50 # Favor players start out with
-abandoned-favor: 0 # If a player abandons a deity then tries to re-follow them, how much favor should they have?
+reselect-favor: 0 # If a player is unfaithful and abandons their deity, how much favor will they have upon return?
+abandon-cooldown: 20m # When a player selects a deity, how long until they can abandon?
 max-favor: 250 # Max amount of favor players can have
 decay-rate: 5 # Rate at which favor decays over time
 decay-interval: 1200 # How often favor decays (in seconds) 1200 = 1 day

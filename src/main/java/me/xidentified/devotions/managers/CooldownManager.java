@@ -32,30 +32,26 @@ public class CooldownManager {
     private final Map<UUID, Map<String, Long>> playerActionTimestamps = new HashMap<>();
 
 
+    public void setCooldown(Player player, String action, long cooldownTimeMs) {
+        Map<String, Long> playerTimestamps = playerActionTimestamps
+                .computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
+        playerTimestamps.put(action, System.currentTimeMillis() + cooldownTimeMs);
+    }
+
     public long isActionAllowed(Player player, String action) {
         long currentTime = System.currentTimeMillis();
-        Long cooldownTime = cooldowns.get(action);
-        if (cooldownTime == null) {
-            return 0; // No cooldown defined for this action
+        Map<String, Long> playerTimestamps = playerActionTimestamps.get(player.getUniqueId());
+
+        if (playerTimestamps == null) {
+            return 0; // No cooldowns for this player
         }
 
-        Map<String, Long> playerTimestamps = playerActionTimestamps.computeIfAbsent(player.getUniqueId(),
-                k -> new HashMap<>());
         Long nextAllowedActionTime = playerTimestamps.get(action);
-
         if (nextAllowedActionTime != null && currentTime < nextAllowedActionTime) {
             return nextAllowedActionTime - currentTime;
         }
 
-        playerTimestamps.put(action, currentTime + cooldownTime);
-        return 0;
-    }
-
-    // Method to set cooldowns from the config
-    public void setCooldown(Player player, String action, long cooldownTimeMs) {
-        playerCooldowns
-                .computeIfAbsent(player.getUniqueId(), k -> new HashMap<>())
-                .put(action, System.currentTimeMillis() + cooldownTimeMs);
+        return 0; // No cooldown or cooldown expired
     }
 
     public long parseCooldown(String input) {

@@ -4,12 +4,15 @@ import static org.bukkit.Bukkit.getServer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.Setter;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
 import me.xidentified.devotions.storage.StorageManager;
@@ -24,6 +27,7 @@ public class DevotionManager {
     private final StorageManager storage;
     private final Map<UUID, FavorManager> playerDevotions = new ConcurrentHashMap<>();
     private final Map<String, Deity> deities;
+    @Getter @Setter public Map<UUID, Boolean> hasAbandonedDeity = new HashMap<>();
 
     public DevotionManager(Devotions plugin, Map<String, Deity> loadedDeities) {
         this.plugin = plugin;

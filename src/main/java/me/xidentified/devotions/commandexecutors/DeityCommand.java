@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.xidentified.devotions.Deity;
 import me.xidentified.devotions.Devotions;
+import me.xidentified.devotions.managers.CooldownManager;
 import me.xidentified.devotions.managers.DevotionManager;
 import me.xidentified.devotions.managers.FavorManager;
 import me.xidentified.devotions.util.JavaScriptEngine;
@@ -105,14 +107,27 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         plugin.debugLog("Current devotion status for player " + player.getName() + ": " +
                 devotionManager.getPlayerDevotion(playerUniqueId));
 
+        // Check if the player has abandoned this deity before
+        boolean hasAbandoned = devotionManager.getHasAbandonedDeity().getOrDefault(playerUniqueId, false);
+
         // Check if the player already has a devotion
         FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
         if (currentFavorManager != null) {
             // Player has an existing devotion
             if (!currentFavorManager.getDeity().equals(selectedDeity)) {
-                // Player is switching to a new deity, so reset the favor and update the deity
+                // Player is switching to a new deity
                 currentFavorManager.resetFavor();
                 currentFavorManager.setDeity(selectedDeity);
+
+                // Apply repeat-favor logic if they abandoned the deity before
+                int favor = hasAbandoned && currentFavorManager.getDeity().equals(selectedDeity)
+                        ? plugin.getConfig().getInt("repeat-favor", 20) // Use repeat-favor if abandoned
+                        : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise
+                currentFavorManager.setFavor(favor);
+
+                // Mark that the player is no longer abandoning the deity
+                devotionManager.getHasAbandonedDeity().put(playerUniqueId, false);
+
                 // Save the updated devotion
                 devotionManager.setPlayerDevotion(playerUniqueId, currentFavorManager);
             } else {
@@ -121,8 +136,18 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
                         .insertParsed("deity", selectedDeity.getName()));
             }
         } else {
-            // Player does not have an existing devotion, create a new FavorManager
+            // Player does not have an existing devotion
             FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
+
+            // Apply repeat-favor logic if they abandoned the deity before
+            int favor = hasAbandoned
+                    ? plugin.getConfig().getInt("repeat-favor", 20) // Use repeat-favor if abandoned
+                    : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise
+            newFavorManager.setFavor(favor);
+
+            // Mark that the player is no longer abandoning the deity
+            devotionManager.getHasAbandonedDeity().put(playerUniqueId, false);
+
             devotionManager.setPlayerDevotion(playerUniqueId, newFavorManager);
         }
 
@@ -130,6 +155,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
                 devotionManager.getPlayerDevotion(playerUniqueId));
         return true;
     }
+
 
     private boolean handleInfo(Player player, String[] args) {
         if (args.length < 2) {
@@ -193,16 +219,28 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
     private boolean handleAbandon(Player player) {
         UUID playerUniqueId = player.getUniqueId();
         DevotionManager devotionManager = plugin.getDevotionManager();
+        CooldownManager cooldownManager = plugin.getCooldownManager();
+
+        // Check if the player is still on cooldown
+        long remainingCooldown = cooldownManager.isActionAllowed(player, "abandon");
+        if (remainingCooldown > 0) {
+            long minutesLeft = TimeUnit.MILLISECONDS.toMinutes(remainingCooldown);
+            Devotions.sendMessage(player, Messages.ABANDON_COOLDOWN_ACTIVE
+                    .insertParsed("time", minutesLeft + " minutes")
+            );
+            return true;
+        }
 
         // Check if the player has a devotion
         FavorManager favorManager = devotionManager.getPlayerDevotion(playerUniqueId);
-
         if (favorManager == null) {
             Devotions.sendMessage(player, Messages.NO_DEVOTION_SET);
             return true;
         }
 
         Deity deity = favorManager.getDeity();
+
+        // Check deity-specific abandonment conditions (if configured)
         if (deity != null && deity.getAbandonCondition() != null) {
             String condition = PlaceholderAPI.setPlaceholders(player, deity.getAbandonCondition());
             boolean conditionMet = JavaScriptEngine.evaluateExpression(condition);
@@ -215,17 +253,28 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Check if reset-favor-on-abandon is true
-        boolean resetFavorOnAbandon = plugin.getDevotionsConfig().resetFavorOnAbandon();
-        if (resetFavorOnAbandon) {
-            favorManager.resetFavor();
-        }
+        // Penalize favor on abandonment
+        int repeatFavor = plugin.getConfig().getInt("reselect-favor", 0);
+        favorManager.setFavor(repeatFavor);
+
+        // Mark the player as having abandoned the deity
+        devotionManager.getHasAbandonedDeity().put(playerUniqueId, true);
+
+        // Set the abandon cooldown
+        long abandonCooldown = plugin.getCooldownManager().getCooldownFromConfig("abandon-cooldown", "20m");
+        cooldownManager.setCooldown(player, "abandon", abandonCooldown);
 
         // Remove the player's devotion
         devotionManager.removeDevotion(playerUniqueId);
-        Devotions.sendMessage(player, Messages.DEVOTION_ABANDONED);
+
+        // Send abandonment message
+        Devotions.sendMessage(player, Messages.DEVOTION_ABANDONED
+                .insertParsed("deity", deity != null ? deity.getName() : "None")
+        );
+
         return true;
     }
+
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label,

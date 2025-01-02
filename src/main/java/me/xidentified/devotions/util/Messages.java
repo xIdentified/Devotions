@@ -28,6 +28,10 @@ public class Messages {
     public static final Message DEVOTION_ABANDONED = new MessageBuilder("devotion.abandoned")
             .withDefault("<prefix>You have abandoned your devotion.")
             .build();
+    public static final Message ABANDON_COOLDOWN_ACTIVE = new MessageBuilder("devotion.abandon_cooldown")
+            .withDefault(
+                    "<prefix_negative>You must wait a full day before abandoning your devotion.")
+            .build();
     public static final Message DEVOTION_ALREADY_SET = new MessageBuilder("devotion.already_set")
             .withDefault("<prefix>You are already devoted to {name}.")
             .withPlaceholder("name", "favor")
