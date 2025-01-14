@@ -29,31 +29,38 @@ public class CooldownManager {
         cooldowns.put("shrine", getCooldownFromConfig("shrine-cooldown", "3s"));
     }
 
-    private final Map<UUID, Map<String, Long>> playerActionTimestamps = new HashMap<>();
-
-
+    /**
+     * Sets an action cooldown for a specific player in milliseconds.
+     */
     public void setCooldown(Player player, String action, long cooldownTimeMs) {
-        Map<String, Long> playerTimestamps = playerActionTimestamps
+        Map<String, Long> playerTimestamps = playerCooldowns
                 .computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
         playerTimestamps.put(action, System.currentTimeMillis() + cooldownTimeMs);
     }
 
+    /**
+     * Checks if a player's action is allowed. Returns 0 if allowed,
+     * or the remaining milliseconds until it can be performed again.
+     */
     public long isActionAllowed(Player player, String action) {
         long currentTime = System.currentTimeMillis();
-        Map<String, Long> playerTimestamps = playerActionTimestamps.get(player.getUniqueId());
+        Map<String, Long> playerTimestamps = playerCooldowns.get(player.getUniqueId());
 
         if (playerTimestamps == null) {
-            return 0; // No cooldowns for this player
+            return 0; // No record of cooldowns for this player
         }
 
-        Long nextAllowedActionTime = playerTimestamps.get(action);
-        if (nextAllowedActionTime != null && currentTime < nextAllowedActionTime) {
-            return nextAllowedActionTime - currentTime;
+        Long nextAllowedTime = playerTimestamps.get(action);
+        if (nextAllowedTime != null && currentTime < nextAllowedTime) {
+            return nextAllowedTime - currentTime;
         }
 
-        return 0; // No cooldown or cooldown expired
+        return 0; // No cooldown or it has expired
     }
 
+    /**
+     * Parse a string like "1d2h10m" into milliseconds.
+     */
     public long parseCooldown(String input) {
         Pattern pattern = Pattern.compile("(\\d+)([dhms])");
         Matcher matcher = pattern.matcher(input);
@@ -68,13 +75,22 @@ public class CooldownManager {
                 case "s" -> totalMillis += TimeUnit.SECONDS.toMillis(value);
             }
         }
-
         return totalMillis;
     }
 
+    /**
+     * Load a cooldown value from config, parse it to milliseconds.
+     * If not found, use defaultValue (like "10m").
+     */
     public long getCooldownFromConfig(String path, String defaultValue) {
         String cooldownStr = plugin.getConfig().getString(path, defaultValue);
         return parseCooldown(cooldownStr);
     }
 
+    /**
+     * Completely removes all cooldown data for a specific player.
+     */
+    public void clearCooldowns(Player player) {
+        playerCooldowns.remove(player.getUniqueId());
+    }
 }

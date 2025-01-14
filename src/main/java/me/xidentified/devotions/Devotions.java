@@ -225,6 +225,11 @@ public class Devotions extends JavaPlugin {
         getServer().getPluginManager().registerEvents(shrineCmd, this);
 
         debugLog("Devotions successfully initialized!");
+
+        long rawInterval = getConfig().getLong("decay-interval", 1200);
+        getLogger().info("Decay interval (seconds) from config: " + rawInterval);
+        long decayInterval = rawInterval * 20L;
+        getLogger().info("Decay interval in ticks: " + decayInterval);
     }
 
     @Override

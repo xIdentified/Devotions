@@ -8,9 +8,6 @@ public class Messages {
     public static final Message GENERAL_PLAYER_NOT_FOUND = new MessageBuilder("general.player_not_found")
             .withDefault("<prefix_negative>Player not found: {name}")
             .build();
-    public static final Message MIGRATION_COMPLETE = new MessageBuilder("general.migration_complete")
-            .withDefault("<prefix>Storage successfully migrated!")
-            .build();
     public static final Message DEVOTION_RELOAD_SUCCESS = new MessageBuilder("devotion.reload_success")
             .withDefault("<prefix>Devotions successfully reloaded!")
             .build();

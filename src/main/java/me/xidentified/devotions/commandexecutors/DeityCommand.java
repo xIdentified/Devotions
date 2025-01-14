@@ -101,7 +101,7 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
         // Check if the player already has a devotion
         FavorManager currentFavorManager = devotionManager.getPlayerDevotion(playerUniqueId);
         if (currentFavorManager != null) {
-            // Player already has a devotion
+            // Player already has a devotion, tell them to abandon it first
             Deity currentDeity = currentFavorManager.getDeity();
             Devotions.sendMessage(player, Messages.DEVOTION_MUST_ABANDON
                     .insertParsed("current_deity", currentDeity.getName())
@@ -109,10 +109,10 @@ public class DeityCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // Player does not have an existing devotion
+        // Player does not have an existing devotion, create new one
         FavorManager newFavorManager = new FavorManager(plugin, playerUniqueId, selectedDeity);
 
-        // Apply repeat-favor logic if the deity was previously abandoned
+        // Apply repeat-favor logic if their chosen deity was previously abandoned
         int favor = devotionManager.hasAbandonedDeity(playerUniqueId, selectedDeity.getName())
                 ? plugin.getConfig().getInt("reselect-favor", 0) // Use reselect-favor for abandoned deities
                 : plugin.getConfig().getInt("initial-favor", 100); // Use initial-favor otherwise

@@ -48,10 +48,6 @@ public class DevotionsConfig {
         return plugin.getConfig().getInt("shrine-limit", 3);
     }
 
-    public boolean resetFavorOnAbandon() {
-        return plugin.getConfig().getBoolean("reset-favor-on-abandon", true);
-    }
-
     public DevotionsConfig(Devotions plugin) {
         this.plugin = plugin;
     }

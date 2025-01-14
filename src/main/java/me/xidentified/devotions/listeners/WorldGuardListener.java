@@ -79,7 +79,7 @@ public class WorldGuardListener implements Listener {
 
     private WorldGuardPlugin getWorldGuardPlugin() {
         Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+        if (!(plugin instanceof WorldGuardPlugin)) {
             return null;
         }
         return (WorldGuardPlugin) plugin;

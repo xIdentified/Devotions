@@ -1,7 +1,5 @@
 package me.xidentified.devotions.managers;
 
-import static org.bukkit.Bukkit.getServer;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,9 +23,9 @@ public class DevotionManager {
 
     private final Devotions plugin;
     private final StorageManager storage;
-    private final Map<UUID, FavorManager> playerDevotions = new ConcurrentHashMap<>();
+    private final Map<UUID, FavorManager> playerDevotions = new HashMap<>();
     private final Map<String, Deity> deities;
-    @Getter @Setter private Map<UUID, Set<String>> abandonedDeities = new ConcurrentHashMap<>();
+    @Getter @Setter private Map<UUID, Set<String>> abandonedDeities = new HashMap<>();
 
     public DevotionManager(Devotions plugin, Map<String, Deity> loadedDeities) {
         this.plugin = plugin;
@@ -37,37 +34,41 @@ public class DevotionManager {
         loadPlayerDevotions();
     }
 
+    /**
+     * Returns a list of all FavorManagers for a given Deity, sorted by favor descending.
+     */
     public List<FavorManager> getSortedFavorDataByDeity(Deity deity) {
         return playerDevotions.values().stream()
-                .filter(favorManager -> favorManager.getDeity().equals(deity))
+                .filter(fm -> fm.getDeity().equals(deity))
                 .sorted(Comparator.comparingInt(FavorManager::getFavor).reversed())
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieve a Deity by internal map key or display name.
+     */
     public Deity getDeityByInput(String input) {
-        if (input == null || deities == null) {
-            return null;
-        }
+        if (input == null || deities == null) return null;
 
-        String normalizedInput = input.toLowerCase();
-
-        // Try to match by internal ID (key in the map)
-        Deity deity = deities.get(normalizedInput);
+        String normalized = input.toLowerCase();
+        // Match by internal ID
+        Deity deity = deities.get(normalized);
         if (deity != null) {
             return deity;
         }
 
-        // Try to match by display name (case-insensitive)
+        // Match by display name
         for (Deity d : deities.values()) {
             if (d.getName().equalsIgnoreCase(input)) {
                 return d;
             }
         }
-
-        return null; // No match found
+        return null;
     }
 
-
+    /**
+     * Get the FavorManager for a player if it exists; null otherwise.
+     */
     public FavorManager getPlayerDevotion(UUID playerUUID) {
         FavorManager manager = playerDevotions.get(playerUUID);
         if (manager == null || manager.getDeity() == null) {
@@ -78,26 +79,29 @@ public class DevotionManager {
         return manager;
     }
 
-    public synchronized void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
+    /**
+     * Assign a new FavorManager to a player.
+     * If the old devotion was to a different deity, reset the new manager's favor.
+     */
+    public void setPlayerDevotion(UUID playerUUID, FavorManager newDevotion) {
         if (playerUUID == null || newDevotion == null) {
-            plugin.getLogger().warning(
-                    "Attempted to set null player ID or devotion: Player ID = " + playerUUID + ", Devotion = "
-                            + newDevotion);
+            plugin.getLogger().warning("Attempted to set null player ID or devotion: "
+                    + playerUUID + ", " + newDevotion);
             return;
         }
 
-        FavorManager currentDevotion;
-        synchronized (playerDevotions) {
-            currentDevotion = playerDevotions.get(playerUUID);
-            if (currentDevotion != null && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
-                // Player is switching to a new deity, reset their favor
-                newDevotion.resetFavor();
-            }
-
-            // Update the player's devotion with the new or reset FavorManager
-            playerDevotions.put(playerUUID, newDevotion);
+        FavorManager currentDevotion = playerDevotions.get(playerUUID);
+        if (currentDevotion != null
+                && currentDevotion.getDeity() != null
+                && !currentDevotion.getDeity().equals(newDevotion.getDeity())) {
+            // Player is switching to a new deity, reset their favor
+            newDevotion.resetFavor();
         }
 
+        // Update player's devotion
+        playerDevotions.put(playerUUID, newDevotion);
+
+        // Persist and notify if player is online
         Player player = Bukkit.getPlayer(playerUUID);
         if (player != null) {
             Deity deity = newDevotion.getDeity();
@@ -109,29 +113,43 @@ public class DevotionManager {
                     .insertNumber("favor", newDevotion.getFavor())
             );
         } else {
-            plugin.getLogger().warning("Tried to set devotion for a player that is not online: " + playerUUID);
+            plugin.getLogger().warning("Tried to set devotion for offline player: " + playerUUID);
         }
     }
 
+    /**
+     * Remove a player's devotion entirely.
+     */
     public void removeDevotion(UUID playerUUID) {
-        FavorManager favorManager = playerDevotions.remove(playerUUID);
-        if (favorManager != null) {
+        FavorManager fm = playerDevotions.remove(playerUUID);
+        if (fm != null) {
+            fm.cancelTasks();
+            // Set favor to 'abandoned' amount as punishment for leaving devotion
             int abandonedFavor = plugin.getConfig().getInt("abandoned-favor", 0);
-            favorManager.setFavor(abandonedFavor);
-            storage.getStorage().savePlayerDevotion(playerUUID, favorManager);
+            fm.setFavor(abandonedFavor);
+
+            storage.getStorage().savePlayerDevotion(playerUUID, fm);
+        }
+
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player != null) {
+            plugin.getCooldownManager().clearCooldowns(player);
         }
         storage.getStorage().removePlayerDevotion(playerUUID);
     }
 
+    /**
+     * Loads all saved devotions from storage into memory.
+     */
     public void loadPlayerDevotions() {
-        Set<UUID> playerUUIDs = getAllStoredPlayerUUIDs();
+        Set<UUID> playerUUIDs = storage.getStorage().getAllStoredPlayerUUIDs();
         for (UUID uuid : playerUUIDs) {
-            DevotionData devotionData = storage.getStorage().getPlayerDevotion(uuid);
-            if (devotionData != null) {
-                Deity deity = getDeityByInput(devotionData.getDeityName());
+            DevotionData data = storage.getStorage().getPlayerDevotion(uuid);
+            if (data != null) {
+                Deity deity = getDeityByInput(data.getDeityName());
                 if (deity != null) {
                     FavorManager favorManager = new FavorManager(plugin, uuid, deity);
-                    favorManager.setFavor(devotionData.getFavor());
+                    favorManager.setFavor(data.getFavor());
                     playerDevotions.put(uuid, favorManager);
                 } else {
                     plugin.getLogger().warning("Deity not found for UUID: " + uuid);
@@ -141,56 +159,72 @@ public class DevotionManager {
         plugin.getLogger().info("Loaded devotions for " + playerDevotions.size() + " players.");
     }
 
-    private Set<UUID> getAllStoredPlayerUUIDs() {
-        return storage.getStorage().getAllStoredPlayerUUIDs();
-    }
-
     public List<Deity> getAllDeities() {
         return new ArrayList<>(deities.values());
     }
 
+    /**
+     * Saves devotions for all currently online players.
+     */
     public void saveAllPlayerDevotions() {
-        for (Player player : getServer().getOnlinePlayers()) {
-            UUID playerUUID = player.getUniqueId();
-            FavorManager favorManager = playerDevotions.get(playerUUID);
-            if (favorManager != null) {
-                storage.getStorage().savePlayerDevotion(playerUUID, favorManager);
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            UUID uuid = player.getUniqueId();
+            FavorManager fm = playerDevotions.get(uuid);
+            if (fm != null) {
+                storage.getStorage().savePlayerDevotion(uuid, fm);
             }
         }
     }
 
+    /**
+     * Returns a list of all FavorManagers sorted by favor descending.
+     */
     public List<FavorManager> getSortedFavorData() {
-        List<FavorManager> sortedFavorData = new ArrayList<>(playerDevotions.values());
-        // Sort the list by favor in descending order so top players show first
-        sortedFavorData.sort((o1, o2) -> Integer.compare(o2.getFavor(), o1.getFavor()));
-        return sortedFavorData;
+        List<FavorManager> sorted = new ArrayList<>(playerDevotions.values());
+        sorted.sort((a, b) -> Integer.compare(b.getFavor(), a.getFavor()));
+        return sorted;
     }
 
+    /**
+     * Clears all devotions in memory AND the deity map. Use carefully.
+     */
     public void clearData() {
         playerDevotions.clear();
         deities.clear();
     }
 
+    /**
+     * Reload from storage, discarding current in-memory devotion data.
+     */
     public void reset() {
         playerDevotions.clear();
         loadPlayerDevotions();
     }
 
+    /**
+     * Track that a player abandoned a specific deity.
+     */
     public void markDeityAsAbandoned(UUID playerUUID, String deityId) {
-        abandonedDeities.computeIfAbsent(playerUUID, k -> new HashSet<>()).add(deityId.toLowerCase());
+        abandonedDeities.computeIfAbsent(playerUUID, k -> new HashSet<>())
+                .add(deityId.toLowerCase());
     }
 
+    /**
+     * Check if player has abandoned this deity before.
+     */
     public boolean hasAbandonedDeity(UUID playerUUID, String deityId) {
         Set<String> abandoned = abandonedDeities.get(playerUUID);
         return abandoned != null && abandoned.contains(deityId.toLowerCase());
     }
 
+    /**
+     * Clears the "abandoned" status for a deity, if needed.
+     */
     public void clearAbandonedDeity(UUID playerUUID, String deityId) {
         Set<String> abandoned = abandonedDeities.get(playerUUID);
         if (abandoned != null) {
             abandoned.remove(deityId.toLowerCase());
         }
     }
-
 }
 
