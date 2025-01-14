@@ -55,7 +55,7 @@ public class Devotions extends JavaPlugin {
 
     @Getter
     private static Devotions instance;
-    private final DevotionsConfig devotionsConfig = new DevotionsConfig(this);
+    private DevotionsConfig devotionsConfig = new DevotionsConfig(this);
     private DevotionManager devotionManager;
     private RitualManager ritualManager;
     private CooldownManager cooldownManager;
@@ -66,10 +66,9 @@ public class Devotions extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        devotionsConfig = new DevotionsConfig(this);
+        devotionsConfig.initConfigs();
         initializePlugin();
-        devotionsConfig.loadSoundsConfig();
-        devotionsConfig.reloadSavedItemsConfig();
 
         translations = BukkitTinyTranslations.application(this);
         translations.setMessageStorage(new YamlMessageStorage(new File(getDataFolder(), "/lang/")));
@@ -172,7 +171,7 @@ public class Devotions extends JavaPlugin {
     public void initializePlugin() {
         HandlerList.unregisterAll(this);
         instance = this;
-        devotionsConfig.loadRitualConfig();
+        devotionsConfig.loadRitualConfig(false);
 
         // Initialize storage
         this.storageManager = new StorageManager(this);

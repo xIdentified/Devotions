@@ -228,4 +228,9 @@ public class RitualManager {
         ritualDroppedItems.remove(player);
     }
 
+    public void clearRituals() {
+        rituals.clear();
+        playerRituals.clear();
+        ritualDroppedItems.clear();
+    }
 }

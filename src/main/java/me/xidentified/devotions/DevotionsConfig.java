@@ -1,8 +1,6 @@
 package me.xidentified.devotions;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,171 +34,205 @@ import org.bukkit.potion.PotionEffectType;
 public class DevotionsConfig {
 
     private final Devotions plugin;
-    private final Map<String, Miracle> miraclesMap = new HashMap<>();
+
+    /**
+     * -- GETTER --
+     * If you need direct access to the main config.
+     */
+    // Main config (config.yml), already managed by plugin.getConfig(), but we'll store a reference
+    @Getter
+    private FileConfiguration mainConfig;
+
+    /**
+     * -- GETTER --
+     * If you want direct access to sounds config for playing SFX, etc.
+     */
+    // Separate YAML configs
+    @Getter
     private YamlConfiguration soundsConfig;
-    private YamlConfiguration savedItemsConfig;
     private YamlConfiguration deitiesConfig;
     private YamlConfiguration ritualConfig;
-    private File savedItemsConfigFile;
-    @Setter private boolean hideFavorMessages;
 
-    public int getShrineLimit() {
-        return plugin.getConfig().getInt("shrine-limit", 3);
-    }
+    // Whether to hide favor messages; read from config.yml (or you can store directly in plugin)
+    @Getter
+    @Setter
+    private boolean hideFavorMessages;
 
+    // Miracles map if you need to track them globally (populated in parseMiracle)
+    private final Map<String, Miracle> miraclesMap = new HashMap<>();
+
+    /**
+     * Constructor.
+     * We won't load configs here to avoid partial data if plugin isn't fully initialized yet.
+     */
     public DevotionsConfig(Devotions plugin) {
         this.plugin = plugin;
     }
 
+    // -------------------------------------------------------
+    //  1) INITIALIZE - Called once during plugin startup
+    // -------------------------------------------------------
+    public void initConfigs() {
+        // 1) Make sure the plugin’s default config.yml is created if missing
+        plugin.saveDefaultConfig();
+        // 2) Reload plugin config from disk -> plugin.getConfig()
+        plugin.reloadConfig();
+        this.mainConfig = plugin.getConfig();
+
+        // You can read any top-level config settings here, e.g.:
+        this.hideFavorMessages = mainConfig.getBoolean("hide-favor-messages", false);
+
+        // 3) Load each custom YAML
+        loadRitualConfig(false);
+        loadSoundsConfig(false);
+        loadDeitiesConfig(false);
+
+        // 4) Parse data from the loaded files into memory
+        loadRituals(); // parse "rituals.yml"
+        // If you want to parse deities immediately, do something like:
+        // Map<String, Deity> loadedDeities = loadDeities(deitiesConfig);
+        // plugin.setDeities(loadedDeities) or something similar.
+
+        plugin.debugLog("All configs have been initialized.");
+    }
+
+    // -------------------------------------------------------
+    //  2) RELOAD - Called if user does "/devotions reload", etc.
+    // -------------------------------------------------------
     public void reloadConfigs() {
         plugin.reloadConfig();
+        this.mainConfig = plugin.getConfig();
+        this.hideFavorMessages = mainConfig.getBoolean("hide-favor-messages", false);
 
-        reloadRitualConfig();
-        reloadSoundsConfig();
+        loadRitualConfig(true);
+        loadSoundsConfig(true);
+        loadDeitiesConfig(true);
+
+        // 3) Re-parse
+        loadRituals();
+        // e.g. re-parse deities:
+        // Map<String, Deity> reloadedDeities = loadDeities(deitiesConfig);
+        // plugin.setDeities(reloadedDeities);
+
         plugin.loadLanguages();
 
-        // Reset the DevotionManager
         if (plugin.getDevotionManager() != null) {
             plugin.getDevotionManager().reset();
         }
 
         plugin.initializePlugin();
+
+        plugin.debugLog("All configs have been reloaded.");
     }
 
-    // Translates item ID for rituals and offerings
-    // TODO: Saved item support
-    public String getItemId(ItemStack item) {
-        plugin.debugLog("Checking for vanilla item key: VANILLA:" + item.getType().name());
-        // If the item is a potion, append the potion type to the ID
-        if (item.getType() == Material.POTION) {
-            PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-            if (potionMeta != null) {
-                PotionData potionData = potionMeta.getBasePotionData();
-                return "VANILLA:POTION_" + potionData.getType().name();
-            }
-        }
-        // constructs vanilla item IDs for non-potion items
-        return "VANILLA:" + item.getType().name();
+    public Map<String, Deity> reloadDeitiesConfig() {
+        // Reload the file on disk
+        loadDeitiesConfig(true);
+        // Now parse the reloaded file into a Map<String, Deity>
+        return loadDeities(this.deitiesConfig);
     }
 
-    public void loadRitualConfig() {
+    // -------------------------------------------------------
+    //  LOAD / RELOAD RITUAL CONFIG
+    // -------------------------------------------------------
+    public void loadRitualConfig(boolean overwrite) {
         File ritualFile = new File(plugin.getDataFolder(), "rituals.yml");
         if (!ritualFile.exists()) {
+            // creates default from jar if not found
             plugin.saveResource("rituals.yml", false);
         }
-        ritualConfig = YamlConfiguration.loadConfiguration(ritualFile);
-    }
-
-    private void reloadRitualConfig() {
-        File ritualFile = new File(plugin.getDataFolder(), "rituals.yml");
-        if (ritualFile.exists()) {
-            ritualConfig = YamlConfiguration.loadConfiguration(ritualFile);
-        }
-        loadRituals();
+        // "overwrite" can be used if we want to forcibly overwrite
+        // existing local changes with jar defaults. Usually we do false.
+        this.ritualConfig = YamlConfiguration.loadConfiguration(ritualFile);
     }
 
     public void loadRituals() {
-        ConfigurationSection ritualsSection = ritualConfig.getConfigurationSection("rituals");
-        if (ritualsSection == null) {
-            plugin.getLogger().warning("No rituals section found in config.");
+        // We assume ritualConfig is not null if we've loaded it above
+        if (ritualConfig == null) {
+            plugin.getLogger().warning("ritualConfig is null; cannot load rituals.");
             return;
         }
+
+        ConfigurationSection ritualsSection = ritualConfig.getConfigurationSection("rituals");
+        if (ritualsSection == null) {
+            plugin.getLogger().warning("No 'rituals' section found in rituals.yml.");
+            return;
+        }
+
+        // If you store these rituals in a manager, clear old data first
+        RitualManager.getInstance(plugin).clearRituals();
 
         Set<String> usedItems = new HashSet<>();
 
         for (String key : ritualsSection.getKeys(false)) {
             try {
                 String path = "rituals." + key + ".";
-
-                // Check for duplicate items and warn
                 String itemString = ritualConfig.getString(path + "item");
                 if (itemString != null && !usedItems.add(itemString.toLowerCase())) {
                     plugin.getLogger().warning(
-                            "Duplicate item detected for ritual: " + key + ". Use unique items for each ritual.");
+                            "Duplicate item detected for ritual: " + key +
+                                    ". Use unique items for each ritual.");
                 }
 
-                // Parse general info
+                // parse out the info
                 String displayName = ritualConfig.getString(path + "display_name");
                 String description = ritualConfig.getString(path + "description");
-                Boolean consumeItem = ritualConfig.getBoolean(path + "consume-item", true);
+                boolean consumeItem = ritualConfig.getBoolean(path + "consume-item", true);
                 int favorReward = ritualConfig.getInt(path + "favor");
 
-                RitualItem ritualItem = null;
-                if (itemString != null) {
-                    String[] parts = itemString.split(":");
-                    if (parts.length == 2) {
-                        String type = parts[0];
-                        String itemId = parts[1];
+                // parse the item (SAVED or VANILLA)
+                RitualItem ritualItem = parseRitualItem(itemString, key);
 
-                        if ("SAVED".equalsIgnoreCase(type)) {
-                            ItemStack savedItem = loadSavedItem(itemId);
-                            if (savedItem == null) {
-                                plugin.getLogger().warning("Saved item not found: " + itemId + " for ritual: " + key);
-                            } else {
-                                ritualItem = new RitualItem("SAVED", savedItem);
-                            }
-                        } else if ("VANILLA".equalsIgnoreCase(type)) {
-                            ritualItem = new RitualItem("VANILLA", itemId);
-                        } else {
-                            plugin.getLogger().warning("Unknown item type: " + type + " for ritual: " + key);
-                        }
-                    }
-                }
-
-                // Parse conditions
+                // parse conditions
                 String expression = ritualConfig.getString(path + "conditions.expression", "");
                 String time = ritualConfig.getString(path + "conditions.time");
                 String biome = ritualConfig.getString(path + "conditions.biome");
                 String weather = ritualConfig.getString(path + "conditions.weather");
                 String moonPhase = ritualConfig.getString(path + "conditions.moon_phase");
                 double minAltitude = ritualConfig.getDouble(path + "conditions.min_altitude", 0.0);
-                int minExperience = ritualConfig.getInt(path + "conditions.min_experience", 0);
+                int minExp = ritualConfig.getInt(path + "conditions.min_experience", 0);
                 double minHealth = ritualConfig.getDouble(path + "conditions.min_health", 0.0);
                 int minHunger = ritualConfig.getInt(path + "conditions.min_hunger", 0);
 
-                RitualConditions ritualConditions = new RitualConditions(expression, time, biome, weather, moonPhase,
-                        minAltitude, minExperience, minHealth, minHunger);
+                RitualConditions conditions = new RitualConditions(
+                        expression, time, biome, weather, moonPhase,
+                        minAltitude, minExp, minHealth, minHunger
+                );
 
-                // Parse outcome
-                List<String> outcomeCommands;
+                // parse outcome
+                List<String> outcomeCommands = new ArrayList<>();
                 if (ritualConfig.isList(path + "outcome-command")) {
                     outcomeCommands = ritualConfig.getStringList(path + "outcome-command");
                 } else {
                     String singleCommand = ritualConfig.getString(path + "outcome-command");
                     if (singleCommand == null || singleCommand.isEmpty()) {
                         plugin.getLogger().warning("No outcome specified for ritual: " + key);
-                        continue; // Skip if no command is provided
+                        continue;
                     }
                     outcomeCommands = Collections.singletonList(singleCommand);
                 }
-                RitualOutcome ritualOutcome = new RitualOutcome("RUN_COMMAND", outcomeCommands);
+                RitualOutcome outcome = new RitualOutcome("RUN_COMMAND", outcomeCommands);
 
-                // Parse objectives
-                List<RitualObjective> objectives = new ArrayList<>();
-                try {
-                    List<Map<?, ?>> objectivesList = ritualConfig.getMapList(path + "objectives");
-                    for (Map<?, ?> objectiveMap : objectivesList) {
-                        String typeStr = (String) objectiveMap.get("type");
-                        RitualObjective.Type type = RitualObjective.Type.valueOf(typeStr);
-                        String objDescription = (String) objectiveMap.get("description");
-                        String target = (String) objectiveMap.get("target");
-                        int count = (Integer) objectiveMap.get("count");
+                // parse objectives
+                List<RitualObjective> objectives = parseObjectives(path, key);
 
-                        boolean isRegionTarget = !target.matches("-?\\d+,-?\\d+,-?\\d+"); // Check if target is not coordinates
+                // Create the Ritual object
+                Ritual ritual = new Ritual(
+                        plugin,
+                        key,
+                        displayName,
+                        description,
+                        ritualItem,
+                        consumeItem,
+                        favorReward,
+                        conditions,
+                        outcome,
+                        objectives
+                );
 
-                        RitualObjective objective = new RitualObjective(plugin, type, objDescription, target, count, isRegionTarget);
-                        objectives.add(objective);
-                        plugin.debugLog("Loaded objective " + objDescription + " for ritual " + key);
-                    }
-                } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to load objectives for ritual: " + key);
-                    e.printStackTrace();
-                }
+                // Finally, store the ritual
+                RitualManager.getInstance(plugin).addRitual(key, ritual);
 
-                // Create and store the ritual
-                Ritual ritual = new Ritual(plugin, key, displayName, description, ritualItem, consumeItem, favorReward,
-                        ritualConditions, ritualOutcome, objectives);
-                RitualManager.getInstance(plugin).addRitual(key, ritual);  // Store the ritual and key
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to load ritual with key: " + key);
                 e.printStackTrace();
@@ -208,91 +240,156 @@ public class DevotionsConfig {
         }
     }
 
-    private void reloadSoundsConfig() {
-        File soundFile = new File(plugin.getDataFolder(), "sounds.yml");
-        if (soundFile.exists()) {
-            soundsConfig = YamlConfiguration.loadConfiguration(soundFile);
+    // Helper to parse itemString from "rituals.yml"
+    private RitualItem parseRitualItem(String itemString, String ritualKey) {
+        if (itemString == null) return null;
+        String[] parts = itemString.split(":");
+        if (parts.length == 2) {
+            String type = parts[0];
+            String itemId = parts[1];
+            if ("VANILLA".equalsIgnoreCase(type)) {
+                return new RitualItem("VANILLA", itemId);
+            } else {
+                plugin.getLogger().warning("Unknown item type: " + type + " for ritual: " + ritualKey);
+            }
         }
-        loadRituals();
+        return null;
     }
 
-    public void reloadSavedItemsConfig() {
-        if (savedItemsConfigFile == null) {
-            savedItemsConfigFile = new File(plugin.getDataFolder(), "savedItems.yml");
-        }
-        savedItemsConfig = YamlConfiguration.loadConfiguration(savedItemsConfigFile);
+    // Helper to parse objectives from the config
+    private List<RitualObjective> parseObjectives(String path, String ritualKey) {
+        List<RitualObjective> objectives = new ArrayList<>();
+        try {
+            List<Map<?, ?>> objList = ritualConfig.getMapList(path + "objectives");
+            for (Map<?, ?> objMap : objList) {
+                String typeStr = (String) objMap.get("type");
+                RitualObjective.Type type = RitualObjective.Type.valueOf(typeStr);
 
-        // Look for defaults in the jar
-        InputStream defConfigStream = plugin.getResource("savedItems.yml");
-        if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream));
-            savedItemsConfig.setDefaults(defConfig);
+                String description = (String) objMap.get("description");
+                String target = (String) objMap.get("target");
+                int count = (Integer) objMap.get("count");
+
+                // If target isn't coordinates, interpret as region
+                boolean isRegionTarget = !target.matches("-?\\d+,-?\\d+,-?\\d+");
+
+                RitualObjective objective = new RitualObjective(plugin, type, description, target, count, isRegionTarget);
+                objectives.add(objective);
+                plugin.debugLog("Loaded objective " + description + " for ritual.");
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to load objectives for ritual: " + ritualKey);
+            e.printStackTrace();
         }
+        return objectives;
     }
 
-    public Map<String, Deity> loadDeities(YamlConfiguration deitiesConfig) {
+    // -------------------------------------------------------
+    //  LOAD / RELOAD SOUNDS.YML
+    // -------------------------------------------------------
+    private void loadSoundsConfig(boolean overwrite) {
+        File soundsFile = new File(plugin.getDataFolder(), "sounds.yml");
+        if (!soundsFile.exists()) {
+            plugin.saveResource("sounds.yml", false);
+        }
+        this.soundsConfig = YamlConfiguration.loadConfiguration(soundsFile);
+        plugin.debugLog("sounds.yml successfully loaded!");
+    }
+
+    // -------------------------------------------------------
+    //  TODO: LOAD / RELOAD SAVEDITEMS.YML
+    // -------------------------------------------------------
+
+
+
+    // -------------------------------------------------------
+    //  LOAD / RELOAD DEITIES.YML
+    // -------------------------------------------------------
+    private void loadDeitiesConfig(boolean overwrite) {
+        File deitiesFile = new File(plugin.getDataFolder(), "deities.yml");
+        if (!deitiesFile.exists()) {
+            plugin.saveResource("deities.yml", false);
+        }
+        this.deitiesConfig = YamlConfiguration.loadConfiguration(deitiesFile);
+    }
+
+    // Called from somewhere else, or after loadDeitiesConfig
+    public Map<String, Deity> loadDeities(YamlConfiguration yaml) {
         Map<String, Deity> deityMap = new HashMap<>();
-        ConfigurationSection deitiesSection = deitiesConfig.getConfigurationSection("deities");
+        ConfigurationSection deitiesSection = yaml.getConfigurationSection("deities");
         if (deitiesSection == null) {
             plugin.getLogger().warning("No 'deities' section found in config.");
             return deityMap;
         }
 
         for (String deityKey : deitiesSection.getKeys(false)) {
-            ConfigurationSection deityConfig = deitiesSection.getConfigurationSection(deityKey);
-            if (deityConfig == null) {
-                plugin.getLogger().warning("Deity configuration section is missing for: " + deityKey);
+            ConfigurationSection deityCfg = deitiesSection.getConfigurationSection(deityKey);
+            if (deityCfg == null) {
+                plugin.getLogger().warning("Deity configuration section missing for: " + deityKey);
                 continue;
             }
 
-            String name = deityConfig.getString("name", deityKey); // Default to key if name is missing
-            String lore = deityConfig.getString("lore", "");
-            String domain = deityConfig.getString("domain", "");
-            String alignment = deityConfig.getString("alignment", "");
-            List<String> favoredRituals = deityConfig.getStringList("rituals");
-            String abandonCondition = deityConfig.getString("abandon-condition", null);
-            String selectionCondition = deityConfig.getString("selection-condition", null);
+            String name = deityCfg.getString("name", deityKey);
+            String lore = deityCfg.getString("lore", "");
+            String domain = deityCfg.getString("domain", "");
+            String alignment = deityCfg.getString("alignment", "");
+            List<String> favoredRituals = deityCfg.getStringList("rituals");
+            String abandonCondition = deityCfg.getString("abandon-condition", null);
+            String selectionCondition = deityCfg.getString("selection-condition", null);
 
-            // Load offerings
-            List<String> offeringStrings = deityConfig.getStringList("offerings");
+            // parse offerings
+            List<String> offeringStrings = deityCfg.getStringList("offerings");
             List<Offering> favoredOfferings = offeringStrings.stream()
-                    .map(offeringString -> parseOffering(offeringString,
-                            deityKey)) // Use a separate method to parse each offering
+                    .map(off -> parseOffering(off, deityKey))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            // Parse blessings
-            List<Blessing> deityBlessings = deityConfig.getStringList("blessings").stream()
+            // parse blessings
+            List<Blessing> blessings = deityCfg.getStringList("blessings").stream()
                     .map(this::parseBlessing)
                     .collect(Collectors.toList());
 
-            // Parse curses
-            List<Curse> deityCurses = deityConfig.getStringList("curses").stream()
+            // parse curses
+            List<Curse> curses = deityCfg.getStringList("curses").stream()
                     .map(this::parseCurse)
                     .collect(Collectors.toList());
 
+            // parse miracles
             List<Miracle> deityMiracles = new ArrayList<>();
-
-            for (String miracleString : deityConfig.getStringList("miracles")) {
-                Miracle miracle = parseMiracle(miracleString);
+            for (String miracleStr : deityCfg.getStringList("miracles")) {
+                Miracle miracle = parseMiracle(miracleStr);
                 if (miracle != null) {
                     deityMiracles.add(miracle);
-                    miraclesMap.put(miracleString, miracle);
+                    // store in miraclesMap if you want a global reference
+                    miraclesMap.put(miracleStr, miracle);
                 } else {
-                    plugin.debugLog("Failed to parse miracle: " + miracleString + " for deity " + deityKey);
+                    plugin.debugLog("Failed to parse miracle: " + miracleStr + " for deity " + deityKey);
                 }
             }
 
-            Deity deity = new Deity(plugin, name, lore, domain, alignment, favoredOfferings, favoredRituals,
-                    deityBlessings, deityCurses, deityMiracles, abandonCondition, selectionCondition);
+            // create deity
+            Deity deity = new Deity(
+                    plugin,
+                    name,
+                    lore,
+                    domain,
+                    alignment,
+                    favoredOfferings,
+                    favoredRituals,
+                    blessings,
+                    curses,
+                    deityMiracles,
+                    abandonCondition,
+                    selectionCondition
+            );
             deityMap.put(deityKey.toLowerCase(), deity);
-            plugin.getLogger()
-                    .info("Loaded deity " + deity.getName() + " with " + favoredOfferings.size() + " offerings.");
+            plugin.getLogger().info("Loaded deity " + name + " with " + favoredOfferings.size() + " offerings.");
         }
-
         return deityMap;
     }
 
+    // -------------------------------------------------------
+    // PARSE OFFERING, MIRACLE, BLESSING, CURSE
+    // -------------------------------------------------------
     private Offering parseOffering(String offeringString, String deityKey) {
         String[] parts = offeringString.split(":");
         if (parts.length < 3) {
@@ -304,7 +401,7 @@ public class DevotionsConfig {
         String itemId = parts[1];
         String[] favorAndChance = parts[2].split("-");
         int favorValue;
-        double chance = 1.0; // Default chance is 100%
+        double chance = 1.0;
 
         try {
             favorValue = Integer.parseInt(favorAndChance[0]);
@@ -313,7 +410,7 @@ public class DevotionsConfig {
             }
         } catch (NumberFormatException e) {
             plugin.getLogger()
-                    .warning("Invalid favor value or chance in offerings for deity " + deityKey + ": " + parts[2]);
+                    .warning("Invalid favor or chance in offering for deity " + deityKey + ": " + parts[2]);
             return null;
         }
 
@@ -324,43 +421,19 @@ public class DevotionsConfig {
 
         ItemStack itemStack = resolveItemStack(type, itemId, deityKey);
         if (itemStack == null) {
-            // resolveItemStack will log the error
-            return null;
+            return null; // error logged already
         }
 
         return new Offering(itemStack, favorValue, commands, chance);
     }
 
     private ItemStack resolveItemStack(String type, String itemId, String deityKey) {
-        if ("Saved".equalsIgnoreCase(type)) {
-            ItemStack itemStack = loadSavedItem(itemId);
-            if (itemStack == null) {
-                plugin.getLogger().warning("Saved item not found: " + itemId + " for deity: " + deityKey);
-            }
-            return itemStack;
+        Material material = Material.matchMaterial(itemId);
+        if (material != null) {
+            return new ItemStack(material);
         } else {
-            Material material = Material.matchMaterial(itemId);
-            if (material != null) {
-                return new ItemStack(material);
-            } else {
-                plugin.getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + itemId);
-                return null;
-            }
-        }
-    }
-
-    public Map<String, Deity> reloadDeitiesConfig() {
-        File deitiesFile = new File(plugin.getDataFolder(), "deities.yml");
-        if (!deitiesFile.exists()) {
-            plugin.saveResource("deities.yml", false);
-        }
-
-        if (deitiesFile.exists()) {
-            deitiesConfig = YamlConfiguration.loadConfiguration(deitiesFile);
-            return loadDeities(deitiesConfig);
-        } else {
-            plugin.getLogger().severe("Unable to create default deities.yml");
-            return new HashMap<>(); // Return an empty map as a fallback
+            plugin.getLogger().warning("Invalid material in offerings for deity " + deityKey + ": " + itemId);
+            return null;
         }
     }
 
@@ -370,13 +443,13 @@ public class DevotionsConfig {
         List<Condition> conditions = new ArrayList<>();
 
         String[] parts = miracleString.split(":", 2);
-        String miracleType = parts[0];  // Define miracleType here
-
-        plugin.debugLog("Parsed miracleString: " + miracleString);
-        plugin.debugLog("Miracle type: " + miracleType);
-        if (parts.length > 1) {
-            plugin.debugLog("Command/Argument: " + parts[1]);
+        if (parts.length == 0) {
+            plugin.debugLog("Empty miracle string!");
+            return null;
         }
+
+        String miracleType = parts[0];
+        plugin.debugLog("Miracle type: " + miracleType);
 
         switch (miracleType) {
             case "revive_on_death" -> {
@@ -392,7 +465,7 @@ public class DevotionsConfig {
                 conditions.add(new HasRepairableItemsCondition());
             }
             case "summon_aid" -> {
-                effect = new SummonAidEffect(3); // Summoning 3 entities.
+                effect = new SummonAidEffect(3);
                 conditions.add(new LowHealthCondition());
                 conditions.add(new NearHostileMobsCondition());
             }
@@ -407,7 +480,7 @@ public class DevotionsConfig {
                         effect = new DoubleCropDropsEffect(plugin, duration);
                         conditions.add(new NearCropsCondition());
                     } catch (NumberFormatException e) {
-                        plugin.debugLog("Invalid duration provided for double_crops miracle.");
+                        plugin.debugLog("Invalid duration for double_crops miracle.");
                         return null;
                     }
                 } else {
@@ -425,49 +498,54 @@ public class DevotionsConfig {
                 }
             }
             default -> {
-                plugin.debugLog("Unrecognized miracle encountered in parseMiracle!");
+                plugin.debugLog("Unrecognized miracle type: " + miracleType);
                 return null;
             }
         }
-
         return new Miracle(miracleType, conditions, effect);
     }
 
     private Blessing parseBlessing(String blessingString) {
         String[] parts = blessingString.split(",");
-        PotionEffectType effect = PotionEffectType.getByName(parts[0]);
+        PotionEffectType effectType = PotionEffectType.getByName(parts[0]);
         int strength = Integer.parseInt(parts[1]);
         int duration = Integer.parseInt(parts[2]);
-        return new Blessing(parts[0], duration, strength, effect);
+        return new Blessing(parts[0], duration, strength, effectType);
     }
 
     private Curse parseCurse(String curseString) {
         String[] parts = curseString.split(",");
-        PotionEffectType effect = PotionEffectType.getByName(parts[0]);
+        PotionEffectType effectType = PotionEffectType.getByName(parts[0]);
         int strength = Integer.parseInt(parts[1]);
         int duration = Integer.parseInt(parts[2]);
-        return new Curse(parts[0], duration, strength, effect);
+        return new Curse(parts[0], duration, strength, effectType);
     }
 
+    // -------------------------------------------------------
+    //  GETTERS
+    // -------------------------------------------------------
 
-    public void loadSoundsConfig() {
-        File soundsFile = new File(plugin.getDataFolder(), "sounds.yml");
-        if (!soundsFile.exists()) {
-            plugin.saveResource("sounds.yml", false);
-        }
-        soundsConfig = YamlConfiguration.loadConfiguration(soundsFile);
-        plugin.debugLog("sounds.yml successfully loaded!");
+    /**
+     * Example: retrieve shrine-limit from config.yml.
+     * If mainConfig is null or missing the key, default to 3.
+     */
+    public int getShrineLimit() {
+        return mainConfig != null
+                ? mainConfig.getInt("shrine-limit", 3)
+                : 3;
     }
 
-    private ItemStack loadSavedItem(String name) {
-        File storageFolder = new File(plugin.getDataFolder(), "storage");
-        File itemsFile = new File(storageFolder, "savedItems.yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(itemsFile);
+    public String getItemId(ItemStack item) {
+        plugin.debugLog("Checking for vanilla item key: VANILLA:" + item.getType().name());
 
-        if (config.contains("items." + name)) {
-            return ItemStack.deserialize(config.getConfigurationSection("items." + name).getValues(false));
+        // If the item is a potion, append potion type to the ID for uniqueness
+        if (item.getType() == Material.POTION && item.getItemMeta() instanceof PotionMeta potionMeta) {
+            PotionData potionData = potionMeta.getBasePotionData();
+            return "VANILLA:POTION_" + potionData.getType().name();
         }
-        return null;
+
+        // Otherwise, just use material name
+        return "VANILLA:" + item.getType().name();
     }
 
 }
