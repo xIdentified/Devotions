@@ -26,4 +26,3 @@ public interface IStorage {
 
     void closeConnection();
 }
-

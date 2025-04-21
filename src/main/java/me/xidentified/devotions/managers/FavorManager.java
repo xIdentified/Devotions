@@ -39,27 +39,31 @@ public class FavorManager {
     private int decayTaskId = -1;
     private int effectTaskId = -1;
 
+    // Update the constructor to use deity-specific settings
     public FavorManager(Devotions plugin, UUID playerUUID, Deity deity) {
         this.plugin = plugin;
         this.uuid = playerUUID;
         this.deity = deity;
-        this.favor = plugin.getConfig().getInt("initial-favor");
-        this.maxFavor = plugin.getConfig().getInt("max-favor", 250);
 
-        // Thresholds & chances
-        this.BLESSING_THRESHOLD = plugin.getConfig().getInt("blessing-threshold");
-        this.CURSE_THRESHOLD = plugin.getConfig().getInt("curse-threshold");
-        this.BLESSING_CHANCE = plugin.getConfig().getDouble("blessing-chance");
-        this.CURSE_CHANCE = plugin.getConfig().getDouble("curse-chance");
-        this.MIRACLE_THRESHOLD = plugin.getConfig().getInt("miracle-threshold", 90);
-        this.MIRACLE_CHANCE = plugin.getConfig().getDouble("miracle-chance");
+        // Use deity-specific values instead of global ones
+        this.favor = deity.getInitialFavor();
+        this.maxFavor = deity.getMaxFavor();
+
+        // Thresholds & chances from deity
+        this.BLESSING_THRESHOLD = deity.getBlessingThreshold();
+        this.CURSE_THRESHOLD = deity.getCurseThreshold();
+        this.BLESSING_CHANCE = deity.getBlessingChance();
+        this.CURSE_CHANCE = deity.getCurseChance();
+        this.MIRACLE_THRESHOLD = deity.getMiracleThreshold();
+        this.MIRACLE_CHANCE = deity.getMiracleChance();
+
         // 3 in-game days by default (3 * 24000 ticks = 72000 ticks)
         this.MIRACLE_DURATION = plugin.getConfig().getInt("miracleDuration", 3) * 24000L;
 
         long effectCheckInterval = plugin.getConfig().getLong("effect-interval", 1800) * 20L; // in ticks
 
-        // Decay config
-        this.decayRate = plugin.getConfig().getInt("decay-rate", 5);
+        // Decay config - use deity-specific decay rate
+        this.decayRate = deity.getFavorDecayRate();
         // e.g. 1200 seconds = 20 minutes -> * 20 => 24000 ticks
         long decayInterval = plugin.getConfig().getLong("decay-interval", 1200) * 20L;
 
@@ -117,11 +121,12 @@ public class FavorManager {
         }
     }
 
-    /**
-     * Increases or decreases favor by the given amount, clamped to [0, maxFavor].
-     */
+    // Update the adjustFavor method to use personality-based adjustments
     public void adjustFavor(int amount) {
-        this.favor += amount;
+        // Apply personality-based adjustment to the favor amount
+        int adjustedAmount = deity.adjustFavorByPersonality(amount);
+
+        this.favor += adjustedAmount;
         if (this.favor < 0) {
             this.favor = 0;
         } else if (this.favor > maxFavor) {
@@ -131,8 +136,8 @@ public class FavorManager {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline() && deity != null) {
             // Only send a message if favor actually changed
-            if (amount != 0) {
-                ComponentLike message = (amount > 0)
+            if (adjustedAmount != 0) {
+                ComponentLike message = (adjustedAmount > 0)
                         ? Messages.FAVOR_INCREASED
                         .insertParsed("deity", deity.getName())
                         .insertString("favor", String.valueOf(this.favor))
@@ -142,13 +147,13 @@ public class FavorManager {
                                 .insertParsed("favor", String.valueOf(this.favor))
                                 .insertTag("favor_col", Tag.styling(s -> s.color(FavorUtils.getColorForFavor(this.favor))));
 
-                if (!plugin.getDevotionsConfig().isHideFavorMessages()) {
-                    Devotions.sendMessage(player, message);
-                }
+            if (!plugin.getDevotionsConfig().isHideFavorMessages()) {
+                Devotions.sendMessage(player, message);
             }
         }
-        plugin.getStorageManager().getStorage().savePlayerDevotion(uuid, this);
     }
+    plugin.getStorageManager().getStorage().savePlayerDevotion(uuid, this);
+}
 
     /**
      * Called automatically on the schedule to reduce favor by decayRate.

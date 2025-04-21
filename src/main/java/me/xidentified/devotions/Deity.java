@@ -33,10 +33,24 @@ public class Deity {
     private final List<Miracle> miracles;
     @Getter final String abandonCondition;
     @Getter private final String selectionCondition;
+    @Getter private final int blessingThreshold;
+    @Getter private final int curseThreshold;
+    @Getter private final int miracleThreshold;
+    @Getter private final double blessingChance;
+    @Getter private final double curseChance;
+    @Getter private final double miracleChance;
+    @Getter private final int favorDecayRate;
+    @Getter private final String personality;
+    @Getter private final int initialFavor;
+    @Getter private final int maxFavor;
 
     public Deity(Devotions plugin, String name, String lore, String domain, String alignment,
             List<Offering> offerings, List<String> rituals, List<Blessing> blessings,
-            List<Curse> curses, List<Miracle> miracles, String abandonCondition, String selectionCondition) {
+            List<Curse> curses, List<Miracle> miracles, String abandonCondition,
+            String selectionCondition, int blessingThreshold, int curseThreshold,
+            int miracleThreshold, double blessingChance, double curseChance,
+            double miracleChance, int favorDecayRate, String personality,
+            int initialFavor, int maxFavor) {
         this.plugin = plugin;
         this.name = name;
         this.lore = lore;
@@ -49,6 +63,18 @@ public class Deity {
         this.miracles = miracles;
         this.abandonCondition = abandonCondition;
         this.selectionCondition = selectionCondition;
+
+        // Initialize new fields
+        this.blessingThreshold = blessingThreshold;
+        this.curseThreshold = curseThreshold;
+        this.miracleThreshold = miracleThreshold;
+        this.blessingChance = blessingChance;
+        this.curseChance = curseChance;
+        this.miracleChance = miracleChance;
+        this.favorDecayRate = favorDecayRate;
+        this.personality = personality;
+        this.initialFavor = initialFavor;
+        this.maxFavor = maxFavor;
     }
 
     private CooldownManager cooldownManager() {
@@ -187,5 +213,36 @@ public class Deity {
 
     public List<String> getRitualKeys() {
         return rituals;
+    }
+
+    public int adjustFavorByPersonality(int favorChange) {
+        switch (personality.toLowerCase()) {
+            case "vengeful":
+                // Vengeful deities punish more harshly for negative actions
+                if (favorChange < 0) {
+                    return (int) (favorChange * 1.5);
+                }
+                break;
+            case "forgiving":
+                // Forgiving deities don't punish as harshly
+                if (favorChange < 0) {
+                    return (int) (favorChange * 0.7);
+                }
+                break;
+            case "generous":
+                // Generous deities reward more for positive actions
+                if (favorChange > 0) {
+                    return (int) (favorChange * 1.3);
+                }
+                break;
+            case "demanding":
+                // Demanding deities give less reward for positive actions
+                if (favorChange > 0) {
+                    return (int) (favorChange * 0.8);
+                }
+                break;
+            // Default case - no adjustment
+        }
+        return favorChange;
     }
 }

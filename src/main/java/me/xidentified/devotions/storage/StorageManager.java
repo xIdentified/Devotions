@@ -41,4 +41,8 @@ public class StorageManager {
         }
     }
 
+    public IStorage getStorage() {
+        return this.storage;
+    }
+
 }

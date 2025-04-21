@@ -321,6 +321,18 @@ public class DevotionsConfig {
             return deityMap;
         }
 
+        // Get global defaults from main config
+        int defaultBlessingThreshold = plugin.getConfig().getInt("blessing-threshold", 150);
+        int defaultCurseThreshold = plugin.getConfig().getInt("curse-threshold", 35);
+        int defaultMiracleThreshold = plugin.getConfig().getInt("miracle-threshold", 210);
+        double defaultBlessingChance = plugin.getConfig().getDouble("blessing-chance", 0.4);
+        double defaultCurseChance = plugin.getConfig().getDouble("curse-chance", 0.1);
+        double defaultMiracleChance = plugin.getConfig().getDouble("miracle-chance", 0.03);
+        int defaultDecayRate = plugin.getConfig().getInt("decay-rate", 5);
+        int defaultInitialFavor = plugin.getConfig().getInt("initial-favor", 50);
+        int defaultMaxFavor = plugin.getConfig().getInt("max-favor", 250);
+        String defaultPersonality = "neutral";
+
         for (String deityKey : deitiesSection.getKeys(false)) {
             ConfigurationSection deityCfg = deitiesSection.getConfigurationSection(deityKey);
             if (deityCfg == null) {
@@ -366,7 +378,19 @@ public class DevotionsConfig {
                 }
             }
 
-            // create deity
+            // Parse deity-specific overrides with fallback to global defaults
+            int blessingThreshold = deityCfg.getInt("blessing-threshold", defaultBlessingThreshold);
+            int curseThreshold = deityCfg.getInt("curse-threshold", defaultCurseThreshold);
+            int miracleThreshold = deityCfg.getInt("miracle-threshold", defaultMiracleThreshold);
+            double blessingChance = deityCfg.getDouble("blessing-chance", defaultBlessingChance);
+            double curseChance = deityCfg.getDouble("curse-chance", defaultCurseChance);
+            double miracleChance = deityCfg.getDouble("miracle-chance", defaultMiracleChance);
+            int favorDecayRate = deityCfg.getInt("favor-decay-rate", defaultDecayRate);
+            String personality = deityCfg.getString("personality", defaultPersonality);
+            int initialFavor = deityCfg.getInt("initial-favor", defaultInitialFavor);
+            int maxFavor = deityCfg.getInt("max-favor", defaultMaxFavor);
+
+            // create deity with all parameters
             Deity deity = new Deity(
                     plugin,
                     name,
@@ -379,7 +403,17 @@ public class DevotionsConfig {
                     curses,
                     deityMiracles,
                     abandonCondition,
-                    selectionCondition
+                    selectionCondition,
+                    blessingThreshold,
+                    curseThreshold,
+                    miracleThreshold,
+                    blessingChance,
+                    curseChance,
+                    miracleChance,
+                    favorDecayRate,
+                    personality,
+                    initialFavor,
+                    maxFavor
             );
             deityMap.put(deityKey.toLowerCase(), deity);
             plugin.getLogger().info("Loaded deity " + name + " with " + favoredOfferings.size() + " offerings.");
@@ -546,6 +580,11 @@ public class DevotionsConfig {
 
         // Otherwise, just use material name
         return "VANILLA:" + item.getType().name();
+    }
+
+    // Add the missing getMiraclesMap method
+    public Map<String, Miracle> getMiraclesMap() {
+        return this.miraclesMap;
     }
 
 }

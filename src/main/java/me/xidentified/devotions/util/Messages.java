@@ -300,4 +300,9 @@ public class Messages {
             .withPlaceholder("plugin-ver")
             .withPlaceholder("java-ver")
             .build();
+           
+   // Add a permission denied message to use in our commands
+   public static final Message NO_PERM_CMD = new MessageBuilder("general.no_perm_cmd")
+           .withDefault("<prefix_negative>You don't have permission to use this command.")
+           .build();
 }

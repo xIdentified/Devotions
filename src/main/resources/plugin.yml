@@ -1,62 +1,59 @@
 name: Devotions
 version: '${project.version}'
 main: me.xidentified.devotions.Devotions
-api-version: '1.19'
+api-version: '1.20'
 author: xIdentified
 description: Create and worship deities on your server
 
 softdepend:
-  - PlaceholderAPI
-  - WorldGuard
+ - PlaceholderAPI
+ - WorldGuard
 
 commands:
-  devotions:
-    description: Manage the Devotions plugin
-    usage: /<command> <reload|saveitem|version>
-    aliases: [dvo]
-    permission: devotions.admin
-    permission-message: You do not have permission to use this command.
-    subcommands:
-      saveitem:
-        description: Save an item
-        usage: /devotions saveitem <itemName>
-  deity:
-    description: Manage and view information about deities.
-    usage: /<command> <select|info|list|abandon> [DeityName]
-    permission: devotions.select
-    aliases: [god, gods]
-    tab-completions: true
-  shrine:
-    description: Manage and view information about deities.
-    usage: /<command> <set|delete> [DeityName]
-    aliases: [altar]
-    tab-completions: true
-  favor:
-    description: Manages and adjusts player's favor.
-    usage: /<command> <set|give|take> <playername> <amount>
-    tab-completions: true
-  ritual:
-    description: View ritual information
-    usage: /<command> <info> [ritualName]
-    aliases: [rituals]
-  testmiracle:
-    description: Execute miracles to ensure they work.
-    usage: /<command> <number>
-    tab-completions: true
-  migrate-storage:
-    description: Migrates data from YAML to database storage
-    usage: /migrate-storage
+ devotions:
+   description: Manage the Devotions plugin
+   usage: /<command> <reload|saveitem|version>
+   aliases: [dvo]
+   permission: devotions.admin
+   permission-message: You do not have permission to use this command.
+ deity:
+   description: Manage and view information about deities.
+   usage: /<command> <select|info|list|abandon> [DeityName]
+   permission: devotions.select
+   aliases: [god, gods]
+ shrine:
+   description: Manage and view information about shrines.
+   usage: /<command> <set|delete> [DeityName]
+   aliases: [altar]
+ favor:
+   description: Manages and adjusts player's favor.
+   usage: /<command> <set|give|take> <playername> <amount>
+ ritual:
+   description: View ritual information
+   usage: /<command> <info> [ritualName]
+   aliases: [rituals]
+ testmiracle:
+   description: Execute miracles to ensure they work.
+   usage: /<command> <number>
+ migrate-storage:
+   description: Migrates data from YAML to database storage
+   usage: /migrate-storage
+ deitydiff:
+   description: View information about deity difficulty levels
+   usage: /<command> <list|info> [deityName]
+   permission: devotions.admin
+   aliases: [deitydiff, ddifficulty]
 
 permissions:
-  devotions.shrine.set:
-    description: Allows dedication of shrines to your deity.
-    default: true
-  devotions.admin:
-    description: Allows use of all admin commands.
-    default: op
-  devotions.favor:
-    description: Allows use of /favor.
-    default: true
-  devotions.select:
-    description: Allows selection of a chosen deity.
-    default: true
+ devotions.shrine.set:
+   description: Allows dedication of shrines to your deity.
+   default: true
+ devotions.admin:
+   description: Allows use of all admin commands.
+   default: op
+ devotions.favor:
+   description: Allows use of /favor.
+   default: true
+ devotions.select:
+   description: Allows selection of a chosen deity.
+   default: true

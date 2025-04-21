@@ -46,6 +46,7 @@ me\xidentified\devotions\commandexecutors\TestMiracleCommand.class
 me\xidentified\devotions\managers\MeditationManager$1.class
 me\xidentified\devotions\util\Metrics$MultiLineChart.class
 me\xidentified\devotions\util\Metrics$SimplePie.class
+me\xidentified\devotions\commandexecutors\DeityDifficultyCommand.class
 me\xidentified\devotions\commandexecutors\FavorCommand.class
 me\xidentified\devotions\rituals\RitualManager$1.class
 me\xidentified\devotions\effects\Curse.class
