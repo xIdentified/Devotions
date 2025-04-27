@@ -20,7 +20,7 @@ public class Blessing extends Effect {
     }
 
     public void applyVisualEffect(Player player) {
-        player.spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation(), 10);
+        player.spawnParticle(Particle.HAPPY_VILLAGER, player.getLocation(), 10);
     }
 
     public void applyAudioEffect(Player player) {

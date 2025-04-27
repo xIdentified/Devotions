@@ -20,6 +20,7 @@ import me.xidentified.devotions.commandexecutors.FavorCommand;
 import me.xidentified.devotions.commandexecutors.RitualCommand;
 import me.xidentified.devotions.commandexecutors.ShrineCommandExecutor;
 import me.xidentified.devotions.commandexecutors.TestMiracleCommand;
+import me.xidentified.devotions.commandexecutors.DeityDifficultyCommand;
 import me.xidentified.devotions.listeners.PlayerListener;
 import me.xidentified.devotions.listeners.WorldGuardListener;
 import me.xidentified.devotions.listeners.RitualListener;
@@ -100,7 +101,7 @@ public class Devotions extends JavaPlugin {
     public void spawnParticles(Location location, Particle particle, int count, double radius, double velocity) {
         World world = location.getWorld();
         Particle.DustOptions dustOptions = null;
-        if (particle == Particle.REDSTONE) {
+        if (particle == Particle.DUST) {
             dustOptions = new Particle.DustOptions(Color.RED, 1.0f);  // You can adjust the color and size as needed
         }
 
@@ -198,19 +199,43 @@ public class Devotions extends JavaPlugin {
         RitualCommand ritualCommand = new RitualCommand(this);
 
         // Register commands
-        Objects.requireNonNull(getCommand("deity")).setExecutor(deityCmd);
-        Objects.requireNonNull(getCommand("deity")).setTabCompleter(deityCmd);
-        Objects.requireNonNull(getCommand("favor")).setExecutor(favorCmd);
-        Objects.requireNonNull(getCommand("favor")).setTabCompleter(favorCmd);
-        Objects.requireNonNull(getCommand("shrine")).setExecutor(shrineCmd);
-        Objects.requireNonNull(getCommand("shrine")).setTabCompleter(shrineCmd);
-        Objects.requireNonNull(getCommand("devotions")).setExecutor(new DevotionsCommandExecutor(this));
-        Objects.requireNonNull(getCommand("ritual")).setExecutor(ritualCommand);
-        Objects.requireNonNull(getCommand("ritual")).setTabCompleter(ritualCommand);
+        if (getCommand("deity") != null) {
+            Objects.requireNonNull(getCommand("deity")).setExecutor(deityCmd);
+            Objects.requireNonNull(getCommand("deity")).setTabCompleter(deityCmd);
+        }
+        if (getCommand("favor") != null) {
+            Objects.requireNonNull(getCommand("favor")).setExecutor(favorCmd);
+            Objects.requireNonNull(getCommand("favor")).setTabCompleter(favorCmd);
+        }
+        if (getCommand("shrine") != null) {
+            Objects.requireNonNull(getCommand("shrine")).setExecutor(shrineCmd);
+            Objects.requireNonNull(getCommand("shrine")).setTabCompleter(shrineCmd);
+        }
+        if (getCommand("devotions") != null) {
+            Objects.requireNonNull(getCommand("devotions")).setExecutor(new DevotionsCommandExecutor(this));
+        }
+        if (getCommand("ritual") != null) {
+            Objects.requireNonNull(getCommand("ritual")).setExecutor(ritualCommand);
+            Objects.requireNonNull(getCommand("ritual")).setTabCompleter(ritualCommand);
+        }
+
+        // Add registration for the new command in the initializePlugin method
+        // Add this after the other command registrations
+        DeityDifficultyCommand deityDiffCmd = new DeityDifficultyCommand(this);
+        if (getCommand("deitydiff") != null) {
+            Objects.requireNonNull(getCommand("deitydiff")).setExecutor(deityDiffCmd);
+            Objects.requireNonNull(getCommand("deitydiff")).setTabCompleter(deityDiffCmd);
+        }
+
+        // Add null check for testmiracle command
+        TestMiracleCommand testMiracleCmd = new TestMiracleCommand(devotionsConfig.getMiraclesMap());
+        if (getCommand("testmiracle") != null) {
+            Objects.requireNonNull(getCommand("testmiracle")).setExecutor(testMiracleCmd);
+        }
 
         // Register admin commands
-        TestMiracleCommand testMiracleCmd = new TestMiracleCommand(devotionsConfig.getMiraclesMap());
-        Objects.requireNonNull(getCommand("testmiracle")).setExecutor(testMiracleCmd);
+        TestMiracleCommand testMiracleCmd1 = new TestMiracleCommand(devotionsConfig.getMiraclesMap());
+        Objects.requireNonNull(getCommand("testmiracle")).setExecutor(testMiracleCmd1);
 
         // Register listeners
         this.shrineListener = new ShrineListener(this, shrineManager, cooldownManager);
@@ -246,7 +271,9 @@ public class Devotions extends JavaPlugin {
         getServer().getScheduler().cancelTasks(this);
         ritualManager.ritualDroppedItems.clear();
 
-        translations.close();
+        if (translations != null) {
+            translations.close();
+        }
     }
 
     public void debugLog(String message) {
@@ -283,4 +310,36 @@ public class Devotions extends JavaPlugin {
         BukkitTinyTranslations.sendMessageIfNotEmpty(sender, componentLike);
     }
 
+    // Add missing getter methods
+    public RitualManager getRitualManager() {
+        return this.ritualManager;
+    }
+
+    public ShrineListener getShrineListener() {
+        return this.shrineListener;
+    }
+
+    public DevotionsConfig getDevotionsConfig() {
+        return this.devotionsConfig;
+    }
+
+    public StorageManager getStorageManager() {
+        return this.storageManager;
+    }
+
+    public MeditationManager getMeditationManager() {
+        return this.meditationManager;
+    }
+
+    public CooldownManager getCooldownManager() {
+        return this.cooldownManager;
+    }
+
+    public MessageTranslator getTranslations() {
+        return this.translations;
+    }
+
+    public static Devotions getInstance() {
+        return instance;
+    }
 }

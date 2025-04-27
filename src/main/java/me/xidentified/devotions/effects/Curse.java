@@ -20,7 +20,7 @@ public class Curse extends Effect {
     }
 
     public void applyVisualEffect(Player player) {
-        player.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 10);
+        player.spawnParticle(Particle.LARGE_SMOKE, player.getLocation(), 10);
     }
 
     public void applyAudioEffect(Player player) {

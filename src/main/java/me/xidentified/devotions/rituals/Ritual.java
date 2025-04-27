@@ -161,18 +161,18 @@ public class Ritual {
         switch (feedbackType) {
             case "START" -> {
                 plugin.playConfiguredSound(player, "ritualStarted");
-                plugin.spawnParticles(location, Particle.ENCHANTMENT_TABLE, 50, 2.0, 0.5);
+                plugin.spawnParticles(location, Particle.ENCHANT, 50, 2.0, 0.5);
                 Devotions.sendMessage(player, Messages.RITUAL_START.insertParsed("ritual", displayName));
             }
             case "SUCCESS" -> {
                 plugin.playConfiguredSound(player, "ritualComplete");
-                plugin.spawnParticles(location, Particle.VILLAGER_HAPPY, 50, 2.0, 0.5);
+                plugin.spawnParticles(location, Particle.HAPPY_VILLAGER, 50, 2.0, 0.5);
                 Devotions.sendMessage(player, Messages.RITUAL_SUCCESS.insertParsed("ritual", displayName));
                 favorManager.adjustFavor(favorAmount);
             }
             case "FAILURE" -> {
                 plugin.playConfiguredSound(player, "ritualFailed");
-                plugin.spawnParticles(location, Particle.REDSTONE, 50, 2.0, 0.5);
+                plugin.spawnParticles(location, Particle.DUST, 50, 2.0, 0.5);
                 player.damage(5);
                 Devotions.sendMessage(player, Messages.RITUAL_FAILURE.insertParsed("ritual", displayName));
                 favorManager.adjustFavor(-15); // TODO: Make this a certain percent of the favorAmount maybe??
@@ -208,5 +208,37 @@ public class Ritual {
         this.isCompleted = false;
     }
 
-}
+    // Add missing getter methods
+    public String getKey() {
+        return this.key;
+    }
 
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public int getFavorAmount() {
+        return this.favorAmount;
+    }
+
+    public List<RitualObjective> getObjectives() {
+        return this.objectives;
+    }
+
+    public RitualOutcome getOutcome() {
+        return this.outcome;
+    }
+
+    public RitualItem getItem() {
+        return this.item;
+    }
+
+    public boolean isConsumeItem() {
+        return this.consumeItem;
+    }
+
+}

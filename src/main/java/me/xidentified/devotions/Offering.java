@@ -22,5 +22,19 @@ public class Offering {
         this.chance = chance;
     }
 
-}
+    public int getValue() {
+        return this.value;
+    }
 
+    public List<String> getCommands() {
+        return this.commands;
+    }
+
+    public ItemStack getItemStack() {
+        return this.itemStack;
+    }
+
+    public double getChance() {
+        return this.chance;
+    }
+}

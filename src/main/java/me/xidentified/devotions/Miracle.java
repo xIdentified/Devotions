@@ -172,11 +172,10 @@ class ReviveOnDeath implements MiracleEffect {
 
     @Override
     public void execute(Player player) {
-        @Nullable AttributeInstance maxHealth = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH));
-        if (maxHealth != null) {
-            player.setHealth(maxHealth.getValue());
-            Devotions.sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
-        }
+        // In Spigot, we can use the player's getMaxHealth method directly
+        double maxHealth = player.getMaxHealth();
+        player.setHealth(maxHealth);
+        Devotions.sendMessage(player, Messages.MIRACLE_SAVED_FROM_DEATH);
     }
 }
 

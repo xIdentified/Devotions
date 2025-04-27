@@ -179,7 +179,7 @@ public class ShrineListener implements Listener {
                     droppedItem.remove();
                 }
                 plugin.playConfiguredSound(player, "offeringAccepted");
-                spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.SPELL_WITCH, 50);
+                spawnLocalizedParticles(clickedBlock.getLocation().add(0.5, 1, 0.5), Particle.WITCH, 50);
 
                 // Execute commands
                 for (String cmd : offering.getCommands()) {

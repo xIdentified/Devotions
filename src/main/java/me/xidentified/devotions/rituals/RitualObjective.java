@@ -54,4 +54,20 @@ public class RitualObjective {
     public void reset() {
         this.currentCount = 0; // Reset the current count
     }
+
+    public int getCount() {
+        return this.count;
+    }
+
+    public String getTarget() {
+        return this.target;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Type getType() {
+        return this.type;
+    }
 }

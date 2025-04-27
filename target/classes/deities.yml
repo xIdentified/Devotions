@@ -4,6 +4,17 @@ deities:
     lore: "A mysterious deity often associated with the occult and mystical rituals. Its origins remain a topic of debate among scholars."
     domain: "Occultism"
     alignment: "Evil"
+    # Deity-specific overrides
+    blessing-threshold: 180  # Higher than default (harder to please)
+    curse-threshold: 50      # Higher than default (more forgiving)
+    miracle-threshold: 230   # Higher than default (harder to achieve)
+    blessing-chance: 0.3     # Lower than default (less generous)
+    curse-chance: 0.2        # Higher than default (more vengeful)
+    miracle-chance: 0.02     # Lower than default (less miraculous)
+    favor-decay-rate: 8      # Higher than default (more demanding)
+    personality: "vengeful"  # Personality trait
+    initial-favor: 30        # Lower starting favor (harder)
+    max-favor: 300           # Higher max favor (more potential)
     offerings:
       - "VANILLA:GOLD_INGOT:5:command1;command2" # TYPE:ITEM:FAVOR:COMMANDS
       - "VANILLA:NETHER_STAR:50:give {player} diamond 5;say Thanks for the offering!"
@@ -19,11 +30,23 @@ deities:
       - "repair_all"
       - "stop_burning"
       - "run_command:give {player} DIAMOND 1"
+  
   gaia:
     name: "Gaia"
     lore: "The ancient earth mother, revered as the primal goddess of the earth."
     domain: "Nature"
     alignment: "Good"
+    # Deity-specific overrides
+    blessing-threshold: 120  # Lower than default (easier to please)
+    curse-threshold: 20      # Lower than default (less forgiving)
+    miracle-threshold: 190   # Lower than default (easier to achieve)
+    blessing-chance: 0.5     # Higher than default (more generous)
+    curse-chance: 0.05       # Lower than default (less vengeful)
+    miracle-chance: 0.04     # Higher than default (more miraculous)
+    favor-decay-rate: 3      # Lower than default (less demanding)
+    personality: "generous"  # Personality trait
+    initial-favor: 70        # Higher starting favor (easier)
+    max-favor: 200           # Lower max favor (less potential)
     offerings:
       - "VANILLA:OAK_SAPLING:10"
       - "VANILLA:DIAMOND_HOE:1"
@@ -39,11 +62,23 @@ deities:
       - "grow_crops"
       - "tame_animals"
       - "run_command:give {player} EMERALD 5"
+  
   anubis:
     name: "Anubis"
     lore: "Guardian of the underworld, associated with mummification and the afterlife in ancient Egyptian religion."
     domain: "Afterlife"
     alignment: "Neutral"
+    # Deity-specific overrides
+    blessing-threshold: 150  # Default (balanced)
+    curse-threshold: 35      # Default (balanced)
+    miracle-threshold: 210   # Default (balanced)
+    blessing-chance: 0.4     # Default (balanced)
+    curse-chance: 0.1        # Default (balanced)
+    miracle-chance: 0.03     # Default (balanced)
+    favor-decay-rate: 5      # Default (balanced)
+    personality: "neutral"   # Personality trait
+    initial-favor: 50        # Default (balanced)
+    max-favor: 250           # Default (balanced)
     offerings:
       - "VANILLA:BONE:20"
       - "VANILLA:GOLDEN_SWORD:1"
